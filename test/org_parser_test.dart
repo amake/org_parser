@@ -2,11 +2,34 @@ import 'package:org_parser/org_parser.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('adds one to input values', () {
-    final calculator = Calculator();
-    expect(calculator.addOne(2), 3);
-    expect(calculator.addOne(-7), -6);
-    expect(calculator.addOne(0), 1);
-    expect(() => calculator.addOne(null), throwsNoSuchMethodError);
+  final grammar = OrgGrammar();
+  test('parse a header', () {
+    final result = grammar.parse('* Title');
+    expect(result.value, [
+      [
+        ['*', null, 'Title'],
+        null
+      ]
+    ]);
+  });
+  test('parse a todo header', () {
+    final result = grammar.parse('* TODO Title');
+    expect(result.value, [
+      [
+        ['*', 'TODO', 'Title'],
+        null
+      ]
+    ]);
+  });
+  test('parse a section', () {
+    final result = grammar.parse('''* Title
+  Content1
+  Content2''');
+    expect(result.value, [
+      [
+        ['*', null, 'Title'],
+        '  Content1\n  Content2'
+      ]
+    ]);
   });
 }
