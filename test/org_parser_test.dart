@@ -1,8 +1,10 @@
 import 'package:org_parser/org_parser.dart';
+import 'package:org_parser/src/parser.dart';
 import 'package:test/test.dart';
 
 void main() {
   final grammar = OrgGrammar();
+  final parser = OrgParser();
   test('parse a header', () {
     final result = grammar.parse('* Title');
     expect(result.value, [
@@ -80,5 +82,27 @@ void main() {
     ]) {
       expect(grammar.parse(valid).isSuccess, true);
     }
+  });
+  test('example document', () {
+    final doc = '''An introduction.
+
+* A Headline
+
+  Some text.
+
+** Sub-Topic 1
+
+** Sub-Topic 2
+
+*** Additional entry''';
+    expect(grammar.parse(doc).isSuccess, true);
+    final parsed = parser.parse(doc);
+    expect(parsed.isSuccess, true);
+    final List values = parsed.value;
+    expect(values[0], 'An introduction.');
+    final List sections = values[1];
+    final topSection = sections[0];
+    expect(topSection.headline.title, 'A Headline');
+    expect(topSection.children.length, 2);
   });
 }
