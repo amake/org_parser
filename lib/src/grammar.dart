@@ -2,26 +2,38 @@ library org_parser;
 
 import 'package:petitparser/petitparser.dart';
 
+// See https://orgmode.org/worg/dev/org-syntax.html
+
 class OrgGrammar extends GrammarParser {
   OrgGrammar() : super(OrgGrammarDefinition());
 }
 
 class OrgGrammarDefinition extends GrammarDefinition {
   @override
-  Parser start() => ref(section).star().end();
+  Parser start() => ref(document).end();
 
-  Parser section() => ref(header) & ref(content).optional();
+  Parser document() => ref(content).optional() & ref(section).star();
 
-  Parser header() =>
-      ref(headerDecoration).trim() &
-      ref(todo).trim().optional() &
-      ref(headerTitle).trim(Token.newlineParser());
+  Parser section() => ref(headline) & ref(content).optional();
 
-  Parser headerDecoration() => char('*').plus().flatten();
+  Parser headline() =>
+      ref(stars).trim() &
+      ref(keyword).trim().optional() &
+      ref(priority).trim().optional() &
+      ref(title).trim().optional() &
+      ref(tags).trim().optional();
 
-  Parser todo() => string('TODO') | string('DONE');
+  Parser stars() => char('*').plus().flatten();
 
-  Parser headerTitle() => Token.newlineParser().neg().star().flatten();
+  Parser keyword() => string('TODO') | string('DONE');
 
-  Parser content() => ref(header).neg().plus().flatten();
+  Parser priority() => string('[#') & ref(letter) & char(']');
+
+  Parser title() => Token.newlineParser().neg().star().flatten();
+
+  Parser tags() =>
+      char(':') &
+      (pattern('a-zA-Z0-9_@#%').plus().flatten() & char(':')).star();
+
+  Parser content() => ref(headline).neg().plus().flatten();
 }

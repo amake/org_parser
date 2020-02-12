@@ -7,7 +7,13 @@ void main() {
     final result = grammar.parse('* Title');
     expect(result.value, [
       [
-        ['*', null, 'Title'],
+        [
+          ['*'],
+          null,
+          null,
+          ['T', 'i', 't', 'l', 'e'],
+          null
+        ],
         null
       ]
     ]);
@@ -16,7 +22,13 @@ void main() {
     final result = grammar.parse('* TODO Title');
     expect(result.value, [
       [
-        ['*', 'TODO', 'Title'],
+        [
+          ['*'],
+          'TODO',
+          null,
+          ['T', 'i', 't', 'l', 'e'],
+          null
+        ],
         null
       ]
     ]);
@@ -27,9 +39,46 @@ void main() {
   Content2''');
     expect(result.value, [
       [
-        ['*', null, 'Title'],
-        '  Content1\n  Content2'
+        [
+          ['*'],
+          null,
+          null,
+          ['T', 'i', 't', 'l', 'e'],
+          null
+        ],
+        [
+          'C',
+          'o',
+          'n',
+          't',
+          'e',
+          'n',
+          't',
+          '1',
+          '\n'
+              '',
+          ' ',
+          ' ',
+          'C',
+          'o',
+          'n',
+          't',
+          'e',
+          'n',
+          't',
+          '2'
+        ]
       ]
     ]);
+  });
+  test('valid headers', () {
+    for (final valid in [
+      '* ',
+      '** DONE',
+      '*** Some e-mail',
+      '**** TODO [#A] COMMENT Title :tag:a2%:',
+    ]) {
+      expect(grammar.parse(valid).isSuccess, true);
+    }
   });
 }
