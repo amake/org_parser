@@ -8,30 +8,24 @@ void main() {
   test('parse a header', () {
     final result = grammar.parse('* Title');
     expect(result.value, [
+      null,
       [
         [
-          ['*'],
-          null,
-          null,
-          ['T', 'i', 't', 'l', 'e'],
+          ['*', null, null, 'Title', null],
           null
-        ],
-        null
+        ]
       ]
     ]);
   });
   test('parse a todo header', () {
     final result = grammar.parse('* TODO Title');
     expect(result.value, [
+      null,
       [
         [
-          ['*'],
-          'TODO',
-          null,
-          ['T', 'i', 't', 'l', 'e'],
+          ['*', 'TODO', null, 'Title', null],
           null
-        ],
-        null
+        ]
       ]
     ]);
   });
@@ -40,35 +34,12 @@ void main() {
   Content1
   Content2''');
     expect(result.value, [
+      null,
       [
         [
-          ['*'],
-          null,
-          null,
-          ['T', 'i', 't', 'l', 'e'],
-          null
-        ],
-        [
-          'C',
-          'o',
-          'n',
-          't',
-          'e',
-          'n',
-          't',
-          '1',
-          '\n'
-              '',
-          ' ',
-          ' ',
-          'C',
-          'o',
-          'n',
-          't',
-          'e',
-          'n',
-          't',
-          '2'
+          ['*', null, null, 'Title', null],
+          'Content1\n'
+              '  Content2'
         ]
       ]
     ]);
