@@ -5,6 +5,12 @@ import 'package:test/test.dart';
 void main() {
   final grammar = OrgGrammar();
   final parser = OrgParser();
+  test('parse content', () {
+    final result = grammar.parse('''foo
+bar
+''');
+    expect(result.value, ['foo\nbar\n', []]);
+  });
   test('parse a header', () {
     final result = grammar.parse('* Title');
     expect(result.value, [
@@ -59,7 +65,7 @@ void main() {
 
 * A Headline
 
-  Some text.
+  Some text. *bold*
 
 ** Sub-Topic 1
 
@@ -70,7 +76,7 @@ void main() {
     final parsed = parser.parse(doc);
     expect(parsed.isSuccess, true);
     final List values = parsed.value;
-    expect(values[0], 'An introduction.');
+    expect(values[0], 'An introduction.\n\n');
     final List sections = values[1];
     final topSection = sections[0];
     expect(topSection.headline.title, 'A Headline');

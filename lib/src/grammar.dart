@@ -29,11 +29,16 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser priority() => string('[#') & ref(letter) & char(']');
 
-  Parser title() => Token.newlineParser().neg().star().flatten();
+  Parser title() => ref(newline).neg().star().flatten();
 
   Parser tags() =>
       char(':') &
       (pattern('a-zA-Z0-9_@#%').plus().flatten() & char(':')).star();
 
-  Parser content() => ref(headline).neg().plus().flatten();
+  Parser content() => (char('*').not() & ref(line)).pick(1).plus().flatten();
+
+  Parser line() =>
+      (ref(newline).neg().plus() & ref(newline).optional()) | ref(newline);
+
+  Parser newline() => Token.newlineParser();
 }
