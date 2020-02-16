@@ -44,8 +44,7 @@ bar
       [
         [
           ['*', null, null, 'Title', null],
-          'Content1\n'
-              '  Content2'
+          '  Content1\n  Content2'
         ]
       ]
     ]);

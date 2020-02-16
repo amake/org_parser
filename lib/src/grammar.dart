@@ -18,10 +18,13 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser headline() =>
       ref(stars).trim() &
-      ref(keyword).trim().optional() &
-      ref(priority).trim().optional() &
-      ref(title).trim().optional() &
-      ref(tags).trim().optional();
+      _headlinePartTrim(ref(keyword)).optional() &
+      _headlinePartTrim(ref(priority)).optional() &
+      _headlinePartTrim(ref(title)).optional() &
+      _headlinePartTrim(ref(tags)).optional();
+
+  Parser _headlinePartTrim(Parser parser) =>
+      parser.trim(whitespace(), ref(trailingWhitespace));
 
   Parser stars() => char('*').plus().flatten();
 
@@ -41,4 +44,6 @@ class OrgGrammarDefinition extends GrammarDefinition {
       (ref(newline).neg().plus() & ref(newline).optional()) | ref(newline);
 
   Parser newline() => Token.newlineParser();
+
+  Parser trailingWhitespace() => anyIn(' \t').star() & ref(newline);
 }
