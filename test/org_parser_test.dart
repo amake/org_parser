@@ -75,10 +75,52 @@ bar
     final parsed = parser.parse(doc);
     expect(parsed.isSuccess, true);
     final List values = parsed.value;
-    expect(values[0], 'An introduction.\n\n');
+    final OrgContent firstContent = values[0];
+    final OrgPlainText text = firstContent.children[0];
+    expect(text.content, 'An introduction.\n\n');
     final List sections = values[1];
     final topSection = sections[0];
     expect(topSection.headline.title, 'A Headline');
     expect(topSection.children.length, 2);
+  });
+
+  group('content grammar', () {
+    final contentGrammar = OrgContentGrammar();
+    final contentParser = OrgContentParser();
+    test('content parsing', () {
+      final result = contentGrammar.parse('''foo bar
+biz baz''');
+      expect(result.value, ['foo bar\nbiz baz']);
+    });
+    test('link grammar', () {
+      final result =
+          contentGrammar.parse('''[[http://example.com][example]]''');
+      expect(result.value, [
+        [
+          '[',
+          ['[', 'http://example.com', ']'],
+          ['[', 'example', ']'],
+          ']'
+        ]
+      ]);
+    });
+    test('complex content', () {
+      final result = contentGrammar
+          .parse('''go to [[http://example.com][example]] for *fun*,
+maybe''');
+      expect(result.value, [
+        'go to ',
+        [
+          '[',
+          ['[', 'http://example.com', ']'],
+          ['[', 'example', ']'],
+          ']'
+        ],
+        ' for ',
+        ['*', 'fun', '*'],
+        ',\n'
+            'maybe'
+      ]);
+    });
   });
 }

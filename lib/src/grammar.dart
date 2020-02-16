@@ -49,3 +49,54 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser trailingWhitespace() => anyIn(' \t').star() & ref(newline);
 }
+
+class OrgContentGrammar extends GrammarParser {
+  OrgContentGrammar() : super(OrgContentGrammarDefinition());
+}
+
+class OrgContentGrammarDefinition extends GrammarDefinition {
+  @override
+  Parser start() => ref(textRun).star().end();
+
+  Parser textRun() => ref(objects) | ref(plainText);
+
+  Parser objects() => ref(link) | ref(markups);
+
+  Parser plainText() => ref(objects).neg().plus().flatten();
+
+  Parser link() =>
+      char('[') & ref(linkPart) & ref(linkPart).optional() & char(']');
+
+  Parser linkPart() => char('[') & char(']').neg().plus().flatten() & char(']');
+
+  Parser markups() =>
+      ref(bold) |
+      ref(verbatim) |
+      ref(italic) |
+      ref(strikeThrough) |
+      ref(underline) |
+      ref(code);
+
+  Parser bold() => ref(markup, '*');
+
+  Parser verbatim() => ref(markup, '=');
+
+  Parser italic() => ref(markup, '/');
+
+  Parser strikeThrough() => ref(markup, '+');
+
+  Parser underline() => ref(markup, '_');
+
+  Parser code() => ref(markup, '~');
+
+  Parser markup(String marker) =>
+      char(marker) & ref(markupContents, marker).flatten() & char(marker);
+
+  Parser markupContents(String marker) =>
+      ref(markupBorder) & ref(markupBody, marker) & ref(markupBorder);
+
+  Parser markupBorder() => (whitespace() | anyIn(',\'"')).neg();
+
+  Parser markupBody(String marker) =>
+      (ref(markupBorder) & char(marker)).neg().star();
+}
