@@ -38,10 +38,12 @@ class OrgGrammarDefinition extends GrammarDefinition {
       char(':') &
       (pattern('a-zA-Z0-9_@#%').plus().flatten() & char(':')).star();
 
-  Parser content() => (char('*').not() & ref(line)).pick(1).plus().flatten();
+  Parser content() => ref(_content).flatten();
 
-  Parser line() =>
-      (ref(newline).neg().plus() & ref(newline).optional()) | ref(newline);
+  Parser _content() =>
+      char('*').not() &
+      (ref(newline) & (char('*'))).neg().plus() &
+      ref(newline).optional();
 
   Parser newline() => Token.newlineParser();
 
