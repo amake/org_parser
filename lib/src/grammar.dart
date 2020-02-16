@@ -64,7 +64,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
-  Parser link() =>
+  Parser link() => ref(regularLink) | ref(plainLink);
+
+  Parser plainLink() => ref(_plainLink).flatten();
+
+  Parser _plainLink() => ref(protocol) & char(':') & ref(path2);
+
+  Parser protocol() => string('http') & char('s').optional() | string('mailto');
+
+  Parser path2() => (whitespace() | anyIn('()<>')).neg().plus();
+
+  Parser regularLink() =>
       char('[') & ref(linkPart) & ref(linkPart).optional() & char(']');
 
   Parser linkPart() => char('[') & char(']').neg().plus().flatten() & char(']');

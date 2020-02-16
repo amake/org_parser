@@ -73,7 +73,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser plainText() => super.plainText().map((value) => OrgPlainText(value));
 
   @override
-  Parser link() => super.link().map((values) {
+  Parser plainLink() => super.plainLink().map((value) => OrgLink(value, null));
+
+  @override
+  Parser regularLink() => super.regularLink().map((values) {
         final location = values[1];
         final description = values.length > 3 ? values[2] : null;
         return OrgLink(location, description);
