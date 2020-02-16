@@ -30,7 +30,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser keyword() => string('TODO') | string('DONE');
 
-  Parser priority() => string('[#') & ref(letter) & char(']');
+  Parser priority() => string('[#') & letter() & char(']');
 
   Parser title() => ref(newline).neg().star().flatten();
 
