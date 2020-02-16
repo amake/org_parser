@@ -58,11 +58,11 @@ class OrgLink extends OrgContent {
   final String description;
 }
 
-class OrgMarkup extends OrgPlainText {
-  OrgMarkup(String content, this.style)
+class OrgMarkup extends OrgContent {
+  OrgMarkup(this.content, this.style)
       : assert(style != null),
-        super(content);
-
+        super(const []);
+  final String content;
   final OrgStyle style;
 }
 
