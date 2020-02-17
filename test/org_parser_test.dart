@@ -132,7 +132,21 @@ c/d''');
       expect(result.value, ['a /b\nc/d'], reason: 'bad post char');
       result = grammar.parse('''a/b
 c/ d''');
-      expect(result.value, ['a/b\nc/ d'], reason: 'bad post char');
+      expect(result.value, ['a/b\nc/ d'], reason: 'bad pre char');
+      result = grammar.parse('/a/');
+      expect(result.value, [
+        ['/', 'a', '/']
+      ]);
+      result = grammar.parse('/abc/');
+      expect(result.value, [
+        ['/', 'abc', '/']
+      ]);
+      result = grammar.parse('/a b/');
+      expect(result.value, [
+        ['/', 'a b', '/']
+      ]);
+      result = grammar.parse('//');
+      expect(result.value, ['//'], reason: 'body is required');
     });
   });
 }

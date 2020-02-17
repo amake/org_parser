@@ -1,11 +1,18 @@
 import 'package:petitparser/petitparser.dart';
 
-Parser<List<R>> drop<R>(Parser<R> parser, int index) {
+Parser<List<R>> drop<R>(Parser<R> parser, List<int> indexes) {
   return parser.castList<R>().map<List<R>>((list) {
-    if (index < 0) {
-      index = list.length + index;
+    var result = list;
+    for (int index in indexes.reversed) {
+      if (index < 0) {
+        index = list.length + index;
+      }
+      result = result
+          .sublist(0, index)
+          .followedBy(result.sublist(index + 1))
+          .toList();
     }
-    return list.sublist(0, index).followedBy(list.sublist(index + 1)).toList();
+    return result;
   });
 }
 
@@ -40,4 +47,34 @@ class LookBehindParser<T> extends DelegateParser<T> {
 
   @override
   LookBehindParser<T> copy() => LookBehindParser<T>(delegate);
+}
+
+Parser<void> startOfInput([String message = 'end of input expected']) =>
+    StartOfInputParser(message);
+
+class StartOfInputParser extends Parser<void> {
+  final String message;
+
+  StartOfInputParser(this.message)
+      : assert(message != null, 'message must not be null');
+
+  @override
+  Result parseOn(Context context) {
+    return context.position > 0
+        ? context.failure(message)
+        : context.success(null);
+  }
+
+  @override
+  int fastParseOn(String buffer, int position) => position > 0 ? -1 : position;
+
+  @override
+  String toString() => '${super.toString()}[$message]';
+
+  @override
+  StartOfInputParser copy() => StartOfInputParser(message);
+
+  @override
+  bool hasEqualProperties(StartOfInputParser other) =>
+      super.hasEqualProperties(other) && message == other.message;
 }

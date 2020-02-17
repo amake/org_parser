@@ -100,17 +100,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser code() => ref(markup, '~');
 
-  Parser markup(String marker) => drop(ref(_markup, marker), -1);
+  Parser markup(String marker) => drop(ref(_markup, marker), [0, -1]);
 
   Parser _markup(String marker) =>
-      was(ref(preMarkup)) &
+      (startOfInput() | was(ref(preMarkup))) &
       char(marker) &
       ref(markupContents, marker).flatten() &
       char(marker) &
-      ref(postMarkup).and();
+      (ref(postMarkup).and() | endOfInput());
 
   Parser markupContents(String marker) =>
-      ref(markupBorder) & ref(markupBody, marker) & ref(markupBorder);
+      ref(markupBorder).and() & ref(markupBody, marker) & ref(markupBorder);
 
   Parser markupBorder() => (whitespace() | anyIn(',\'"')).neg();
 
