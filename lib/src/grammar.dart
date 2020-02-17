@@ -1,5 +1,6 @@
 library org_parser;
 
+import 'package:org_parser/src/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 // See https://orgmode.org/worg/dev/org-syntax.html
@@ -99,8 +100,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser code() => ref(markup, '~');
 
-  Parser markup(String marker) =>
-      char(marker) & ref(markupContents, marker).flatten() & char(marker);
+  Parser markup(String marker) => drop(ref(_markup, marker), -1);
+
+  Parser _markup(String marker) =>
+      was(ref(preMarkup)) &
+      char(marker) &
+      ref(markupContents, marker).flatten() &
+      char(marker) &
+      ref(postMarkup).and();
 
   Parser markupContents(String marker) =>
       ref(markupBorder) & ref(markupBody, marker) & ref(markupBorder);
@@ -109,4 +116,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser markupBody(String marker) =>
       (ref(markupBorder) & char(marker)).neg().star();
+
+  Parser preMarkup() => whitespace() | anyIn('({\'"');
+
+  Parser postMarkup() => whitespace() | anyIn('-.,:!?\')}"');
 }

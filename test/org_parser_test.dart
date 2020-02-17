@@ -123,5 +123,16 @@ maybe''');
             'maybe'
       ]);
     });
+    test('markup', () {
+      var result = grammar.parse('''a/b
+c/d''');
+      expect(result.value, ['a/b\nc/d'], reason: 'bad pre/post chars');
+      result = grammar.parse('''a /b
+c/d''');
+      expect(result.value, ['a /b\nc/d'], reason: 'bad post char');
+      result = grammar.parse('''a/b
+c/ d''');
+      expect(result.value, ['a/b\nc/ d'], reason: 'bad post char');
+    });
   });
 }
