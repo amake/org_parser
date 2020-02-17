@@ -106,4 +106,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   Parser mapMarkup(Parser parser, OrgStyle style) =>
       parser.flatten().map((value) => OrgMarkup(value, style));
+
+  @override
+  Parser meta() => super.meta().map((value) => OrgMeta(value));
 }

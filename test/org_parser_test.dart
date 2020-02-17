@@ -148,5 +148,17 @@ c/ d''');
       result = grammar.parse('//');
       expect(result.value, ['//'], reason: 'body is required');
     });
+    test('meta', () {
+      var result = grammar.parse('''#+blah
+foo''');
+      expect(result.value, ['#+blah', '\nfoo']);
+      result = grammar.parse('''   #+blah
+foo''');
+      expect(result.value, ['   #+blah', '\nfoo']);
+      result = grammar.parse('''a   #+blah
+foo''');
+      expect(result.value, ['a   #+blah\nfoo'],
+          reason: 'only leading space is allowed');
+    });
   });
 }

@@ -74,3 +74,8 @@ enum OrgStyle {
   underline,
   code,
 }
+
+class OrgMeta extends OrgContent {
+  OrgMeta(this.content) : super(const []);
+  final String content;
+}

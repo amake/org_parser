@@ -61,7 +61,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser textRun() => ref(objects) | ref(plainText);
 
-  Parser objects() => ref(link) | ref(markups);
+  Parser objects() => ref(link) | ref(markups) | ref(meta);
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
@@ -120,4 +120,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser preMarkup() => whitespace() | anyIn('({\'"');
 
   Parser postMarkup() => whitespace() | anyIn('-.,:!?\')}"');
+
+  Parser meta() => ref(_meta).flatten();
+
+  Parser _meta() =>
+      lineStart() &
+      whitespace().star() &
+      string('#+') &
+      Token.newlineParser().neg().plus();
 }
