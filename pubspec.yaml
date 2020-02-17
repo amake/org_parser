@@ -1,8 +1,8 @@
 name: org_parser
-description: A new Flutter package project.
+description: An Org-mode parser for Dart
 version: 0.0.1
-author:
-homepage:
+author: Aaron Madlon-Kay <aaron@madlon-kay.com>
+homepage: https://github.com/amake/org_parser
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
