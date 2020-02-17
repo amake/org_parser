@@ -61,7 +61,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser textRun() => ref(objects) | ref(plainText);
 
-  Parser objects() => ref(link) | ref(markups) | ref(meta);
+  Parser objects() => ref(link) | ref(markups) | ref(meta) | ref(codeLine);
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
@@ -128,4 +128,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       whitespace().star() &
       string('#+') &
       Token.newlineParser().neg().plus();
+
+  Parser codeLine() => ref(_codeLine).flatten();
+
+  Parser _codeLine() =>
+      lineStart() &
+      whitespace().star() &
+      char(':') &
+      Token.newlineParser().neg().star();
 }
