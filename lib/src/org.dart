@@ -9,7 +9,7 @@ class OrgHeadline {
   final String stars;
   final String keyword;
   final String priority;
-  final String title;
+  final OrgContent title;
   final List<String> tags;
 
   int get level => stars.length;
