@@ -76,9 +76,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser path2() => (whitespace() | anyIn('()<>')).neg().plus();
 
   Parser regularLink() =>
-      char('[') & ref(linkPart) & ref(linkPart).optional() & char(']');
+      char('[') & ref(linkPart) & ref(linkDescription).optional() & char(']');
 
-  Parser linkPart() => char('[') & char(']').neg().plus().flatten() & char(']');
+  Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
+
+  Parser linkPartBody() =>
+      ref(linkPathPart).flatten() &
+      (string('::') & ref(linkSearchPart).flatten()).optional();
+
+  Parser linkPathPart() => char(']').neg().plusLazy(string('::') | char(']'));
+
+  Parser linkSearchPart() =>
+      char('"') & char('"').neg().plus() & char('"') | char(']').neg().plus();
+
+  Parser linkDescription() =>
+      char('[') & char(']').neg().plus().flatten() & char(']');
 
   Parser markups() =>
       ref(bold) |

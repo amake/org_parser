@@ -160,5 +160,54 @@ foo''');
       expect(result.value, ['a   #+blah\nfoo'],
           reason: 'only leading space is allowed');
     });
+    test('links', () {
+      var result = grammar.parse('a http://example.com b');
+      expect(result.value, ['a ', 'http://example.com', ' b']);
+      result = grammar.parse('a https://example.com b');
+      expect(result.value, ['a ', 'https://example.com', ' b']);
+      result = grammar.parse('a [[foo][bar]] b');
+      expect(result.value, [
+        'a ',
+        [
+          '[',
+          [
+            '[',
+            ['foo', null],
+            ']'
+          ],
+          ['[', 'bar', ']'],
+          ']'
+        ],
+        ' b'
+      ]);
+      result = grammar.parse('a [[foo::1][bar]] b');
+      expect(result.value, [
+        'a ',
+        [
+          '[',
+          [
+            '[',
+            [
+              'foo',
+              ['::', '1']
+            ],
+            ']'
+          ],
+          ['[', 'bar', ']'],
+          ']'
+        ],
+        ' b'
+      ]);
+      result = parser.parse('[[foo::1][bar]]');
+      OrgContent content = result.value;
+      OrgLink link = content.children[0];
+      expect(link.description, 'bar');
+      expect(link.location, 'foo::1');
+      result = parser.parse('[[foo::"[1]"][bar]]');
+      content = result.value;
+      link = content.children[0];
+      expect(link.description, 'bar');
+      expect(link.location, 'foo::"[1]"');
+    });
   });
 }

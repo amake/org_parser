@@ -86,6 +86,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser linkPart() => super.linkPart().pick(1);
 
   @override
+  Parser linkPartBody() => super.linkPartBody().flatten();
+
+  @override
+  Parser linkDescription() => super.linkDescription().pick(1);
+
+  @override
   Parser bold() => mapMarkup(super.bold(), OrgStyle.bold);
 
   @override
