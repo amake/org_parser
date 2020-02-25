@@ -79,3 +79,10 @@ class OrgMeta extends OrgContent {
   OrgMeta(this.content) : super(const []);
   final String content;
 }
+
+class OrgBlock extends OrgContent {
+  OrgBlock(this.header, this.body, this.footer) : super(const []);
+  final String header;
+  final String body;
+  final String footer;
+}

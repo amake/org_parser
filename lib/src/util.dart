@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 
-Parser lineStart() => (startOfInput() | was(Token.newlineParser()));
+Parser lineStart() => startOfInput() | was(Token.newlineParser());
 
-Parser lineEnd() => (Token.newlineParser().and() | endOfInput());
+Parser lineEnd() => Token.newlineParser() | endOfInput();
 
 Parser<List<R>> drop<R>(Parser<R> parser, List<int> indexes) {
   return parser.castList<R>().map<List<R>>((list) {

@@ -61,7 +61,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser textRun() => ref(objects) | ref(plainText);
 
-  Parser objects() => ref(link) | ref(markups) | ref(meta) | ref(codeLine);
+  Parser objects() =>
+      ref(link) | ref(markups) | ref(block) | ref(meta) | ref(codeLine);
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
@@ -148,4 +149,30 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       whitespace().star() &
       char(':') &
       Token.newlineParser().neg().star();
+
+  Parser block() =>
+      ref(namedBlock, 'comment') |
+      ref(namedBlock, 'example') |
+      ref(namedBlock, 'export') |
+      ref(namedBlock, 'src') |
+      ref(namedBlock, 'verse');
+
+  Parser namedBlock(String name) =>
+      ref(namedBlockStart, name) &
+      ref(namedBlockEnd, name).neg().star().flatten() &
+      ref(namedBlockEnd, name);
+
+  Parser namedBlockStart(String name) =>
+      ref(indent).flatten() &
+      stringIgnoreCase('#+begin_$name') &
+      (ref(lineTrailing) & lineEnd()).flatten();
+
+  Parser namedBlockEnd(String name) =>
+      ref(indent).flatten() &
+      stringIgnoreCase('#+end_$name') &
+      ref(lineTrailing).flatten();
+
+  Parser indent() => lineStart() & whitespace().star();
+
+  Parser lineTrailing() => any().starLazy(lineEnd());
 }

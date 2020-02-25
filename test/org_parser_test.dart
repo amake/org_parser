@@ -217,5 +217,40 @@ foo''');
       expect(link.description, 'bar');
       expect(link.location, 'foo::"[1]"');
     });
+    test('blocks', () {
+      var result = grammar.parse('''#+begin_src sh
+  echo 'foo'
+  rm bar
+#+end_src''');
+      expect(result.value, [
+        [
+          ['', '#+begin_src', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+end_src', '']
+        ]
+      ]);
+      result = grammar.parse('''#+BEGIN_SRC sh
+  echo 'foo'
+  rm bar
+#+EnD_sRC
+''');
+      expect(result.value, [
+        [
+          ['', '#+BEGIN_SRC', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+EnD_sRC', ''],
+        ],
+        '\n'
+      ]);
+      result = parser.parse('''#+begin_src sh
+  echo 'foo'
+  rm bar
+#+end_src
+''');
+      OrgBlock block = result.value.children[0];
+      expect(block.header, '#+begin_src sh\n');
+      expect(block.body, '  echo \'foo\'\n  rm bar\n');
+      expect(block.footer, '#+end_src');
+    });
   });
 }
