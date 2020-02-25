@@ -81,7 +81,7 @@ bar
       expect(text.content, 'An introduction.\n\n');
       final List sections = values[1];
       final topSection = sections[0];
-      expect(topSection.headline.title, 'A Headline');
+      expect(topSection.headline.title.children[0].content, 'A Headline');
       expect(topSection.children.length, 2);
     });
   });
@@ -99,7 +99,11 @@ biz baz''');
       expect(result.value, [
         [
           '[',
-          ['[', 'http://example.com', ']'],
+          [
+            '[',
+            ['http://example.com', null],
+            ']'
+          ],
           ['[', 'example', ']'],
           ']'
         ]
@@ -113,7 +117,11 @@ maybe''');
         'go to ',
         [
           '[',
-          ['[', 'http://example.com', ']'],
+          [
+            '[',
+            ['http://example.com', null],
+            ']'
+          ],
           ['[', 'example', ']'],
           ']'
         ],
