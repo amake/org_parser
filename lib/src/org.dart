@@ -27,6 +27,8 @@ class OrgSection {
 
   int get level => headline.level;
 
+  bool get isEmpty => content == null && children.isEmpty;
+
   OrgSection copyWith(
           {OrgHeadline headline,
           String content,
