@@ -120,11 +120,23 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser codeLine() => mapMarkup(super.codeLine(), OrgStyle.code);
 
   @override
-  Parser block() => super.block().map((parts) {
+  Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
         final String header = parts[0];
         final String body = parts[1];
         final String footer = parts[2];
-        return OrgBlock(header, OrgPlainText(body), footer);
+        OrgContentElement bodyContent;
+        switch (name) {
+          case 'example':
+          case 'export':
+            bodyContent = OrgMarkup(body, OrgStyle.verbatim);
+            break;
+          case 'src':
+            bodyContent = OrgMarkup(body, OrgStyle.code);
+            break;
+          default:
+            bodyContent = OrgPlainText(body);
+        }
+        return OrgBlock(header, bodyContent, footer);
       });
 
   @override

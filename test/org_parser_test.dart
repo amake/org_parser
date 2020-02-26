@@ -248,8 +248,9 @@ foo''');
 #+end_src
 ''');
       OrgBlock block = result.value.children[0];
+      OrgMarkup body = block.body;
       expect(block.header, '#+begin_src sh');
-      expect(block.body, '  echo \'foo\'\n  rm bar');
+      expect(body.content, '  echo \'foo\'\n  rm bar');
       expect(block.footer, '#+end_src');
     });
   });
