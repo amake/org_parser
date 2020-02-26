@@ -66,7 +66,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser start() => super.start().map((values) {
         final elems = values as List;
-        return OrgContent(elems.cast<OrgContent>());
+        return OrgContent(elems.cast<OrgContentElement>());
       });
 
   @override
@@ -124,7 +124,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final String header = parts[0];
         final String body = parts[1];
         final String footer = parts[2];
-        return OrgBlock(header, body, footer);
+        return OrgBlock(header, OrgPlainText(body), footer);
       });
 
   @override

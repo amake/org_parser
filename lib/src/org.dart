@@ -37,33 +37,29 @@ class OrgSection {
           children ?? this.children);
 }
 
-class OrgContent {
-  OrgContent(Iterable<OrgContent> children)
+class OrgContentElement {}
+
+class OrgContent extends OrgContentElement {
+  OrgContent(Iterable<OrgContentElement> children)
       : children = List.unmodifiable(children),
         assert(children != null);
 
-  final List<OrgContent> children;
+  final List<OrgContentElement> children;
 }
 
-class OrgPlainText extends OrgContent {
-  OrgPlainText(this.content)
-      : assert(content != null),
-        super(const []);
+class OrgPlainText extends OrgContentElement {
+  OrgPlainText(this.content) : assert(content != null);
   final String content;
 }
 
-class OrgLink extends OrgContent {
-  OrgLink(this.location, this.description)
-      : assert(location != null),
-        super(const []);
+class OrgLink extends OrgContentElement {
+  OrgLink(this.location, this.description) : assert(location != null);
   final String location;
   final String description;
 }
 
-class OrgMarkup extends OrgContent {
-  OrgMarkup(this.content, this.style)
-      : assert(style != null),
-        super(const []);
+class OrgMarkup extends OrgContentElement {
+  OrgMarkup(this.content, this.style) : assert(style != null);
   final String content;
   final OrgStyle style;
 }
@@ -77,14 +73,17 @@ enum OrgStyle {
   code,
 }
 
-class OrgMeta extends OrgContent {
-  OrgMeta(this.content) : super(const []);
+class OrgMeta extends OrgContentElement {
+  OrgMeta(this.content) : assert(content != null);
   final String content;
 }
 
-class OrgBlock extends OrgContent {
-  OrgBlock(this.header, this.body, this.footer) : super(const []);
+class OrgBlock extends OrgContentElement {
+  OrgBlock(this.header, this.body, this.footer)
+      : assert(header != null),
+        assert(body != null),
+        assert(footer != null);
   final String header;
-  final String body;
+  final OrgContentElement body;
   final String footer;
 }
