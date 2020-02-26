@@ -128,8 +128,16 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedBlockStart(String name) => super.namedBlockStart(name).flatten();
+  Parser namedBlockStart(String name) =>
+      super.namedBlockStart(name).flatten().map(_trimLastBlankLine);
+
+  String _trimLastBlankLine(String str) =>
+      str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
 
   @override
-  Parser namedBlockEnd(String name) => super.namedBlockEnd(name).flatten();
+  Parser namedBlockEnd(String name) =>
+      super.namedBlockEnd(name).flatten().map(_trimFirstBlankLine);
+
+  String _trimFirstBlankLine(String str) =>
+      str.startsWith('\n') ? str.substring(1, str.length) : str;
 }

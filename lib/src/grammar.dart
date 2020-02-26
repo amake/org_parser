@@ -159,16 +159,19 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlock(String name) =>
       ref(namedBlockStart, name) &
-      ref(namedBlockEnd, name).neg().star().flatten() &
+      ref(namedBlockContent, name) &
       ref(namedBlockEnd, name);
 
   Parser namedBlockStart(String name) =>
       ref(indent).flatten() &
       stringIgnoreCase('#+begin_$name') &
-      (ref(lineTrailing) & lineEnd()).flatten();
+      (ref(lineTrailing) & Token.newlineParser()).flatten();
+
+  Parser namedBlockContent(String name) =>
+      ref(namedBlockEnd, name).neg().star().flatten();
 
   Parser namedBlockEnd(String name) =>
-      ref(indent).flatten() &
+      (Token.newlineParser() & ref(indent)).flatten() &
       stringIgnoreCase('#+end_$name') &
       ref(lineTrailing).flatten();
 

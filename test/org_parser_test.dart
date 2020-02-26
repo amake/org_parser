@@ -225,8 +225,8 @@ foo''');
       expect(result.value, [
         [
           ['', '#+begin_src', ' sh\n'],
-          '  echo \'foo\'\n  rm bar\n',
-          ['', '#+end_src', '']
+          '  echo \'foo\'\n  rm bar',
+          ['\n', '#+end_src', '']
         ]
       ]);
       result = grammar.parse('''#+BEGIN_SRC sh
@@ -237,8 +237,8 @@ foo''');
       expect(result.value, [
         [
           ['', '#+BEGIN_SRC', ' sh\n'],
-          '  echo \'foo\'\n  rm bar\n',
-          ['', '#+EnD_sRC', ''],
+          '  echo \'foo\'\n  rm bar',
+          ['\n', '#+EnD_sRC', ''],
         ],
         '\n'
       ]);
@@ -248,8 +248,8 @@ foo''');
 #+end_src
 ''');
       OrgBlock block = result.value.children[0];
-      expect(block.header, '#+begin_src sh\n');
-      expect(block.body, '  echo \'foo\'\n  rm bar\n');
+      expect(block.header, '#+begin_src sh');
+      expect(block.body, '  echo \'foo\'\n  rm bar');
       expect(block.footer, '#+end_src');
     });
   });
