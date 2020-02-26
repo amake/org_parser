@@ -62,7 +62,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser textRun() => ref(objects) | ref(plainText);
 
   Parser objects() =>
-      ref(link) | ref(markups) | ref(block) | ref(meta) | ref(codeLine);
+      ref(link) |
+      ref(markups) |
+      ref(block) |
+      ref(greaterBlock) |
+      ref(meta) |
+      ref(codeLine);
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
@@ -174,6 +179,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (Token.newlineParser() & ref(indent)).flatten() &
       stringIgnoreCase('#+end_$name') &
       ref(lineTrailing).flatten();
+
+  Parser greaterBlock() =>
+      ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
+
+  Parser namedGreaterBlock(String name) =>
+      ref(namedBlockStart, name) &
+      namedGreaterBlockContent(name) &
+      ref(namedBlockEnd, name);
+
+  Parser namedGreaterBlockContent(String name) => namedBlockContent(name);
 
   Parser indent() => lineStart() & whitespace().star();
 

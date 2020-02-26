@@ -253,5 +253,40 @@ foo''');
       expect(body.content, '  echo \'foo\'\n  rm bar');
       expect(block.footer, '#+end_src');
     });
+    test('greater blocks', () {
+      var result = grammar.parse('''#+begin_quote
+  foo *bar*
+#+end_quote''');
+      expect(result.value, [
+        [
+          ['', '#+begin_quote', '\n'],
+          '  foo *bar*',
+          ['\n', '#+end_quote', '']
+        ]
+      ]);
+      result = grammar.parse('''#+BEGIN_QUOTE
+  foo /bar/
+#+EnD_qUOtE
+''');
+      expect(result.value, [
+        [
+          ['', '#+BEGIN_QUOTE', '\n'],
+          '  foo /bar/',
+          ['\n', '#+EnD_qUOtE', '']
+        ],
+        '\n'
+      ]);
+      result = parser.parse('''#+begin_center
+  foo ~bar~
+  bizbaz
+#+end_center
+''');
+      OrgBlock block = result.value.children[0];
+      expect(block.header, '#+begin_center');
+      OrgContent body = block.body;
+      OrgPlainText child = body.children[0];
+      expect(child.content, '  foo ');
+      expect(block.footer, '#+end_center');
+    });
   });
 }

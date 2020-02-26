@@ -152,4 +152,17 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   String _trimFirstBlankLine(String str) =>
       str.startsWith('\n') ? str.substring(1, str.length) : str;
+
+  @override
+  Parser greaterBlock() => super.greaterBlock().map((parts) {
+        final String header = parts[0];
+        final OrgContent body = parts[1];
+        final String footer = parts[2];
+        return OrgBlock(header, body, footer);
+      });
+
+  @override
+  Parser namedGreaterBlockContent(String name) => super
+      .namedGreaterBlockContent(name)
+      .map((value) => OrgContentParser().parse(value).value);
 }
