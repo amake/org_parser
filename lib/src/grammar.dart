@@ -17,15 +17,16 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser section() => ref(headline) & ref(content).optional();
 
-  Parser headline() =>
-      ref(stars).trim() &
-      _headlinePartTrim(ref(keyword)).optional() &
-      _headlinePartTrim(ref(priority)).optional() &
-      _headlinePartTrim(ref(title)).optional() &
-      _headlinePartTrim(ref(tags)).optional();
+  Parser headline() => drop(ref(_headline), [0, -1]);
 
-  Parser _headlinePartTrim(Parser parser) =>
-      parser.trim(whitespace(), ref(trailingWhitespace));
+  Parser _headline() =>
+      lineStart() &
+      ref(stars).trim() &
+      ref(keyword).trim().optional() &
+      ref(priority).trim().optional() &
+      ref(title).optional() &
+      ref(tags).optional() &
+      lineEnd();
 
   Parser stars() => char('*').plus().flatten();
 
@@ -33,11 +34,14 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser priority() => string('[#') & letter() & char(']');
 
-  Parser title() => ref(newline).neg().star().flatten();
+  Parser title() => (ref(tags) | ref(newline)).neg().star().flatten();
 
   Parser tags() =>
       char(':') &
-      (pattern('a-zA-Z0-9_@#%').plus().flatten() & char(':')).star();
+      ref(tag).separatedBy(char(':'), includeSeparators: false) &
+      char(':');
+
+  Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten();
 
   Parser content() => ref(_content).flatten();
 
@@ -47,8 +51,6 @@ class OrgGrammarDefinition extends GrammarDefinition {
       ref(newline).optional();
 
   Parser newline() => Token.newlineParser();
-
-  Parser trailingWhitespace() => anyIn(' \t').star() & ref(newline);
 }
 
 class OrgContentGrammar extends GrammarParser {

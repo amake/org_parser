@@ -36,6 +36,33 @@ bar
         ]
       ]);
     });
+    test('parse a complex header', () {
+      var result = grammar.parse('** TODO [#A] Title foo bar :biz:baz:');
+      expect(result.value, [
+        null,
+        [
+          [
+            [
+              '**',
+              'TODO',
+              ['[#', 'A', ']'],
+              'Title foo bar ',
+              [
+                ':',
+                ['biz', 'baz'],
+                ':'
+              ]
+            ],
+            null
+          ]
+        ]
+      ]);
+      result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
+      List values = result.value;
+      List<OrgSection> sections = values[1];
+      OrgPlainText title = sections[0].headline.title.children[0];
+      expect(title.content, 'Title foo bar ');
+    });
     test('parse a section', () {
       final result = grammar.parse('''* Title
   Content1

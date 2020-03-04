@@ -49,9 +49,16 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final String keyword = items[1];
         final String priority = items[2];
         final OrgContent title = OrgContentParser().parse(items[3]).value;
-        final List<String> tags = items[4];
-        return OrgHeadline(stars, keyword, priority, title, tags);
+        final List tags = items[4];
+        return OrgHeadline(
+            stars, keyword, priority, title, tags?.cast<String>());
       });
+
+  @override
+  Parser priority() => super.priority().pick(1);
+
+  @override
+  Parser tags() => super.tags().pick(1);
 
   @override
   Parser content() =>
