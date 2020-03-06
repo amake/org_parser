@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:org_parser/org_parser.dart';
 import 'package:org_parser/src/parser.dart';
 import 'package:test/test.dart';
@@ -315,5 +317,10 @@ foo''');
       expect(child.content, '  foo ');
       expect(block.footer, '#+end_center');
     });
+  });
+  test('complex document', () {
+    final result =
+        OrgParser().parse(File('test/org-syntax.org').readAsStringSync());
+    expect(result.isSuccess, true);
   });
 }
