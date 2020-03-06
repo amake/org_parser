@@ -60,9 +60,9 @@ bar
         ]
       ]);
       result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
-      List values = result.value;
-      List<OrgSection> sections = values[1];
-      OrgPlainText title = sections[0].headline.title.children[0];
+      final List values = result.value;
+      final List<OrgSection> sections = values[1];
+      final OrgPlainText title = sections[0].headline.title.children[0];
       expect(title.content, 'Title foo bar ');
     });
     test('parse a section', () {
@@ -90,7 +90,7 @@ bar
       }
     });
     test('example document', () {
-      final doc = '''An introduction.
+      const doc = '''An introduction.
 
 * A Headline
 
@@ -156,8 +156,7 @@ maybe''');
         ],
         ' for ',
         ['*', 'fun', '*'],
-        ',\n'
-            'maybe'
+        ',\nmaybe'
       ]);
     });
     test('markup', () {
@@ -276,8 +275,8 @@ foo''');
   rm bar
 #+end_src
 ''');
-      OrgBlock block = result.value.children[0];
-      OrgMarkup body = block.body;
+      final OrgBlock block = result.value.children[0];
+      final OrgMarkup body = block.body;
       expect(block.header, '#+begin_src sh');
       expect(body.content, '  echo \'foo\'\n  rm bar');
       expect(block.footer, '#+end_src');
@@ -310,10 +309,10 @@ foo''');
   bizbaz
 #+end_center
 ''');
-      OrgBlock block = result.value.children[0];
+      final OrgBlock block = result.value.children[0];
       expect(block.header, '#+begin_center');
-      OrgContent body = block.body;
-      OrgPlainText child = body.children[0];
+      final OrgContent body = block.body;
+      final OrgPlainText child = body.children[0];
       expect(child.content, '  foo ');
       expect(block.footer, '#+end_center');
     });

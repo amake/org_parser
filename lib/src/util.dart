@@ -7,7 +7,7 @@ Parser lineEnd() => Token.newlineParser() | endOfInput();
 Parser<List<R>> drop<R>(Parser<R> parser, List<int> indexes) {
   return parser.castList<R>().map<List<R>>((list) {
     var result = list;
-    for (int index in indexes.reversed) {
+    for (var index in indexes.reversed) {
       if (index < 0) {
         index = list.length + index;
       }

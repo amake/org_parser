@@ -11,8 +11,8 @@ class OrgDocument {
   factory OrgDocument(String text) {
     final parser = OrgParser();
     final result = parser.parse(text);
-    final topContent = result.value[0] as OrgContent;
-    final sections = result.value[1] as List;
+    final OrgContent topContent = result.value[0];
+    final List sections = result.value[1];
     return OrgDocument._(topContent, List.unmodifiable(sections));
   }
 

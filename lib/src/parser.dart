@@ -20,7 +20,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
     }
     final result = <OrgSection>[];
     for (var i = 0; i < sections.length; i++) {
-      final OrgSection parent = sections[i];
+      final parent = sections[i];
       final children = sections
           .sublist(i + 1)
           .takeWhile((item) => item is OrgSection && item.level > parent.level)
@@ -72,7 +72,7 @@ class OrgContentParser extends GrammarParser {
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser start() => super.start().map((values) {
-        final elems = values as List;
+        final List elems = values;
         return OrgContent(elems.cast<OrgContentElement>());
       });
 
