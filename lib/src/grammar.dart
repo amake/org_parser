@@ -69,7 +69,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(block) |
       ref(greaterBlock) |
       ref(meta) |
-      ref(codeLine);
+      ref(codeLine) |
+      ref(table);
 
   Parser plainText() => ref(objects).neg().plus().flatten();
 
@@ -195,4 +196,37 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser indent() => lineStart() & whitespace().star();
 
   Parser lineTrailing() => any().starLazy(lineEnd());
+
+  Parser table() => ref(tableLine).plus();
+
+  Parser tableLine() => ref(tableRow) | ref(tableDotElDivider);
+
+  Parser tableRow() => ref(tableRowRule) | ref(tableRowStandard);
+
+  Parser tableRowStandard() =>
+      ref(indent).flatten() &
+      char('|') &
+      ref(tableCell).star() &
+      (ref(lineTrailing) & lineEnd()).flatten();
+
+  Parser tableCell() =>
+      ref(tableCellLeading).flatten() &
+      ref(tableCellContents).flatten() &
+      ref(tableCellTrailing).flatten();
+
+  Parser tableCellLeading() => char(' ').star();
+
+  Parser tableCellTrailing() => char(' ').star() & char('|');
+
+  Parser tableCellContents() =>
+      anyOf('|\n').neg().starLazy(ref(tableCellTrailing));
+
+  Parser tableRowRule() =>
+      ref(indent).flatten() &
+      (string('|-') & ref(lineTrailing) & lineEnd()).flatten();
+
+  Parser tableDotElDivider() =>
+      ref(indent).flatten() &
+      (string('+-') & anyOf('+-').star()).flatten() &
+      (ref(lineTrailing) & lineEnd()).flatten();
 }

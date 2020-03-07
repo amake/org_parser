@@ -172,4 +172,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser namedGreaterBlockContent(String name) => super
       .namedGreaterBlockContent(name)
       .map((value) => OrgContentParser().parse(value).value);
+
+  @override
+  Parser table() => super.table().map((items) {
+        final List rows = items;
+        return OrgTable(rows.cast<String>());
+      });
+
+  @override
+  Parser tableRow() => super.tableRow().flatten().map(_trimLastBlankLine);
 }

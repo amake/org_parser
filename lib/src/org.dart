@@ -87,3 +87,10 @@ class OrgBlock extends OrgContentElement {
   final OrgContentElement body;
   final String footer;
 }
+
+class OrgTable extends OrgContentElement {
+  OrgTable(Iterable<String> rows) : rows = List.unmodifiable(rows ?? const []);
+
+  // TODO(aaron): Expose cells
+  final List<String> rows;
+}

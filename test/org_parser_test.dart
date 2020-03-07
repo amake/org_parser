@@ -316,6 +316,45 @@ foo''');
       expect(child.content, '  foo ');
       expect(block.footer, '#+end_center');
     });
+    test('tables', () {
+      var result = grammar.parse('''  | foo | bar | baz |
+  |-----+-----+-----|
+  |   1 |   2 |   3 |
+''');
+      expect(result.value, [
+        [
+          [
+            '  ',
+            '|',
+            [
+              [' ', 'foo', ' |'],
+              [' ', 'bar', ' |'],
+              [' ', 'baz', ' |']
+            ],
+            '\n'
+          ],
+          ['  ', '|-----+-----+-----|\n'],
+          [
+            '  ',
+            '|',
+            [
+              ['   ', '1', ' |'],
+              ['   ', '2', ' |'],
+              ['   ', '3', ' |']
+            ],
+            '\n'
+          ]
+        ]
+      ]);
+      result = parser.parse('''  | foo | bar | baz |
+  |-----+-----+-----|
+  |   1 |   2 |   3 |
+''');
+      final OrgTable table = result.value.children[0];
+      expect(table.rows[0], '  | foo | bar | baz |');
+      expect(table.rows[1], '  |-----+-----+-----|');
+      expect(table.rows[2], '  |   1 |   2 |   3 |');
+    });
   });
   test('complex document', () {
     final result =
