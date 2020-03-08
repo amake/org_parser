@@ -89,8 +89,28 @@ class OrgBlock extends OrgContentElement {
 }
 
 class OrgTable extends OrgContentElement {
-  OrgTable(Iterable<String> rows) : rows = List.unmodifiable(rows ?? const []);
+  OrgTable(Iterable<OrgTableRow> rows)
+      : rows = List.unmodifiable(rows ?? const []);
 
-  // TODO(aaron): Expose cells
-  final List<String> rows;
+  final List<OrgTableRow> rows;
+
+  String get indent => rows.isEmpty ? '' : rows.first.indent;
+}
+
+class OrgTableRow extends OrgContentElement {
+  OrgTableRow(this.indent) : assert(indent != null);
+
+  final String indent;
+}
+
+class OrgTableDividerRow extends OrgTableRow {
+  OrgTableDividerRow(String indent) : super(indent);
+}
+
+class OrgTableCellRow extends OrgTableRow {
+  OrgTableCellRow(String indent, Iterable<String> cells)
+      : cells = List.unmodifiable(cells ?? const []),
+        super(indent);
+
+  final List<String> cells;
 }

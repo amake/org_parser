@@ -176,9 +176,32 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser table() => super.table().map((items) {
         final List rows = items;
-        return OrgTable(rows.cast<String>());
+        return OrgTable(rows.cast<OrgTableRow>());
       });
 
   @override
-  Parser tableRow() => super.tableRow().flatten().map(_trimLastBlankLine);
+  Parser tableDotElDivider() => super.tableDotElDivider().map((items) {
+        final String indent = items[0];
+        return OrgTableDividerRow(indent);
+      });
+
+  @override
+  Parser tableRowRule() => super.tableRowRule().map((items) {
+        final String indent = items[0];
+        return OrgTableDividerRow(indent);
+      });
+
+  @override
+  Parser tableRowStandard() => super.tableRowStandard().map((items) {
+        final String indent = items[0];
+        final List cells = items[2];
+        final String trailing = items[3];
+        if (trailing.trim().isNotEmpty) {
+          cells.add(trailing.trim());
+        }
+        return OrgTableCellRow(indent, cells.cast<String>());
+      });
+
+  @override
+  Parser tableCell() => super.tableCell().pick(1);
 }

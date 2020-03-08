@@ -351,9 +351,18 @@ foo''');
   |   1 |   2 |   3 |
 ''');
       final OrgTable table = result.value.children[0];
-      expect(table.rows[0], '  | foo | bar | baz |');
-      expect(table.rows[1], '  |-----+-----+-----|');
-      expect(table.rows[2], '  |   1 |   2 |   3 |');
+      final OrgTableCellRow row0 = table.rows[0];
+      expect(row0.cells[0], 'foo');
+      expect(row0.cells[1], 'bar');
+      expect(row0.cells[2], 'baz');
+      expect(row0.cells.length, 3);
+      final OrgTableDividerRow row1 = table.rows[1];
+      expect(row1 != null, true);
+      final OrgTableCellRow row2 = table.rows[2];
+      expect(row2.cells[0], '1');
+      expect(row2.cells[1], '2');
+      expect(row2.cells[2], '3');
+      expect(row2.cells.length, 3);
     });
   });
   test('complex document', () {
