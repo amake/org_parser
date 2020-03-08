@@ -133,14 +133,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser markupContents(String marker) =>
       ref(markupBorder).and() & ref(markupBody, marker) & ref(markupBorder);
 
-  Parser markupBorder() => (whitespace() | anyIn(',\'"')).neg();
+  // The following markupBorder and pre/postMarkup definitions differ from the
+  // org-syntax.org document; they have been updated based on the definition of
+  // `org-emphasis-regexp-components' in org-20200302.
+
+  Parser markupBorder() => whitespace().neg();
 
   Parser markupBody(String marker) =>
       (ref(markupBorder) & char(marker)).neg().star();
 
-  Parser preMarkup() => whitespace() | anyIn('({\'"');
+  Parser preMarkup() => whitespace() | anyIn('-(\'"{');
 
-  Parser postMarkup() => whitespace() | anyIn('-.,:!?\')}"');
+  Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
 
   Parser meta() => ref(_meta).flatten();
 

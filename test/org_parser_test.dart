@@ -183,6 +183,14 @@ c/ d''');
       ]);
       result = grammar.parse('//');
       expect(result.value, ['//'], reason: 'body is required');
+      result = grammar.parse('~,~');
+      expect(result.value, [
+        ['~', ',', '~']
+      ]);
+      result = grammar.parse("~'~");
+      expect(result.value, [
+        ['~', "'", '~']
+      ]);
     });
     test('meta', () {
       var result = grammar.parse('''#+blah
