@@ -1,3 +1,12 @@
+abstract class OrgTree {
+  OrgTree(this.content, [Iterable<OrgSection> children])
+      : children = List.unmodifiable(children ?? const []);
+  final OrgContent content;
+  final List<OrgSection> children;
+
+  int get level;
+}
+
 class OrgHeadline {
   OrgHeadline(
     this.stars,
@@ -15,26 +24,29 @@ class OrgHeadline {
   int get level => stars.length;
 }
 
-class OrgSection {
+class OrgSection extends OrgTree {
   OrgSection(
     this.headline,
-    this.content, [
-    Iterable<OrgSection> children = const [],
-  ]) : children = List.unmodifiable(children ?? const []);
+    OrgContent content, [
+    Iterable<OrgSection> children,
+  ]) : super(content, children);
   final OrgHeadline headline;
-  final OrgContent content;
-  final List<OrgSection> children;
 
+  @override
   int get level => headline.level;
 
   bool get isEmpty => content == null && children.isEmpty;
 
-  OrgSection copyWith(
-          {OrgHeadline headline,
-          String content,
-          Iterable<OrgSection> children}) =>
-      OrgSection(headline ?? this.headline, content ?? this.content,
-          children ?? this.children);
+  OrgSection copyWith({
+    OrgHeadline headline,
+    OrgContent content,
+    Iterable<OrgSection> children,
+  }) =>
+      OrgSection(
+        headline ?? this.headline,
+        content ?? this.content,
+        children ?? this.children,
+      );
 }
 
 class OrgContentElement {}

@@ -7,7 +7,7 @@ export 'src/grammar.dart';
 export 'src/org.dart';
 export 'src/parser.dart';
 
-class OrgDocument {
+class OrgDocument extends OrgTree {
   factory OrgDocument(String text) {
     final parser = OrgParser();
     final result = parser.parse(text);
@@ -16,8 +16,9 @@ class OrgDocument {
     return OrgDocument._(topContent, List.unmodifiable(sections));
   }
 
-  OrgDocument._(this.topContent, this.sections);
+  OrgDocument._(OrgContent content, Iterable<OrgSection> sections)
+      : super(content, sections);
 
-  final OrgContent topContent;
-  final List<OrgSection> sections;
+  @override
+  int get level => 0;
 }
