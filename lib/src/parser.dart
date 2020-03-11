@@ -71,10 +71,12 @@ class OrgContentParser extends GrammarParser {
 
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
-  Parser start() => super.start().map((values) {
-        final List elems = values;
-        return OrgContent(elems.cast<OrgContentElement>());
-      });
+  Parser start() => super.start().map(_toOrgContent);
+
+  OrgContent _toOrgContent(Object values) {
+    final List elems = values;
+    return OrgContent(elems.cast<OrgContentElement>());
+  }
 
   @override
   Parser plainText([Parser limit]) =>
@@ -176,10 +178,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser namedGreaterBlockContent(String name) =>
-      super.namedGreaterBlockContent(name).map((values) {
-        final List elems = values;
-        return OrgContent(elems.cast<OrgContentElement>());
-      });
+      super.namedGreaterBlockContent(name).map(_toOrgContent);
 
   @override
   Parser table() => super.table().map((items) {
