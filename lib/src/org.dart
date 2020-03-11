@@ -1,3 +1,5 @@
+import 'dart:math';
+
 abstract class OrgTree {
   OrgTree(this.content, [Iterable<OrgSection> children])
       : children = List.unmodifiable(children ?? const []);
@@ -107,16 +109,31 @@ class OrgTable extends OrgContentElement {
   final List<OrgTableRow> rows;
 
   String get indent => rows.isEmpty ? '' : rows.first.indent;
+
+  bool get rectangular =>
+      rows
+          .map((row) => row.cellCount)
+          .where((count) => count >= 0)
+          .toSet()
+          .length <
+      2;
+
+  int get columnCount => rows.map((row) => row.cellCount).reduce(max);
 }
 
-class OrgTableRow extends OrgContentElement {
+abstract class OrgTableRow extends OrgContentElement {
   OrgTableRow(this.indent) : assert(indent != null);
 
   final String indent;
+
+  int get cellCount;
 }
 
 class OrgTableDividerRow extends OrgTableRow {
   OrgTableDividerRow(String indent) : super(indent);
+
+  @override
+  int get cellCount => -1;
 }
 
 class OrgTableCellRow extends OrgTableRow {
@@ -125,4 +142,7 @@ class OrgTableCellRow extends OrgTableRow {
         super(indent);
 
   final List<String> cells;
+
+  @override
+  int get cellCount => cells.length;
 }
