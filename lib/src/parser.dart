@@ -93,7 +93,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser linkPart() => super.linkPart().pick(1);
 
   @override
-  Parser linkPartBody() => super.linkPartBody().flatten();
+  Parser linkPartBody() =>
+      super.linkPartBody().flatten('Link part body expected');
 
   @override
   Parser linkDescription() => super.linkDescription().pick(1);
@@ -118,7 +119,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser code() => mapMarkup(super.code(), OrgStyle.code);
 
   Parser mapMarkup(Parser parser, OrgStyle style) =>
-      parser.flatten().map((value) => OrgMarkup(value, style));
+      parser.flatten('Markup expected').map((value) => OrgMarkup(value, style));
 
   @override
   Parser meta() => super.meta().map((value) => OrgMeta(value));
@@ -147,15 +148,19 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedBlockStart(String name) =>
-      super.namedBlockStart(name).flatten().map(_trimLastBlankLine);
+  Parser namedBlockStart(String name) => super
+      .namedBlockStart(name)
+      .flatten('Named block "$name" start expected')
+      .map(_trimLastBlankLine);
 
   String _trimLastBlankLine(String str) =>
       str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
 
   @override
-  Parser namedBlockEnd(String name) =>
-      super.namedBlockEnd(name).flatten().map(_trimFirstBlankLine);
+  Parser namedBlockEnd(String name) => super
+      .namedBlockEnd(name)
+      .flatten('Named block "$name" end expected')
+      .map(_trimFirstBlankLine);
 
   String _trimFirstBlankLine(String str) =>
       str.startsWith('\n') ? str.substring(1, str.length) : str;

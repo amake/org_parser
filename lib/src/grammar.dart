@@ -28,22 +28,23 @@ class OrgGrammarDefinition extends GrammarDefinition {
       ref(tags).optional() &
       lineEnd();
 
-  Parser stars() => char('*').plus().flatten();
+  Parser stars() => char('*').plus().flatten('Stars expected');
 
   Parser keyword() => string('TODO') | string('DONE');
 
   Parser priority() => string('[#') & letter() & char(']');
 
-  Parser title() => (ref(tags) | ref(newline)).neg().star().flatten();
+  Parser title() =>
+      (ref(tags) | ref(newline)).neg().star().flatten('Title expected');
 
   Parser tags() =>
       char(':') &
       ref(tag).separatedBy(char(':'), includeSeparators: false) &
       char(':');
 
-  Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten();
+  Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten('Tags expected');
 
-  Parser content() => ref(_content).flatten();
+  Parser content() => ref(_content).flatten('Content expected');
 
   Parser _content() =>
       char('*').not() &
@@ -76,7 +77,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser link() => ref(regularLink) | ref(plainLink);
 
-  Parser plainLink() => ref(_plainLink).flatten();
+  Parser plainLink() => ref(_plainLink).flatten('Plain link expected');
 
   Parser _plainLink() => ref(protocol) & char(':') & ref(path2);
 
@@ -90,8 +91,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
 
   Parser linkPartBody() =>
-      ref(linkPathPart).flatten() &
-      (string('::') & ref(linkSearchPart).flatten()).optional();
+      ref(linkPathPart).flatten('Link path part expected') &
+      (string('::') & ref(linkSearchPart).flatten('Link search part expected'))
+          .optional();
 
   Parser linkPathPart() => char(']').neg().plusLazy(string('::') | char(']'));
 
@@ -99,7 +101,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char('"') & char('"').neg().plus() & char('"') | char(']').neg().plus();
 
   Parser linkDescription() =>
-      char('[') & char(']').neg().plus().flatten() & char(']');
+      char('[') &
+      char(']').neg().plus().flatten('Link description expected') &
+      char(']');
 
   Parser markups() =>
       ref(bold) |
@@ -126,7 +130,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser _markup(String marker) =>
       (startOfInput() | was(ref(preMarkup))) &
       char(marker) &
-      ref(markupContents, marker).flatten() &
+      ref(markupContents, marker).flatten('Markup content expected') &
       char(marker) &
       (ref(postMarkup).and() | endOfInput());
 
@@ -146,7 +150,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
 
-  Parser meta() => ref(_meta).flatten();
+  Parser meta() => ref(_meta).flatten('Meta expected');
 
   Parser _meta() =>
       lineStart() &
@@ -154,7 +158,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('#+') &
       Token.newlineParser().neg().plus();
 
-  Parser codeLine() => ref(_codeLine).flatten();
+  Parser codeLine() => ref(_codeLine).flatten('Code line expected');
 
   Parser _codeLine() =>
       lineStart() &
@@ -175,17 +179,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(namedBlockEnd, name);
 
   Parser namedBlockStart(String name) =>
-      ref(indent).flatten() &
+      ref(indent).flatten('Indent expected') &
       stringIgnoreCase('#+begin_$name') &
-      (ref(lineTrailing) & Token.newlineParser()).flatten();
+      (ref(lineTrailing) & Token.newlineParser())
+          .flatten('Trailing line content expected');
 
-  Parser namedBlockContent(String name) =>
-      ref(namedBlockEnd, name).neg().star().flatten();
+  Parser namedBlockContent(String name) => ref(namedBlockEnd, name)
+      .neg()
+      .star()
+      .flatten('Named block content expected');
 
   Parser namedBlockEnd(String name) =>
-      (Token.newlineParser() & ref(indent)).flatten() &
+      (Token.newlineParser() & ref(indent))
+          .flatten('Block end indent expected') &
       stringIgnoreCase('#+end_$name') &
-      ref(lineTrailing).flatten();
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser greaterBlock() =>
       ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
@@ -208,15 +216,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser tableRow() => ref(tableRowRule) | ref(tableRowStandard);
 
   Parser tableRowStandard() =>
-      ref(indent).flatten() &
+      ref(indent).flatten('Indent expected') &
       char('|') &
       ref(tableCell).star() &
-      (ref(lineTrailing) & lineEnd()).flatten();
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
 
   Parser tableCell() =>
-      ref(tableCellLeading).flatten() &
-      ref(tableCellContents).flatten() &
-      ref(tableCellTrailing).flatten();
+      ref(tableCellLeading).flatten('Cell leading content expected') &
+      ref(tableCellContents).flatten('Cell contents expected') &
+      ref(tableCellTrailing).flatten('Cell trailing content expected');
 
   Parser tableCellLeading() => char(' ').star();
 
@@ -226,11 +234,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       anyOf('|\n').neg().starLazy(ref(tableCellTrailing));
 
   Parser tableRowRule() =>
-      ref(indent).flatten() &
-      (string('|-') & ref(lineTrailing) & lineEnd()).flatten();
+      ref(indent).flatten('Indent expected') &
+      (string('|-') & ref(lineTrailing) & lineEnd())
+          .flatten('Trailing line content expected');
 
   Parser tableDotElDivider() =>
-      ref(indent).flatten() &
-      (string('+-') & anyOf('+-').star()).flatten() &
-      (ref(lineTrailing) & lineEnd()).flatten();
+      ref(indent).flatten('Indent expected') &
+      (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
 }
