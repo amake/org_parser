@@ -153,18 +153,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser meta() => ref(_meta).flatten('Meta expected');
 
   Parser _meta() =>
-      lineStart() &
-      whitespace().star() &
+      ref(indent).flatten('Indent expected') &
       string('#+') &
-      Token.newlineParser().neg().plus();
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser codeLine() => ref(_codeLine).flatten('Code line expected');
 
   Parser _codeLine() =>
-      lineStart() &
-      whitespace().star() &
+      ref(indent).flatten('Indent expected') &
       char(':') &
-      Token.newlineParser().neg().star();
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser block() =>
       ref(namedBlock, 'comment') |
