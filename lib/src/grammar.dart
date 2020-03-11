@@ -230,15 +230,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableCell() =>
       ref(tableCellLeading).flatten('Cell leading content expected') &
-      ref(tableCellContents).flatten('Cell contents expected') &
+      ref(tableCellContents) &
       ref(tableCellTrailing).flatten('Cell trailing content expected');
 
   Parser tableCellLeading() => char(' ').star();
 
   Parser tableCellTrailing() => char(' ').star() & char('|');
 
-  Parser tableCellContents() =>
-      anyOf('|\n').neg().starLazy(ref(tableCellTrailing));
+  Parser tableCellContents() {
+    final end = ref(tableCellTrailing) | lineEnd();
+    return (ref(objects) | ref(plainText, end)).starLazy(end);
+  }
 
   Parser tableRowRule() =>
       ref(indent).flatten('Indent expected') &

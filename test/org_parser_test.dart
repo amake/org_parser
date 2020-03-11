@@ -341,9 +341,21 @@ foo''');
             '  ',
             '|',
             [
-              [' ', 'foo', ' |'],
-              [' ', 'bar', ' |'],
-              [' ', 'baz', ' |']
+              [
+                ' ',
+                ['foo'],
+                ' |'
+              ],
+              [
+                ' ',
+                ['bar'],
+                ' |'
+              ],
+              [
+                ' ',
+                ['baz'],
+                ' |'
+              ]
             ],
             '\n'
           ],
@@ -352,30 +364,40 @@ foo''');
             '  ',
             '|',
             [
-              ['   ', '1', ' |'],
-              ['   ', '2', ' |'],
-              ['   ', '3', ' |']
+              [
+                '   ',
+                ['1'],
+                ' |'
+              ],
+              [
+                '   ',
+                ['2'],
+                ' |'
+              ],
+              [
+                '   ',
+                ['3'],
+                ' |'
+              ]
             ],
             '\n'
           ]
         ]
       ]);
-      result = parser.parse('''  | foo | bar | baz |
+      result = parser.parse('''  | foo | *bar* | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
 ''');
       final OrgTable table = result.value.children[0];
       final OrgTableCellRow row0 = table.rows[0];
-      expect(row0.cells[0], 'foo');
-      expect(row0.cells[1], 'bar');
-      expect(row0.cells[2], 'baz');
+      final OrgPlainText row0Cell0 = row0.cells[0].children[0];
+      expect(row0Cell0.content, 'foo');
+      final OrgMarkup row0Cell1 = row0.cells[1].children[0];
+      expect(row0Cell1.content, '*bar*');
       expect(row0.cells.length, 3);
       final OrgTableDividerRow row1 = table.rows[1];
       expect(row1 != null, true);
       final OrgTableCellRow row2 = table.rows[2];
-      expect(row2.cells[0], '1');
-      expect(row2.cells[1], '2');
-      expect(row2.cells[2], '3');
       expect(row2.cells.length, 3);
     });
   });

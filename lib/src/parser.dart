@@ -206,9 +206,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         if (trailing.trim().isNotEmpty) {
           cells.add(trailing.trim());
         }
-        return OrgTableCellRow(indent, cells.cast<String>());
+        return OrgTableCellRow(indent, cells.cast<OrgContent>());
       });
 
   @override
   Parser tableCell() => super.tableCell().pick(1);
+
+  @override
+  Parser tableCellContents() => super.tableCellContents().map(_toOrgContent);
 }

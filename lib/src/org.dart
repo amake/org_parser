@@ -137,11 +137,11 @@ class OrgTableDividerRow extends OrgTableRow {
 }
 
 class OrgTableCellRow extends OrgTableRow {
-  OrgTableCellRow(String indent, Iterable<String> cells)
+  OrgTableCellRow(String indent, Iterable<OrgContent> cells)
       : cells = List.unmodifiable(cells ?? const []),
         super(indent);
 
-  final List<String> cells;
+  final List<OrgContent> cells;
 
   @override
   int get cellCount => cells.length;
