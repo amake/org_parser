@@ -296,7 +296,10 @@ foo''');
       expect(result.value, [
         [
           ['', '#+begin_quote', '\n'],
-          '  foo *bar*',
+          [
+            '  foo ',
+            ['*', 'bar', '*']
+          ],
           ['\n', '#+end_quote', '']
         ]
       ]);
@@ -307,7 +310,10 @@ foo''');
       expect(result.value, [
         [
           ['', '#+BEGIN_QUOTE', '\n'],
-          '  foo /bar/',
+          [
+            '  foo ',
+            ['/', 'bar', '/']
+          ],
           ['\n', '#+EnD_qUOtE', '']
         ],
         '\n'

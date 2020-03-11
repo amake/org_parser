@@ -77,7 +77,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser plainText() => super.plainText().map((value) => OrgPlainText(value));
+  Parser plainText([Parser limit]) =>
+      super.plainText(limit).map((value) => OrgPlainText(value));
 
   @override
   Parser plainLink() => super.plainLink().map((value) => OrgLink(value, null));
@@ -174,9 +175,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedGreaterBlockContent(String name) => super
-      .namedGreaterBlockContent(name)
-      .map((value) => OrgContentParser().parse(value).value);
+  Parser namedGreaterBlockContent(String name) =>
+      super.namedGreaterBlockContent(name).map((values) {
+        final List elems = values;
+        return OrgContent(elems.cast<OrgContentElement>());
+      });
 
   @override
   Parser table() => super.table().map((items) {

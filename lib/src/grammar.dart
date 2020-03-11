@@ -73,7 +73,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(codeLine) |
       ref(table);
 
-  Parser plainText() => ref(objects).neg().plus().flatten();
+  Parser plainText([Parser limit]) {
+    var fullLimit = ref(objects) | endOfInput();
+    if (limit != null) {
+      fullLimit |= limit;
+    }
+    return any().plusLazy(fullLimit).flatten('Plain text expected');
+  }
 
   Parser link() => ref(regularLink) | ref(plainLink);
 
@@ -201,7 +207,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       namedGreaterBlockContent(name) &
       ref(namedBlockEnd, name);
 
-  Parser namedGreaterBlockContent(String name) => namedBlockContent(name);
+  Parser namedGreaterBlockContent(String name) {
+    final end = ref(namedBlockEnd, name);
+    return (ref(objects) | ref(plainText, end)).starLazy(end);
+  }
 
   Parser indent() => lineStart() & whitespace().star();
 
