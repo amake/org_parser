@@ -146,3 +146,10 @@ class OrgTableCellRow extends OrgTableRow {
   @override
   int get cellCount => cells.length;
 }
+
+class OrgTimestamp extends OrgContentElement {
+  OrgTimestamp(this.content) : assert(content != null);
+
+  // TODO(aaron): Expose actual data
+  final String content;
+}

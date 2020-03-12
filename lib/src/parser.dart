@@ -214,4 +214,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser tableCellContents() => super.tableCellContents().map(_toOrgContent);
+
+  @override
+  Parser timestamp() => super
+      .timestamp()
+      .flatten('Timestamp expected')
+      .map((value) => OrgTimestamp(value));
 }

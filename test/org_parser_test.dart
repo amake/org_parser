@@ -400,6 +400,139 @@ foo''');
       final OrgTableCellRow row2 = table.rows[2];
       expect(row2.cells.length, 3);
     });
+    test('timestamps', () {
+      var result = grammar.parse('''<2020-03-12 Wed>''');
+      expect(result.value, [
+        [
+          '<',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          null,
+          [],
+          '>'
+        ]
+      ]);
+      result = grammar.parse('''<2020-03-12 Wed 8:34>''');
+      expect(result.value, [
+        [
+          '<',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          ['8', ':', '34'],
+          [],
+          '>'
+        ]
+      ]);
+      result = grammar.parse('''<2020-03-12 Wed 8:34 +1w>''');
+      expect(result.value, [
+        [
+          '<',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          ['8', ':', '34'],
+          [
+            ['+', '1', 'w']
+          ],
+          '>'
+        ]
+      ]);
+      result = grammar.parse('''<2020-03-12 Wed 8:34 +1w --2d>''');
+      expect(result.value, [
+        [
+          '<',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          ['8', ':', '34'],
+          [
+            ['+', '1', 'w'],
+            ['--', '2', 'd']
+          ],
+          '>'
+        ]
+      ]);
+      result = grammar.parse('''[2020-03-12 Wed 18:34 .+1w --12d]''');
+      expect(result.value, [
+        [
+          '[',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          ['18', ':', '34'],
+          [
+            ['.+', '1', 'w'],
+            ['--', '12', 'd']
+          ],
+          ']'
+        ]
+      ]);
+      result = grammar.parse('''[2020-03-12 Wed 18:34-19:35 .+1w --12d]''');
+      expect(result.value, [
+        [
+          '[',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          [
+            ['18', ':', '34'],
+            '-',
+            ['19', ':', '35']
+          ],
+          [
+            ['.+', '1', 'w'],
+            ['--', '12', 'd']
+          ],
+          ']'
+        ]
+      ]);
+      result = grammar.parse(
+          '''[2020-03-11 Wed 18:34 .+1w --12d]--[2020-03-12 Wed 18:34 .+1w --12d]''');
+      expect(result.value, [
+        [
+          '[',
+          ['2020', '-', '03', '-', '11', 'Wed'],
+          ['18', ':', '34'],
+          [
+            ['.+', '1', 'w'],
+            ['--', '12', 'd']
+          ],
+          ']'
+        ],
+        '--',
+        [
+          '[',
+          ['2020', '-', '03', '-', '12', 'Wed'],
+          ['18', ':', '34'],
+          [
+            ['.+', '1', 'w'],
+            ['--', '12', 'd']
+          ],
+          ']'
+        ]
+      ]);
+      result = grammar.parse('''<%%(what (the (f)))>''');
+      expect(result.value, [
+        [
+          '<%%',
+          [
+            '(',
+            [
+              'what',
+              [
+                '(',
+                [
+                  'the',
+                  [
+                    '(',
+                    ['f'],
+                    ')'
+                  ]
+                ],
+                ')'
+              ]
+            ],
+            ')'
+          ],
+          '>'
+        ]
+      ]);
+      result = grammar.parse('''<%%(what (the (f))>''');
+      expect(result.value, ['<%%(what (the (f))>'], reason: 'Invalid sexp');
+      result = grammar.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
+      expect(result.value, ['[2020-03-11 Wed 18:34:56 .+1w --12d]'],
+          reason: 'Seconds not supported');
+    });
   });
   test('complex document', () {
     final result =

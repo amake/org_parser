@@ -71,7 +71,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(greaterBlock) |
       ref(meta) |
       ref(codeLine) |
-      ref(table);
+      ref(table) |
+      ref(timestamp);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(objects) | endOfInput();
@@ -251,4 +252,78 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(indent).flatten('Indent expected') &
       (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
       (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+
+  Parser timestamp() =>
+      ref(timestampDiary) |
+      ref(timestampSimple, true) |
+      ref(timestampSimple, false) |
+      ref(timestampRange, true) |
+      ref(timestampRange, false);
+
+  Parser timestampDiary() => string('<%%') & ref(sexp) & char('>');
+
+  // TODO(aaron): Bother with a real Elisp parser here?
+  Parser sexp() => ref(sexpAtom) | ref(sexpList);
+
+  Parser sexpAtom() =>
+      (anyOf('()') | whitespace()).neg().plus().flatten('Expected atom');
+
+  Parser sexpList() => char('(') & ref(sexp).trim().star() & char(')');
+
+  Parser timestampSimple(bool active) =>
+      (active ? char('<') : char('[')) &
+      ref(date) &
+      ref(time).trim().optional() &
+      ref(repeaterOrDelay).trim().repeat(0, 2) &
+      (active ? char('>') : char(']'));
+
+  Parser timestampRange(bool active) =>
+      ref(timestampTimeRange, active) | ref(timestampDateRange, active);
+
+  Parser timestampTimeRange(bool active) =>
+      (active ? char('<') : char('[')) &
+      ref(date) &
+      (ref(time) & char('-') & ref(time)).trim() &
+      ref(repeaterOrDelay).trim().repeat(0, 2) &
+      (active ? char('>') : char(']'));
+
+  Parser timestampDateRange(bool active) =>
+      ref(timestampSimple, active) &
+      char('-').repeat(1, 3) &
+      ref(timestampSimple, active);
+
+  Parser date() =>
+      ref(year) &
+      char('-') &
+      ref(month) &
+      char('-') &
+      ref(day) &
+      dayName().trim();
+
+  Parser year() => digit().times(4).flatten('Expected year');
+
+  Parser month() => digit().times(2).flatten('Expected month');
+
+  Parser day() => digit().times(2).flatten('Expected day');
+
+  Parser dayName() => (whitespace() | anyOf('+-]>\n') | digit())
+      .neg()
+      .plus()
+      .flatten('Expected day name');
+
+  Parser time() => ref(hours) & char(':') & ref(minutes);
+
+  Parser hours() => digit().repeat(1, 2).flatten('Expected hours');
+
+  Parser minutes() => digit().times(2).flatten('Expected minutes');
+
+  Parser repeaterOrDelay() =>
+      ref(repeaterMark) &
+      digit().plus().flatten('Expected number') &
+      ref(repeaterUnit);
+
+  Parser repeaterMark() =>
+      string('++') | string('.+') | string('--') | anyOf('+-');
+
+  Parser repeaterUnit() => anyOf('hdwmy');
 }
