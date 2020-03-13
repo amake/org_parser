@@ -124,7 +124,7 @@ biz baz''');
       expect(result.value, ['foo bar\nbiz baz']);
     });
     test('link grammar', () {
-      final result = grammar.parse('''[[http://example.com][example]]''');
+      var result = grammar.parse('[[http://example.com][example]]');
       expect(result.value, [
         [
           '[',
@@ -137,6 +137,24 @@ biz baz''');
           ']'
         ]
       ]);
+      result = grammar.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
+      expect(result.value, [
+        [
+          '[',
+          [
+            '[',
+            ['*[wtf] what?', null],
+            ']'
+          ],
+          ['[', '[lots][of][boxes]', ']'],
+          ']'
+        ]
+      ]);
+      result = parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
+      final OrgContent content = result.value;
+      final OrgLink link = content.children[0];
+      expect(link.location, '*[wtf] what?');
+      expect(link.description, '[lots][of][boxes]');
     });
     test('complex content', () {
       final result =

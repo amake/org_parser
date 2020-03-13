@@ -93,25 +93,64 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser path2() => (whitespace() | anyIn('()<>')).neg().plus();
 
+  /*
+    Default value of org-link-brackets-re (org-20200302):
+
+    \[\[\(\(?:[^][\]\|\\\(?:\\\\\)*[][]\|\\+[^][]\)+\)]\(?:\[\(\(?:.\|\n\)+?\)]\)?]
+
+    Or in rx form:
+
+    (seq "[["
+     (group
+      (one-or-more
+       (or (not (any "[\\]"))
+           (seq "\\"
+                (zero-or-more "\\\\")
+                (any "[]"))
+           (seq (one-or-more "\\")
+                (not (any "[]"))))))
+     "]"
+     (opt "["
+          (group
+           (+? anything))
+          "]")
+     "]")
+   */
+
   Parser regularLink() =>
       char('[') & ref(linkPart) & ref(linkDescription).optional() & char(']');
 
   Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
 
   Parser linkPartBody() =>
-      ref(linkPathPart).flatten('Link path part expected') &
-      (string('::') & ref(linkSearchPart).flatten('Link search part expected'))
-          .optional();
+      ref(linkPathPart) &
+      (string('::') & ref(linkSearchPart).map(_flattenEscape)).optional();
 
-  Parser linkPathPart() => char(']').neg().plusLazy(string('::') | char(']'));
+  Parser linkPathPart() =>
+      ref(linkChar).plusLazy(string('::') | char(']')).map(_flattenEscape);
+
+  Parser linkChar() => ref(linkEscape).pick(1) | any();
+
+  Parser linkEscape() => char('\\') & anyOf('[]\\');
+
+  // Use instead of flatten() to allow dropping escape chars
+  Object _flattenEscape(Object items) {
+    final List list = items;
+    return list.join();
+  }
 
   Parser linkSearchPart() =>
-      char('"') & char('"').neg().plus() & char('"') | char(']').neg().plus();
+      char('"') & ref(linkChar).plusLazy(char('"')) & char('"') |
+      ref(linkChar).plusLazy(char(']'));
 
   Parser linkDescription() =>
       char('[') &
-      char(']').neg().plus().flatten('Link description expected') &
+      ref(anyChar).plusLazy(string(']]')).map(_flattenEscape) &
       char(']');
+
+  Parser anyChar() => ref(escape).pick(0) | any();
+
+  Parser escape() => any() & char('\u200b'); // zero-width space
 
   Parser markups() =>
       ref(bold) |

@@ -96,8 +96,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser linkPart() => super.linkPart().pick(1);
 
   @override
-  Parser linkPartBody() =>
-      super.linkPartBody().flatten('Link part body expected');
+  Parser linkPartBody() => super.linkPartBody().map((value) {
+        final List items = value;
+        return items.where((item) => item != null).join();
+      });
 
   @override
   Parser linkDescription() => super.linkDescription().pick(1);
