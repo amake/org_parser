@@ -533,6 +533,22 @@ foo''');
       expect(result.value, ['[2020-03-11 Wed 18:34:56 .+1w --12d]'],
           reason: 'Seconds not supported');
     });
+    test('fixed-width area', () {
+      var result = grammar.parse('  : foo');
+      expect(result.value, [
+        [
+          ['  ', ': ', 'foo']
+        ]
+      ]);
+      result = grammar.parse('''  : foo
+  : bar''');
+      expect(result.value, [
+        [
+          ['  ', ': ', 'foo\n'],
+          ['  ', ': ', 'bar']
+        ]
+      ]);
+    });
   });
   test('complex document', () {
     final result =

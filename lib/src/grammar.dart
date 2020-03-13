@@ -70,7 +70,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(block) |
       ref(greaterBlock) |
       ref(meta) |
-      ref(codeLine) |
+      ref(fixedWidthArea) |
       ref(table) |
       ref(timestamp) |
       ref(keyword);
@@ -165,12 +165,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('#+') &
       ref(lineTrailing).flatten('Trailing line content expected');
 
-  Parser codeLine() => ref(_codeLine).flatten('Code line expected');
+  Parser fixedWidthArea() => ref(fixedWidthLine).plus();
 
-  Parser _codeLine() =>
+  Parser fixedWidthLine() =>
       ref(indent).flatten('Indent expected') &
-      char(':') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      string(': ') &
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
 
   Parser block() =>
       ref(namedBlock, 'comment') |

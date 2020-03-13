@@ -128,7 +128,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser meta() => super.meta().map((value) => OrgMeta(value));
 
   @override
-  Parser codeLine() => mapMarkup(super.codeLine(), OrgStyle.code);
+  Parser fixedWidthArea() => super
+      .fixedWidthArea()
+      .flatten('Fixed-width area expected')
+      .map(_trimLastBlankLine)
+      .map((value) => OrgFixedWidthArea(value));
 
   @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {

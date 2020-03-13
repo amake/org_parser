@@ -159,3 +159,9 @@ class OrgKeyword extends OrgContentElement {
 
   final String content;
 }
+
+class OrgFixedWidthArea extends OrgContentElement {
+  OrgFixedWidthArea(this.content) : assert(content != null);
+
+  final String content;
+}
