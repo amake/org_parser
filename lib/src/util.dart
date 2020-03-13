@@ -53,7 +53,7 @@ class LookBehindParser<T> extends DelegateParser<T> {
   LookBehindParser<T> copy() => LookBehindParser<T>(delegate);
 }
 
-Parser<void> startOfInput([String message = 'end of input expected']) =>
+Parser<void> startOfInput([String message = 'start of input expected']) =>
     StartOfInputParser(message);
 
 class StartOfInputParser extends Parser<void> {
