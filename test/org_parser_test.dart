@@ -128,11 +128,7 @@ biz baz''');
       expect(result.value, [
         [
           '[',
-          [
-            '[',
-            ['http://example.com', null],
-            ']'
-          ],
+          ['[', 'http://example.com', ']'],
           ['[', 'example', ']'],
           ']'
         ]
@@ -141,11 +137,7 @@ biz baz''');
       expect(result.value, [
         [
           '[',
-          [
-            '[',
-            ['*[wtf] what?', null],
-            ']'
-          ],
+          ['[', '*[wtf] what?', ']'],
           ['[', '[lots][of][boxes]', ']'],
           ']'
         ]
@@ -164,11 +156,7 @@ maybe''');
         'go to ',
         [
           '[',
-          [
-            '[',
-            ['http://example.com', null],
-            ']'
-          ],
+          ['[', 'http://example.com', ']'],
           ['[', 'example', ']'],
           ']'
         ],
@@ -232,11 +220,7 @@ foo''');
         'a ',
         [
           '[',
-          [
-            '[',
-            ['foo', null],
-            ']'
-          ],
+          ['[', 'foo', ']'],
           ['[', 'bar', ']'],
           ']'
         ],
@@ -247,14 +231,7 @@ foo''');
         'a ',
         [
           '[',
-          [
-            '[',
-            [
-              'foo',
-              ['::', '1']
-            ],
-            ']'
-          ],
+          ['[', 'foo::1', ']'],
           ['[', 'bar', ']'],
           ']'
         ],
@@ -265,7 +242,7 @@ foo''');
       OrgLink link = content.children[0];
       expect(link.description, 'bar');
       expect(link.location, 'foo::1');
-      result = parser.parse('[[foo::"[1]"][bar]]');
+      result = parser.parse('[[foo::"\\[1\\]"][bar]]');
       content = result.value;
       link = content.children[0];
       expect(link.description, 'bar');

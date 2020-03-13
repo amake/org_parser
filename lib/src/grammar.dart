@@ -123,11 +123,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
 
   Parser linkPartBody() =>
-      ref(linkPathPart) &
-      (string('::') & ref(linkSearchPart).map(_flattenEscape)).optional();
-
-  Parser linkPathPart() =>
-      ref(linkChar).plusLazy(string('::') | char(']')).map(_flattenEscape);
+      ref(linkChar).plusLazy(char(']')).map(_flattenEscape);
 
   Parser linkChar() => ref(linkEscape).pick(1) | any();
 
@@ -138,10 +134,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     final List list = items;
     return list.join();
   }
-
-  Parser linkSearchPart() =>
-      char('"') & ref(linkChar).plusLazy(char('"')) & char('"') |
-      ref(linkChar).plusLazy(char(']'));
 
   Parser linkDescription() =>
       char('[') &
