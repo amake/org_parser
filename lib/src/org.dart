@@ -153,3 +153,9 @@ class OrgTimestamp extends OrgContentElement {
   // TODO(aaron): Expose actual data
   final String content;
 }
+
+class OrgKeyword extends OrgContentElement {
+  OrgKeyword(this.content) : assert(content != null);
+
+  final String content;
+}

@@ -220,4 +220,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .timestamp()
       .flatten('Timestamp expected')
       .map((value) => OrgTimestamp(value));
+
+  @override
+  Parser keyword() => super.keyword().map((value) => OrgKeyword(value));
 }

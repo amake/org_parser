@@ -72,7 +72,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(meta) |
       ref(codeLine) |
       ref(table) |
-      ref(timestamp);
+      ref(timestamp) |
+      ref(keyword);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(objects) | endOfInput();
@@ -326,4 +327,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('++') | string('.+') | string('--') | anyOf('+-');
 
   Parser repeaterUnit() => anyOf('hdwmy');
+
+  Parser keyword() => ref(_keyword).flatten('Expected keyword');
+
+  Parser _keyword() =>
+      string('SCHEDULED:') |
+      string('DEADLINE:') |
+      string('CLOCK:') |
+      string('CLOSED:');
 }
