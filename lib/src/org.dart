@@ -1,5 +1,14 @@
 import 'dart:math';
 
+bool isOrgLocalSectionUrl(String url) => url.startsWith('*');
+
+/// Return the title of the section pointed to by the URL. The URL must be one
+/// for which [isOrgLocalSectionUrl] returns true.
+String parseOrgLocalSectionUrl(String url) {
+  assert(isOrgLocalSectionUrl(url));
+  return url.substring(1);
+}
+
 abstract class OrgTree {
   OrgTree(this.content, [Iterable<OrgSection> children])
       : children = List.unmodifiable(children ?? const []);
