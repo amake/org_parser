@@ -60,7 +60,7 @@ class OrgSection extends OrgTree {
       );
 }
 
-class OrgContentElement {}
+abstract class OrgContentElement {}
 
 class OrgContent extends OrgContentElement {
   OrgContent(Iterable<OrgContentElement> children)
