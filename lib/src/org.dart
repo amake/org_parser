@@ -23,13 +23,17 @@ class OrgHeadline {
     this.stars,
     this.keyword,
     this.priority,
-    this.title, [
+    this.title,
+    this.rawTitle, [
     Iterable<String> tags = const [],
   ]) : tags = List.unmodifiable(tags ?? const []);
   final String stars;
   final String keyword;
   final String priority;
   final OrgContent title;
+
+  // For resolving links
+  final String rawTitle;
   final List<String> tags;
 
   int get level => stars.length;
