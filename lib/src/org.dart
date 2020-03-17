@@ -16,6 +16,10 @@ abstract class OrgTree {
   final List<OrgSection> children;
 
   int get level;
+
+  bool contains(Pattern pattern) =>
+      content != null && content.contains(pattern) ||
+      children.any((child) => child.contains(pattern));
 }
 
 class OrgHeadline {
@@ -37,6 +41,11 @@ class OrgHeadline {
   final List<String> tags;
 
   int get level => stars.length;
+
+  bool contains(Pattern pattern) =>
+      keyword != null && keyword.contains(pattern) ||
+      title != null && title.contains(pattern) ||
+      tags.any((tag) => tag.contains(pattern));
 }
 
 class OrgSection extends OrgTree {
@@ -62,9 +71,22 @@ class OrgSection extends OrgTree {
         content ?? this.content,
         children ?? this.children,
       );
+
+  @override
+  bool contains(Pattern pattern) =>
+      headline.contains(pattern) || super.contains(pattern);
 }
 
-abstract class OrgContentElement {}
+// ignore: one_member_abstracts
+abstract class OrgContentElement {
+  bool contains(Pattern pattern);
+}
+
+mixin SingleContentElement {
+  String get content;
+
+  bool contains(Pattern pattern) => content.contains(pattern);
+}
 
 class OrgContent extends OrgContentElement {
   OrgContent(Iterable<OrgContentElement> children)
@@ -72,10 +94,15 @@ class OrgContent extends OrgContentElement {
         assert(children != null);
 
   final List<OrgContentElement> children;
+
+  @override
+  bool contains(Pattern pattern) =>
+      children.any((child) => child.contains(pattern));
 }
 
-class OrgPlainText extends OrgContentElement {
+class OrgPlainText extends OrgContentElement with SingleContentElement {
   OrgPlainText(this.content) : assert(content != null);
+  @override
   final String content;
 }
 
@@ -83,10 +110,18 @@ class OrgLink extends OrgContentElement {
   OrgLink(this.location, this.description) : assert(location != null);
   final String location;
   final String description;
+
+  @override
+  bool contains(Pattern pattern) =>
+      location.contains(pattern) ||
+      description != null && description.contains(pattern);
 }
 
-class OrgMarkup extends OrgContentElement {
-  OrgMarkup(this.content, this.style) : assert(style != null);
+class OrgMarkup extends OrgContentElement with SingleContentElement {
+  OrgMarkup(this.content, this.style)
+      : assert(content != null),
+        assert(style != null);
+  @override
   final String content;
   final OrgStyle style;
 }
@@ -100,8 +135,10 @@ enum OrgStyle {
   code,
 }
 
-class OrgMeta extends OrgContentElement {
+class OrgMeta extends OrgContentElement with SingleContentElement {
   OrgMeta(this.content) : assert(content != null);
+
+  @override
   final String content;
 }
 
@@ -113,6 +150,12 @@ class OrgBlock extends OrgContentElement {
   final String header;
   final OrgContentElement body;
   final String footer;
+
+  @override
+  bool contains(Pattern pattern) =>
+      header.contains(pattern) ||
+      body.contains(pattern) ||
+      footer.contains(pattern);
 }
 
 class OrgTable extends OrgContentElement {
@@ -132,6 +175,9 @@ class OrgTable extends OrgContentElement {
       2;
 
   int get columnCount => rows.map((row) => row.cellCount).reduce(max);
+
+  @override
+  bool contains(Pattern pattern) => rows.any((row) => row.contains(pattern));
 }
 
 abstract class OrgTableRow extends OrgContentElement {
@@ -147,6 +193,9 @@ class OrgTableDividerRow extends OrgTableRow {
 
   @override
   int get cellCount => -1;
+
+  @override
+  bool contains(Pattern pattern) => false;
 }
 
 class OrgTableCellRow extends OrgTableRow {
@@ -158,23 +207,29 @@ class OrgTableCellRow extends OrgTableRow {
 
   @override
   int get cellCount => cells.length;
+
+  @override
+  bool contains(Pattern pattern) => cells.any((cell) => cell.contains(pattern));
 }
 
-class OrgTimestamp extends OrgContentElement {
+class OrgTimestamp extends OrgContentElement with SingleContentElement {
   OrgTimestamp(this.content) : assert(content != null);
 
   // TODO(aaron): Expose actual data
+  @override
   final String content;
 }
 
-class OrgKeyword extends OrgContentElement {
+class OrgKeyword extends OrgContentElement with SingleContentElement {
   OrgKeyword(this.content) : assert(content != null);
 
+  @override
   final String content;
 }
 
-class OrgFixedWidthArea extends OrgContentElement {
+class OrgFixedWidthArea extends OrgContentElement with SingleContentElement {
   OrgFixedWidthArea(this.content) : assert(content != null);
 
+  @override
   final String content;
 }
