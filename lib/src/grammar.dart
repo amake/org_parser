@@ -287,10 +287,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser timestamp() =>
       ref(timestampDiary) |
-      ref(timestampSimple, true) |
-      ref(timestampSimple, false) |
       ref(timestampRange, true) |
-      ref(timestampRange, false);
+      ref(timestampRange, false) |
+      ref(timestampSimple, true) |
+      ref(timestampSimple, false);
 
   Parser timestampDiary() => string('<%%') & ref(sexp) & char('>');
 
@@ -321,7 +321,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser timestampDateRange(bool active) =>
       ref(timestampSimple, active) &
-      char('-').repeat(1, 3) &
+      char('-').repeat(1, 3).flatten('Expected timestamp separator') &
       ref(timestampSimple, active);
 
   Parser date() =>
