@@ -17,9 +17,12 @@ abstract class OrgTree {
 
   int get level;
 
-  bool contains(Pattern pattern) =>
-      content != null && content.contains(pattern) ||
-      children.any((child) => child.contains(pattern));
+  bool contains(Pattern pattern, {bool includeChildren = true}) {
+    if (content != null && content.contains(pattern)) {
+      return true;
+    }
+    return includeChildren && children.any((child) => child.contains(pattern));
+  }
 }
 
 class OrgHeadline {
@@ -73,8 +76,9 @@ class OrgSection extends OrgTree {
       );
 
   @override
-  bool contains(Pattern pattern) =>
-      headline.contains(pattern) || super.contains(pattern);
+  bool contains(Pattern pattern, {bool includeChildren = true}) =>
+      headline.contains(pattern) ||
+      super.contains(pattern, includeChildren: includeChildren);
 }
 
 // ignore: one_member_abstracts
