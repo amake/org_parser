@@ -124,21 +124,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
 
   Parser linkPartBody() =>
-      ref(linkChar).plusLazy(char(']')).map(_flattenEscape);
+      // Join instead of flatten to drop escape chars
+      ref(linkChar).plusLazy(char(']')).map((items) => items.join());
 
   Parser linkChar() => ref(linkEscape).pick(1) | any();
 
   Parser linkEscape() => char('\\') & anyOf('[]\\');
 
-  // Use instead of flatten() to allow dropping escape chars
-  Object _flattenEscape(Object items) {
-    final List list = items;
-    return list.join();
-  }
-
   Parser linkDescription() =>
       char('[') &
-      ref(anyChar).plusLazy(string(']]')).map(_flattenEscape) &
+      // Join instead of flatten to drop escape chars
+      ref(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
       char(']');
 
   Parser anyChar() => ref(escape).pick(0) | any();

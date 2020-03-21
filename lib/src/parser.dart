@@ -78,12 +78,10 @@ class OrgContentParser extends GrammarParser {
 
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
-  Parser start() => super.start().map(_toOrgContent);
-
-  OrgContent _toOrgContent(Object values) {
-    final List elems = values;
-    return OrgContent(elems.cast<OrgContentElement>());
-  }
+  Parser start() => super
+      .start()
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
 
   @override
   Parser plainText([Parser limit]) =>
@@ -184,26 +182,24 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedGreaterBlockContent(String name) =>
-      super.namedGreaterBlockContent(name).map(_toOrgContent);
+  Parser namedGreaterBlockContent(String name) => super
+      .namedGreaterBlockContent(name)
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
 
   @override
-  Parser table() => super.table().map((items) {
-        final List rows = items;
-        return OrgTable(rows.cast<OrgTableRow>());
-      });
+  Parser table() =>
+      super.table().castList<OrgTableRow>().map((rows) => OrgTable(rows));
 
   @override
-  Parser tableDotElDivider() => super.tableDotElDivider().map((items) {
-        final String indent = items[0];
-        return OrgTableDividerRow(indent);
-      });
+  Parser tableDotElDivider() => super
+      .tableDotElDivider()
+      .pick(0)
+      .map((indent) => OrgTableDividerRow(indent));
 
   @override
-  Parser tableRowRule() => super.tableRowRule().map((items) {
-        final String indent = items[0];
-        return OrgTableDividerRow(indent);
-      });
+  Parser tableRowRule() =>
+      super.tableRowRule().pick(0).map((item) => OrgTableDividerRow(item));
 
   @override
   Parser tableRowStandard() => super.tableRowStandard().map((items) {
@@ -220,7 +216,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser tableCell() => super.tableCell().pick(1);
 
   @override
-  Parser tableCellContents() => super.tableCellContents().map(_toOrgContent);
+  Parser tableCellContents() => super
+      .tableCellContents()
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
 
   @override
   Parser timestamp() => super
@@ -232,10 +231,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser keyword() => super.keyword().map((value) => OrgKeyword(value));
 
   @override
-  Parser list() => super.list().map((values) {
-        final List items = values;
-        return OrgList(items.cast<OrgListItem>());
-      });
+  Parser list() =>
+      super.list().castList<OrgListItem>().map((items) => OrgList(items));
 
   @override
   Parser listItemOrdered() => super.listItemOrdered().map((values) {
