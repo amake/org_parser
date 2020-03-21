@@ -73,7 +73,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(fixedWidthArea) |
       ref(table) |
       ref(timestamp) |
-      ref(keyword);
+      ref(keyword) |
+      ref(list);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(objects) | endOfInput();
@@ -366,4 +367,44 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('DEADLINE:') |
       string('CLOCK:') |
       string('CLOSED:');
+
+  Parser list() => ref(listItem).plus();
+
+  Parser listItem() => ref(listItemUnordered) | ref(listItemOrdered);
+
+  Parser listItemUnordered() =>
+      ref(indent).flatten('Indent expected') &
+      ref(listUnorderedBullet).flatten('Unordered bullet expected') &
+      ref(listCheckBox).trim(char(' ')).optional() &
+      ref(listTag).trim(char(' ')).optional() &
+      ref(listItemContents);
+
+  Parser listUnorderedBullet() => anyOf('*-+') & char(' ');
+
+  Parser listTag() =>
+      any()
+          .plusLazy(string(' :: ') | Token.newlineParser())
+          .flatten('Tag term expected') &
+      string(' :: ');
+
+  Parser listItemOrdered() =>
+      ref(indent).flatten('Indent expected') &
+      ref(listOrderedBullet).flatten('Ordered bullet expected') &
+      ref(listCounterSet).trim(char(' ')).optional() &
+      ref(listCheckBox).trim(char(' ')).optional() &
+      ref(listItemContents);
+
+  Parser listOrderedBullet() =>
+      (digit().plus() | letter()) & anyOf('.)') & char(' ');
+
+  Parser listCounterSet() => string('[@') & digit().plus() & char(']');
+
+  Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
+
+  Parser listItemContents() {
+    final end = Token.newlineParser().times(3) |
+        (ref(indent) & (ref(listOrderedBullet) | ref(listUnorderedBullet))) |
+        endOfInput();
+    return any().plusLazy(end).flatten();
+  }
 }

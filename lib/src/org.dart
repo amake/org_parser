@@ -237,3 +237,62 @@ class OrgFixedWidthArea extends OrgContentElement with SingleContentElement {
   @override
   final String content;
 }
+
+class OrgList extends OrgContentElement {
+  OrgList(Iterable<OrgListItem> items) : items = List.unmodifiable(items ?? []);
+  final List<OrgListItem> items;
+
+  @override
+  bool contains(Pattern pattern) => items.any((item) => item.contains(pattern));
+}
+
+class OrgListItem extends OrgContentElement {
+  OrgListItem(this.indent, this.bullet, this.checkbox, this.body)
+      : assert(indent != null),
+        assert(bullet != null);
+
+  final String indent;
+  final String bullet;
+  final String checkbox;
+  final OrgContent body;
+
+  @override
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) ||
+      bullet.contains(pattern) ||
+      checkbox != null && checkbox.contains(pattern) ||
+      body != null && body.contains(pattern);
+}
+
+class OrgListUnorderedItem extends OrgListItem {
+  OrgListUnorderedItem(
+    String indent,
+    String bullet,
+    String checkbox,
+    this.tag,
+    OrgContent body,
+  ) : super(indent, bullet, checkbox, body);
+
+  final String tag;
+
+  @override
+  bool contains(Pattern pattern) =>
+      tag != null && tag.contains(pattern) || super.contains(pattern);
+}
+
+class OrgListOrderedItem extends OrgListItem {
+  OrgListOrderedItem(
+    String indent,
+    String bullet,
+    this.counterSet,
+    String checkbox,
+    OrgContent body,
+  ) : super(indent, bullet, checkbox, body);
+
+  final String counterSet;
+
+  @override
+  bool contains(Pattern pattern) =>
+      counterSet != null && counterSet.contains(pattern) ||
+      super.contains(pattern);
+}

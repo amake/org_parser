@@ -546,6 +546,55 @@ foo''');
         ]
       ]);
     });
+    test('lists', () {
+      var result = grammar.parse('- foo');
+      expect(result.value, [
+        [
+          ['', '- ', null, null, 'foo']
+        ]
+      ]);
+      result = grammar.parse('''- foo
+  - bar''');
+      expect(result.value, [
+        [
+          ['', '- ', null, null, 'foo\n'],
+          ['  ', '- ', null, null, 'bar']
+        ]
+      ]);
+      result = grammar.parse('''3. [@3] foo
+   - bar :: baz
+     blah
+   - [ ] *bazinga*''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '3. ',
+            [
+              '[@',
+              ['3'],
+              ']'
+            ],
+            null,
+            'foo\n'
+          ],
+          [
+            '   ',
+            '- ',
+            null,
+            ['bar', ' :: '],
+            'baz\n     blah\n'
+          ],
+          [
+            '   ',
+            '- ',
+            ['[', ' ', ']'],
+            null,
+            '*bazinga*'
+          ]
+        ]
+      ]);
+    });
   });
   test('complex document', () {
     final result =

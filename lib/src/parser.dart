@@ -230,4 +230,44 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser keyword() => super.keyword().map((value) => OrgKeyword(value));
+
+  @override
+  Parser list() => super.list().map((values) {
+        final List items = values;
+        return OrgList(items.cast<OrgListItem>());
+      });
+
+  @override
+  Parser listItemOrdered() => super.listItemOrdered().map((values) {
+        final String indent = values[0];
+        final String bullet = values[1];
+        final String counterSet = values[2];
+        final String checkBox = values[3];
+        final OrgContent body = values[4];
+        return OrgListOrderedItem(indent, bullet, counterSet, checkBox, body);
+      });
+
+  @override
+  Parser listItemUnordered() => super.listItemUnordered().map((values) {
+        final String indent = values[0];
+        final String bullet = values[1];
+        final String checkBox = values[2];
+        final String tag = values[3];
+        final OrgContent body = values[4];
+        return OrgListUnorderedItem(indent, bullet, checkBox, tag, body);
+      });
+
+  @override
+  Parser listItemContents() => super.listItemContents().map(
+      (value) => OrgContentParser().parse(_trimLastBlankLine(value)).value);
+
+  @override
+  Parser listCounterSet() =>
+      super.listCounterSet().flatten('Counter set expected');
+
+  @override
+  Parser listCheckBox() => super.listCheckBox().flatten('Check box expected');
+
+  @override
+  Parser listTag() => super.listTag().flatten('List tag expected');
 }
