@@ -161,17 +161,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .flatten('Named block "$name" start expected')
       .map(_trimLastBlankLine);
 
-  String _trimLastBlankLine(String str) =>
-      str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
-
   @override
   Parser namedBlockEnd(String name) => super
       .namedBlockEnd(name)
       .flatten('Named block "$name" end expected')
       .map(_trimFirstBlankLine);
-
-  String _trimFirstBlankLine(String str) =>
-      str.startsWith('\n') ? str.substring(1, str.length) : str;
 
   @override
   Parser greaterBlock() => super.greaterBlock().map((parts) {
@@ -268,3 +262,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser listTag() => super.listTag().flatten('List tag expected');
 }
+
+String _trimFirstBlankLine(String str) =>
+    str.startsWith('\n') ? str.substring(1, str.length) : str;
+
+String _trimLastBlankLine(String str) =>
+    str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
