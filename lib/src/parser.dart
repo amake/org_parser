@@ -231,26 +231,34 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser listItemOrdered() => super.listItemOrdered().map((values) {
         final String indent = values[0];
-        final String bullet = values[1];
-        final String counterSet = values[2];
-        final String checkBox = values[3];
-        final OrgContent body = values[4];
+        final List rest = values[1];
+        final String bullet = rest[0];
+        final String counterSet = rest[1];
+        final String checkBox = rest[2];
+        final OrgContent body = rest[3];
         return OrgListOrderedItem(indent, bullet, counterSet, checkBox, body);
       });
 
   @override
   Parser listItemUnordered() => super.listItemUnordered().map((values) {
         final String indent = values[0];
-        final String bullet = values[1];
-        final String checkBox = values[2];
-        final String tag = values[3];
-        final OrgContent body = values[4];
+        final List rest = values[1];
+        final String bullet = rest[0];
+        final String checkBox = rest[1];
+        final String tag = rest[2];
+        final OrgContent body = rest[3];
         return OrgListUnorderedItem(indent, bullet, checkBox, tag, body);
       });
 
   @override
-  Parser listItemContents() => super.listItemContents().map(
-      (value) => OrgContentParser().parse(_trimLastBlankLine(value)).value);
+  Parser listItemContents() => super
+      .listItemContents()
+      .castList<OrgContentElement>()
+      .map(_toOrgContentWithLastLineTrim);
+
+  @override
+  Parser listOrderedBullet() =>
+      super.listOrderedBullet().flatten('Ordered list bullet expected');
 
   @override
   Parser listCounterSet() =>
@@ -268,3 +276,12 @@ String _trimFirstBlankLine(String str) =>
 
 String _trimLastBlankLine(String str) =>
     str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
+
+OrgContent _toOrgContentWithLastLineTrim(List<OrgContentElement> elems) {
+  if (elems.isNotEmpty && elems.last is OrgPlainText) {
+    final OrgPlainText lastText = elems.last;
+    elems[elems.length - 1] =
+        OrgPlainText(_trimLastBlankLine(lastText.content));
+  }
+  return OrgContent(elems);
+}

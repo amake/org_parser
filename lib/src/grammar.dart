@@ -369,38 +369,51 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listItem() => ref(listItemUnordered) | ref(listItemOrdered);
 
   Parser listItemUnordered() =>
-      ref(indent).flatten('Indent expected') &
-      ref(listUnorderedBullet).flatten('Unordered bullet expected') &
-      ref(listCheckBox).trim(char(' ')).optional() &
-      ref(listTag).trim(char(' ')).optional() &
-      ref(listItemContents);
+      (ref(indent) & ref(listUnorderedBullet).and())
+          .flatten('Indent expected') &
+      indentedRegion(
+        parser: ref(listUnorderedBullet).flatten('Unordered bullet expected') &
+            ref(listCheckBox).trim(char(' ')).optional() &
+            ref(listTag).trim(char(' ')).optional() &
+            ref(listItemContents),
+        indentAdjust: 1,
+        maxSeparatingLineBreaks: 2,
+      );
 
   Parser listUnorderedBullet() => anyOf('*-+') & char(' ');
 
   Parser listTag() =>
-      any()
-          .plusLazy(string(' :: ') | Token.newlineParser())
-          .flatten('Tag term expected') &
+      any().plusLazy(string(' :: ') | lineEnd()).flatten('Tag term expected') &
       string(' :: ');
 
   Parser listItemOrdered() =>
-      ref(indent).flatten('Indent expected') &
-      ref(listOrderedBullet).flatten('Ordered bullet expected') &
-      ref(listCounterSet).trim(char(' ')).optional() &
-      ref(listCheckBox).trim(char(' ')).optional() &
-      ref(listItemContents);
+      (ref(indent) & ref(listOrderedBullet).and()).flatten('Indent expected') &
+      indentedRegion(
+        parser: ref(listOrderedBullet) &
+            ref(listCounterSet).trim(char(' ')).optional() &
+            ref(listCheckBox).trim(char(' ')).optional() &
+            ref(listItemContents),
+        indentAdjust: 1,
+        maxSeparatingLineBreaks: 2,
+      );
 
   Parser listOrderedBullet() =>
-      (digit().plus() | letter()) & anyOf('.)') & char(' ');
+      (digit().plus().flatten('Bullet number expected') | letter()) &
+      anyOf('.)') &
+      char(' ');
 
-  Parser listCounterSet() => string('[@') & digit().plus() & char(']');
+  Parser listCounterSet() =>
+      string('[@') &
+      digit().plus().flatten('Counter set number expected') &
+      char(']');
 
   Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
 
   Parser listItemContents() {
-    final end = Token.newlineParser().times(3) |
-        (ref(indent) & (ref(listOrderedBullet) | ref(listUnorderedBullet))) |
-        endOfInput();
-    return any().plusLazy(end).flatten();
+    final end = ref(listItemAnyStart) | endOfInput();
+    return (ref(objects) | ref(plainText, end)).star();
   }
+
+  Parser listItemAnyStart() =>
+      ref(indent) & (ref(listUnorderedBullet) | ref(listOrderedBullet));
 }

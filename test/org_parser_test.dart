@@ -550,18 +550,80 @@ foo''');
       var result = grammar.parse('- foo');
       expect(result.value, [
         [
-          ['', '- ', null, null, 'foo']
+          [
+            '',
+            [
+              '- ',
+              null,
+              null,
+              ['foo']
+            ]
+          ]
         ]
       ]);
       result = grammar.parse('''- foo
   - bar''');
       expect(result.value, [
         [
-          ['', '- ', null, null, 'foo\n'],
-          ['  ', '- ', null, null, 'bar']
+          [
+            '',
+            [
+              '- ',
+              null,
+              null,
+              [
+                'foo\n',
+                [
+                  [
+                    '  ',
+                    [
+                      '- ',
+                      null,
+                      null,
+                      ['bar']
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
         ]
       ]);
-      result = grammar.parse('''3. [@3] foo
+      result = grammar.parse('''- foo
+
+  bar''');
+      expect(result.value, [
+        [
+          [
+            '',
+            [
+              '- ',
+              null,
+              null,
+              ['foo\n\n  bar']
+            ]
+          ]
+        ]
+      ]);
+      result = grammar.parse('''- foo
+
+
+  bar''');
+      expect(result.value, [
+        [
+          [
+            '',
+            [
+              '- ',
+              null,
+              null,
+              ['foo\n\n']
+            ]
+          ]
+        ],
+        '\n  bar'
+      ]);
+      result = grammar.parse('''30. [@30] foo
    - bar :: baz
      blah
    - [ ] *bazinga*''');
@@ -569,28 +631,36 @@ foo''');
         [
           [
             '',
-            '3. ',
             [
-              '[@',
-              ['3'],
-              ']'
-            ],
-            null,
-            'foo\n'
-          ],
-          [
-            '   ',
-            '- ',
-            null,
-            ['bar', ' :: '],
-            'baz\n     blah\n'
-          ],
-          [
-            '   ',
-            '- ',
-            ['[', ' ', ']'],
-            null,
-            '*bazinga*'
+              ['30', '.', ' '],
+              ['[@', '30', ']'],
+              null,
+              [
+                'foo\n',
+                [
+                  [
+                    '   ',
+                    [
+                      '- ',
+                      null,
+                      ['bar', ' :: '],
+                      ['baz\n     blah\n']
+                    ]
+                  ],
+                  [
+                    '   ',
+                    [
+                      '- ',
+                      ['[', ' ', ']'],
+                      null,
+                      [
+                        ['*', 'bazinga', '*']
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
           ]
         ]
       ]);
