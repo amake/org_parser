@@ -605,6 +605,22 @@ foo''');
           ]
         ]
       ]);
+      result = grammar.parse('  - foo\n'
+          ' \n'
+          '    bar');
+      expect(result.value, [
+        [
+          [
+            '  ',
+            [
+              '- ',
+              null,
+              null,
+              ['foo\n \n    bar']
+            ]
+          ]
+        ]
+      ]);
       result = grammar.parse('''- foo
 
 

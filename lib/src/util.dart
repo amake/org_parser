@@ -155,21 +155,29 @@ class IndentedRegionParser extends DelegateParser {
 
   int _endOfNextNewLineRun(String buffer, int position) {
     final start = buffer.indexOf('\n', position);
-    var here = start;
+    var end = start, here = start;
     var lines = 0;
-    while (
-        here >= 0 && here < buffer.length && buffer.codeUnitAt(here) == 0x0a) {
-      final next = here + 1;
-      if (next < buffer.length && buffer.codeUnitAt(next) == 0x0d) {
-        here++;
+    outer:
+    while (here >= 0 && here < buffer.length) {
+      switch (buffer.codeUnitAt(here)) {
+        case 0x20: // space
+        case 0x09: // tab
+        case 0x0d: // carriage return
+          here++;
+          break;
+        case 0x0a: // line feed
+          lines++;
+          if (maxSeparatingLineBreaks != kUnlimitedSeparatingLineBreaks &&
+              lines > maxSeparatingLineBreaks) {
+            break outer;
+          } else {
+            end = ++here;
+          }
+          break;
+        default:
+          break outer;
       }
-      lines++;
-      if (maxSeparatingLineBreaks != kUnlimitedSeparatingLineBreaks &&
-          lines > maxSeparatingLineBreaks) {
-        break;
-      }
-      here++;
     }
-    return here;
+    return end;
   }
 }
