@@ -254,7 +254,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser listItemContents() => super
       .listItemContents()
       .castList<OrgContentElement>()
-      .map(_toOrgContentWithLastLineTrim);
+      .map((elems) => OrgContent(elems));
 
   @override
   Parser listOrderedBullet() =>
@@ -276,12 +276,3 @@ String _trimFirstBlankLine(String str) =>
 
 String _trimLastBlankLine(String str) =>
     str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
-
-OrgContent _toOrgContentWithLastLineTrim(List<OrgContentElement> elems) {
-  if (elems.isNotEmpty && elems.last is OrgPlainText) {
-    final OrgPlainText lastText = elems.last;
-    elems[elems.length - 1] =
-        OrgPlainText(_trimLastBlankLine(lastText.content));
-  }
-  return OrgContent(elems);
-}
