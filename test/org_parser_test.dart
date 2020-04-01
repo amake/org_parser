@@ -255,9 +255,10 @@ foo''');
 #+end_src''');
       expect(result.value, [
         [
-          ['', '#+begin_src', ' sh\n'],
-          '  echo \'foo\'\n  rm bar',
-          ['\n', '#+end_src', '']
+          '',
+          ['#+begin_src', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+end_src', '']
         ]
       ]);
       result = grammar.parse('''#+BEGIN_SRC sh
@@ -267,11 +268,11 @@ foo''');
 ''');
       expect(result.value, [
         [
-          ['', '#+BEGIN_SRC', ' sh\n'],
-          '  echo \'foo\'\n  rm bar',
-          ['\n', '#+EnD_sRC', ''],
-        ],
-        '\n'
+          '',
+          ['#+BEGIN_SRC', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+EnD_sRC', '\n']
+        ]
       ]);
       result = parser.parse('''#+begin_src sh
   echo 'foo'
@@ -280,9 +281,9 @@ foo''');
 ''');
       final OrgBlock block = result.value.children[0];
       final OrgMarkup body = block.body;
-      expect(block.header, '#+begin_src sh');
-      expect(body.content, '  echo \'foo\'\n  rm bar');
-      expect(block.footer, '#+end_src');
+      expect(block.header, '#+begin_src sh\n');
+      expect(body.content, '  echo \'foo\'\n  rm bar\n');
+      expect(block.footer, '#+end_src\n');
     });
     test('greater blocks', () {
       var result = grammar.parse('''#+begin_quote
@@ -290,12 +291,14 @@ foo''');
 #+end_quote''');
       expect(result.value, [
         [
-          ['', '#+begin_quote', '\n'],
+          '',
+          ['#+begin_quote', '\n'],
           [
             '  foo ',
-            ['*', 'bar', '*']
+            ['*', 'bar', '*'],
+            '\n'
           ],
-          ['\n', '#+end_quote', '']
+          ['', '#+end_quote', '']
         ]
       ]);
       result = grammar.parse('''#+BEGIN_QUOTE
@@ -304,14 +307,15 @@ foo''');
 ''');
       expect(result.value, [
         [
-          ['', '#+BEGIN_QUOTE', '\n'],
+          '',
+          ['#+BEGIN_QUOTE', '\n'],
           [
             '  foo ',
-            ['/', 'bar', '/']
+            ['/', 'bar', '/'],
+            '\n'
           ],
-          ['\n', '#+EnD_qUOtE', '']
+          ['', '#+EnD_qUOtE', '\n']
         ],
-        '\n'
       ]);
       result = parser.parse('''#+begin_center
   foo ~bar~
@@ -319,11 +323,11 @@ foo''');
 #+end_center
 ''');
       final OrgBlock block = result.value.children[0];
-      expect(block.header, '#+begin_center');
+      expect(block.header, '#+begin_center\n');
       final OrgContent body = block.body;
       final OrgPlainText child = body.children[0];
       expect(child.content, '  foo ');
-      expect(block.footer, '#+end_center');
+      expect(block.footer, '#+end_center\n');
     });
     test('tables', () {
       var result = grammar.parse('''  | foo | bar | baz |

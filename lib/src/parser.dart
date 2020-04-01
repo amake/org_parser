@@ -137,9 +137,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
-        final String header = parts[0];
-        final String body = parts[1];
-        final String footer = parts[2];
+        final String indent = parts[0];
+        final String header = parts[1];
+        final String body = parts[2];
+        final String footer = parts[3];
         OrgContentElement bodyContent;
         switch (name) {
           case 'example':
@@ -152,27 +153,24 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           default:
             bodyContent = OrgPlainText(body);
         }
-        return OrgBlock(header, bodyContent, footer);
+        return OrgBlock(indent, header, bodyContent, footer);
       });
 
   @override
-  Parser namedBlockStart(String name) => super
-      .namedBlockStart(name)
-      .flatten('Named block "$name" start expected')
-      .map(_trimLastBlankLine);
+  Parser namedBlockStart(String name) =>
+      super.namedBlockStart(name).flatten('Named block "$name" start expected');
 
   @override
-  Parser namedBlockEnd(String name) => super
-      .namedBlockEnd(name)
-      .flatten('Named block "$name" end expected')
-      .map(_trimFirstBlankLine);
+  Parser namedBlockEnd(String name) =>
+      super.namedBlockEnd(name).flatten('Named block "$name" end expected');
 
   @override
   Parser greaterBlock() => super.greaterBlock().map((parts) {
-        final String header = parts[0];
-        final OrgContent body = parts[1];
-        final String footer = parts[2];
-        return OrgBlock(header, body, footer);
+        final String indent = parts[0];
+        final String header = parts[1];
+        final OrgContent body = parts[2];
+        final String footer = parts[3];
+        return OrgBlock(indent, header, body, footer);
       });
 
   @override

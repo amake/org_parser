@@ -147,10 +147,12 @@ class OrgMeta extends OrgContentElement with SingleContentElement {
 }
 
 class OrgBlock extends OrgContentElement {
-  OrgBlock(this.header, this.body, this.footer)
-      : assert(header != null),
+  OrgBlock(this.indent, this.header, this.body, this.footer)
+      : assert(indent != null),
+        assert(header != null),
         assert(body != null),
         assert(footer != null);
+  final String indent;
   final String header;
   final OrgContentElement body;
   final String footer;

@@ -208,15 +208,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(namedBlock, 'verse');
 
   Parser namedBlock(String name) =>
+      ref(indent).flatten('Indent expected') &
       ref(namedBlockStart, name) &
       ref(namedBlockContent, name) &
       ref(namedBlockEnd, name);
 
   Parser namedBlockStart(String name) =>
-      ref(indent).flatten('Indent expected') &
       stringIgnoreCase('#+begin_$name') &
-      (ref(lineTrailing) & Token.newlineParser())
-          .flatten('Trailing line content expected');
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
 
   Parser namedBlockContent(String name) => ref(namedBlockEnd, name)
       .neg()
@@ -224,15 +223,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       .flatten('Named block content expected');
 
   Parser namedBlockEnd(String name) =>
-      (Token.newlineParser() & ref(indent))
-          .flatten('Block end indent expected') &
+      ref(indent).flatten('Block end indent expected') &
       stringIgnoreCase('#+end_$name') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
 
   Parser greaterBlock() =>
       ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
 
   Parser namedGreaterBlock(String name) =>
+      ref(indent).flatten('Indent expected') &
       ref(namedBlockStart, name) &
       namedGreaterBlockContent(name) &
       ref(namedBlockEnd, name);
