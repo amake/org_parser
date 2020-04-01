@@ -139,11 +139,22 @@ enum OrgStyle {
   code,
 }
 
-class OrgMeta extends OrgContentElement with SingleContentElement {
-  OrgMeta(this.content) : assert(content != null);
+class OrgMeta extends OrgContentElement {
+  OrgMeta(this.indent, this.keyword, this.trailing)
+      : assert(indent != null),
+        assert(keyword != null),
+        assert(trailing != null);
+
+  final String indent;
+  final String keyword;
+  final String trailing;
 
   @override
-  final String content;
+  bool contains(Pattern pattern) {
+    return indent.contains(pattern) ||
+        keyword.contains(pattern) ||
+        trailing.contains(pattern);
+  }
 }
 
 class OrgBlock extends OrgContentElement {

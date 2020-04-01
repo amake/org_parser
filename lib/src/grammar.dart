@@ -69,7 +69,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(markups) |
       ref(block) |
       ref(greaterBlock) |
-      ref(meta) |
+      ref(affiliatedKeyword) |
       ref(fixedWidthArea) |
       ref(table) |
       ref(timestamp) |
@@ -186,12 +186,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
 
-  Parser meta() => ref(_meta).flatten('Meta expected');
-
-  Parser _meta() =>
+  Parser affiliatedKeyword() =>
       ref(indent).flatten('Indent expected') &
-      string('#+') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref(affiliatedKeywordBody).flatten('Affiliated keyword body expected') &
+      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+
+  // TODO(aaron): Actually parse real keywords
+  Parser affiliatedKeywordBody() => string('#+') & whitespace().neg().plus();
 
   Parser fixedWidthArea() => ref(fixedWidthLine).plus();
 

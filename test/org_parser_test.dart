@@ -201,10 +201,16 @@ c/ d''');
     test('meta', () {
       var result = grammar.parse('''#+blah
 foo''');
-      expect(result.value, ['#+blah', '\nfoo']);
+      expect(result.value, [
+        ['', '#+blah', '\n'],
+        'foo'
+      ]);
       result = grammar.parse('''   #+blah
 foo''');
-      expect(result.value, ['   #+blah', '\nfoo']);
+      expect(result.value, [
+        ['   ', '#+blah', '\n'],
+        'foo'
+      ]);
       result = grammar.parse('''a   #+blah
 foo''');
       expect(result.value, ['a   #+blah\nfoo'],

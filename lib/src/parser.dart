@@ -126,7 +126,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       parser.flatten('Markup expected').map((value) => OrgMarkup(value, style));
 
   @override
-  Parser meta() => super.meta().map((value) => OrgMeta(value));
+  Parser affiliatedKeyword() => super.affiliatedKeyword().map((items) {
+        final String indent = items[0];
+        final String keyword = items[1];
+        final String trailing = items[2];
+        return OrgMeta(indent, keyword, trailing);
+      });
 
   @override
   Parser fixedWidthArea() => super
