@@ -211,6 +211,15 @@ foo''');
         ['   ', '#+blah', '\n'],
         'foo'
       ]);
+      // TODO(aaron): Figure out why this fails without the leading 'a'
+      result = grammar.parse('''a
+#+blah
+foo''');
+      expect(result.value, [
+        'a\n',
+        ['', '#+blah', '\n'],
+        'foo'
+      ]);
       result = grammar.parse('''a   #+blah
 foo''');
       expect(result.value, ['a   #+blah\nfoo'],

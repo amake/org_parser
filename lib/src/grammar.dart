@@ -242,7 +242,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     return (ref(objects) | ref(plainText, end)).starLazy(end);
   }
 
-  Parser indent() => lineStart() & whitespace().star();
+  Parser indent() => lineStart() & anyOf(' \t').star();
 
   Parser lineTrailing() => any().starLazy(lineEnd());
 
