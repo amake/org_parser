@@ -32,7 +32,7 @@ class LookBehindParser<T> extends DelegateParser<T> {
     if (position == 0) {
       return context.failure('Cannot look behind start of buffer');
     }
-    final result = delegate.parseOn(Context(buffer, position - 1));
+    final result = super.parseOn(Context(buffer, position - 1));
     if (result.isSuccess) {
       return context.success(result.value);
     } else {

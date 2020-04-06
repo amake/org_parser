@@ -11,7 +11,7 @@ String parseOrgLocalSectionUrl(String url) {
 
 abstract class OrgTree {
   OrgTree(this.content, [Iterable<OrgSection> children])
-      : children = List.unmodifiable(children ?? const []);
+      : children = List.unmodifiable(children ?? const <OrgSection>[]);
   final OrgContent content;
   final List<OrgSection> children;
 
@@ -33,7 +33,7 @@ class OrgHeadline {
     this.title,
     this.rawTitle, [
     Iterable<String> tags = const [],
-  ]) : tags = List.unmodifiable(tags ?? const []);
+  ]) : tags = List.unmodifiable(tags ?? const <String>[]);
   final String stars;
   final String keyword;
   final String priority;
@@ -177,7 +177,7 @@ class OrgBlock extends OrgContentElement {
 
 class OrgTable extends OrgContentElement {
   OrgTable(Iterable<OrgTableRow> rows)
-      : rows = List.unmodifiable(rows ?? const []);
+      : rows = List.unmodifiable(rows ?? const <OrgTableRow>[]);
 
   final List<OrgTableRow> rows;
 
@@ -217,7 +217,7 @@ class OrgTableDividerRow extends OrgTableRow {
 
 class OrgTableCellRow extends OrgTableRow {
   OrgTableCellRow(String indent, Iterable<OrgContent> cells)
-      : cells = List.unmodifiable(cells ?? const []),
+      : cells = List.unmodifiable(cells ?? const <OrgContent>[]),
         super(indent);
 
   final List<OrgContent> cells;
@@ -259,7 +259,8 @@ class OrgFixedWidthArea extends OrgContentElement {
 }
 
 class OrgList extends OrgContentElement {
-  OrgList(Iterable<OrgListItem> items) : items = List.unmodifiable(items ?? []);
+  OrgList(Iterable<OrgListItem> items)
+      : items = List.unmodifiable(items ?? const <OrgListItem>[]);
   final List<OrgListItem> items;
 
   @override

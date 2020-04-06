@@ -11,8 +11,8 @@ class OrgDocument extends OrgTree {
   factory OrgDocument(String text) {
     final parser = OrgParser();
     final result = parser.parse(text);
-    final OrgContent topContent = result.value[0];
-    final List sections = result.value[1];
+    final topContent = result.value[0] as OrgContent;
+    final sections = result.value[1] as List;
     return OrgDocument._(topContent, List.unmodifiable(sections));
   }
 

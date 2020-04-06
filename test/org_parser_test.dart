@@ -60,9 +60,9 @@ bar
         ]
       ]);
       result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
-      final List values = result.value;
-      final List<OrgSection> sections = values[1];
-      final OrgPlainText title = sections[0].headline.title.children[0];
+      final values = result.value as List;
+      final sections = values[1] as List<OrgSection>;
+      final title = sections[0].headline.title.children[0] as OrgPlainText;
       expect(title.content, 'Title foo bar ');
     });
     test('parse a section', () {
@@ -104,13 +104,14 @@ bar
       expect(grammar.parse(doc).isSuccess, true);
       final parsed = parser.parse(doc);
       expect(parsed.isSuccess, true);
-      final List values = parsed.value;
-      final OrgContent firstContent = values[0];
-      final OrgPlainText text = firstContent.children[0];
+      final values = parsed.value as List;
+      final firstContent = values[0] as OrgContent;
+      final text = firstContent.children[0] as OrgPlainText;
       expect(text.content, 'An introduction.\n\n');
-      final List sections = values[1];
-      final topSection = sections[0];
-      expect(topSection.headline.title.children[0].content, 'A Headline');
+      final sections = values[1] as List;
+      final topSection = sections[0] as OrgSection;
+      final topContent0 = topSection.headline.title.children[0] as OrgPlainText;
+      expect(topContent0.content, 'A Headline');
       expect(topSection.children.length, 2);
     });
   });
@@ -143,8 +144,8 @@ biz baz''');
         ]
       ]);
       result = parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
-      final OrgContent content = result.value;
-      final OrgLink link = content.children[0];
+      final content = result.value as OrgContent;
+      final link = content.children[0] as OrgLink;
       expect(link.location, '*[wtf] what?');
       expect(link.description, '[lots][of][boxes]');
     });
@@ -253,13 +254,13 @@ foo''');
         ' b'
       ]);
       result = parser.parse('[[foo::1][bar]]');
-      OrgContent content = result.value;
-      OrgLink link = content.children[0];
+      var content = result.value as OrgContent;
+      var link = content.children[0] as OrgLink;
       expect(link.description, 'bar');
       expect(link.location, 'foo::1');
       result = parser.parse('[[foo::"\\[1\\]"][bar]]');
-      content = result.value;
-      link = content.children[0];
+      content = result.value as OrgContent;
+      link = content.children[0] as OrgLink;
       expect(link.description, 'bar');
       expect(link.location, 'foo::"[1]"');
     });
@@ -294,8 +295,8 @@ foo''');
   rm bar
 #+end_src
 ''');
-      final OrgBlock block = result.value.children[0];
-      final OrgMarkup body = block.body;
+      final block = result.value.children[0] as OrgBlock;
+      final body = block.body as OrgMarkup;
       expect(block.header, '#+begin_src sh\n');
       expect(body.content, '  echo \'foo\'\n  rm bar\n');
       expect(block.footer, '#+end_src\n');
@@ -337,10 +338,10 @@ foo''');
   bizbaz
 #+end_center
 ''');
-      final OrgBlock block = result.value.children[0];
+      final block = result.value.children[0] as OrgBlock;
       expect(block.header, '#+begin_center\n');
-      final OrgContent body = block.body;
-      final OrgPlainText child = body.children[0];
+      final body = block.body as OrgContent;
+      final child = body.children[0] as OrgPlainText;
       expect(child.content, '  foo ');
       expect(block.footer, '#+end_center\n');
     });
@@ -402,16 +403,16 @@ foo''');
   |-----+-----+-----|
   |   1 |   2 |   3 |
 ''');
-      final OrgTable table = result.value.children[0];
-      final OrgTableCellRow row0 = table.rows[0];
-      final OrgPlainText row0Cell0 = row0.cells[0].children[0];
+      final table = result.value.children[0] as OrgTable;
+      final row0 = table.rows[0] as OrgTableCellRow;
+      final row0Cell0 = row0.cells[0].children[0] as OrgPlainText;
       expect(row0Cell0.content, 'foo');
-      final OrgMarkup row0Cell1 = row0.cells[1].children[0];
+      final row0Cell1 = row0.cells[1].children[0] as OrgMarkup;
       expect(row0Cell1.content, '*bar*');
       expect(row0.cells.length, 3);
-      final OrgTableDividerRow row1 = table.rows[1];
+      final row1 = table.rows[1] as OrgTableDividerRow;
       expect(row1 != null, true);
-      final OrgTableCellRow row2 = table.rows[2];
+      final row2 = table.rows[2] as OrgTableCellRow;
       expect(row2.cells.length, 3);
     });
     test('timestamps', () {
