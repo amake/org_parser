@@ -244,11 +244,18 @@ class OrgKeyword extends OrgContentElement with SingleContentElement {
   final String content;
 }
 
-class OrgFixedWidthArea extends OrgContentElement with SingleContentElement {
-  OrgFixedWidthArea(this.content) : assert(content != null);
+class OrgFixedWidthArea extends OrgContentElement {
+  OrgFixedWidthArea(this.indent, this.content)
+      : assert(indent != null),
+        assert(content != null);
+
+  final String indent;
+  final String content;
 
   @override
-  final String content;
+  bool contains(Pattern pattern) {
+    return indent.contains(pattern) || content.contains(pattern);
+  }
 }
 
 class OrgList extends OrgContentElement {

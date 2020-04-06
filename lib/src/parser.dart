@@ -134,11 +134,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser fixedWidthArea() => super
-      .fixedWidthArea()
-      .flatten('Fixed-width area expected')
-      .map(_trimLastBlankLine)
-      .map((value) => OrgFixedWidthArea(value));
+  Parser fixedWidthArea() => super.fixedWidthArea().castList().map((items) {
+        final List firstLine = items[0];
+        final String indent = firstLine[0];
+        final body = firstLine.skip(1).join() +
+            items.skip(1).expand((line) => line).join();
+        return OrgFixedWidthArea(indent, body);
+      });
 
   @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
@@ -273,9 +275,3 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser listTag() => super.listTag().flatten('List tag expected');
 }
-
-String _trimFirstBlankLine(String str) =>
-    str.startsWith('\n') ? str.substring(1, str.length) : str;
-
-String _trimLastBlankLine(String str) =>
-    str.endsWith('\n') ? str.substring(0, str.length - 1) : str;
