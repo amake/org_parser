@@ -62,7 +62,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       });
 
   @override
-  Parser priority() => super.priority().pick(1);
+  Parser priority() => super.priority().flatten('Priority expected');
 
   @override
   Parser tags() => super.tags().pick(1);
