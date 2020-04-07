@@ -60,24 +60,30 @@ class OrgContentGrammar extends GrammarParser {
 
 class OrgContentGrammarDefinition extends GrammarDefinition {
   @override
-  Parser start() => ref(textRun).star().end();
+  Parser start() => ref(element).star().end();
 
-  Parser textRun() => ref(objects) | ref(plainText);
+  Parser element([bool includeParagraph = true]) {
+    final elements = ref(block) |
+        ref(greaterBlock) |
+        ref(affiliatedKeyword) |
+        ref(fixedWidthArea) |
+        ref(table) |
+        ref(list);
+    return includeParagraph ? elements | ref(paragraph) : elements;
+  }
 
-  Parser objects() =>
-      ref(link) |
-      ref(markups) |
-      ref(block) |
-      ref(greaterBlock) |
-      ref(affiliatedKeyword) |
-      ref(fixedWidthArea) |
-      ref(table) |
-      ref(timestamp) |
-      ref(keyword) |
-      ref(list);
+  Parser paragraph() =>
+      ref(indent).flatten('Indent expected') &
+      ref(textRun, ref(element, false)).plusLazy(ref(paragraphEnd));
+
+  Parser paragraphEnd() => endOfInput() | ref(element, false);
+
+  Parser textRun([Parser limit]) => ref(object) | ref(plainText, limit);
+
+  Parser object() => ref(link) | ref(markups) | ref(timestamp) | ref(keyword);
 
   Parser plainText([Parser limit]) {
-    var fullLimit = ref(objects) | endOfInput();
+    var fullLimit = ref(object) | endOfInput();
     if (limit != null) {
       fullLimit |= limit;
     }
@@ -239,7 +245,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedGreaterBlockContent(String name) {
     final end = ref(namedBlockEnd, name);
-    return (ref(objects) | ref(plainText, end)).starLazy(end);
+    return ref(textRun, end).starLazy(end);
   }
 
   Parser indent() => lineStart() & anyOf(' \t').star();
@@ -269,7 +275,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableCellContents() {
     final end = ref(tableCellTrailing) | lineEnd();
-    return (ref(objects) | ref(plainText, end)).starLazy(end);
+    return ref(textRun, end).starLazy(end);
   }
 
   Parser tableRowRule() =>
@@ -411,7 +417,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemContents() {
     final end = ref(listItemAnyStart) | endOfInput();
-    return (ref(objects) | ref(plainText, end)).star();
+    return (ref(element) | ref(textRun, end)).star();
   }
 
   Parser listItemAnyStart() =>

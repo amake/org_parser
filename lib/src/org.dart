@@ -317,3 +317,15 @@ class OrgListOrderedItem extends OrgListItem {
       counterSet != null && counterSet.contains(pattern) ||
       super.contains(pattern);
 }
+
+class OrgParagraph extends OrgContentElement {
+  OrgParagraph(this.indent, this.body)
+      : assert(indent != null),
+        assert(body != null);
+  final String indent;
+  final OrgContent body;
+
+  @override
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) || body.contains(pattern);
+}

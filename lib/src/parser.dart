@@ -49,7 +49,12 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final keyword = items[1] as String;
         final priority = items[2] as String;
         final rawTitle = items[3] as String;
-        final title = OrgContentParser().parse(rawTitle).value as OrgContent;
+        final titleElements = OrgContentParser.textRunParser()
+            .star()
+            .castList<OrgContentElement>()
+            .parse(rawTitle)
+            .value;
+        final title = OrgContent(titleElements);
         final tags = items[4] as List;
         return OrgHeadline(
           stars,
@@ -75,6 +80,11 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 
 class OrgContentParser extends GrammarParser {
   OrgContentParser() : super(OrgContentParserDefinition());
+
+  static Parser textRunParser() {
+    final definition = OrgContentParserDefinition();
+    return definition.build(start: definition.textRun);
+  }
 }
 
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
@@ -83,6 +93,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .start()
       .castList<OrgContentElement>()
       .map((elems) => OrgContent(elems));
+
+  @override
+  Parser paragraph() => super.paragraph().map((items) {
+        final indent = items[0] as String;
+        final bodyElements = items[1] as List;
+        final body = OrgContent(bodyElements.cast<OrgContentElement>());
+        return OrgParagraph(indent, body);
+      });
 
   @override
   Parser plainText([Parser limit]) =>
