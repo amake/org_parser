@@ -195,7 +195,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser affiliatedKeyword() =>
       ref(indent).flatten('Indent expected') &
       ref(affiliatedKeywordBody).flatten('Affiliated keyword body expected') &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   // TODO(aaron): Actually parse real keywords
   Parser affiliatedKeywordBody() => string('#+') & whitespace().neg().plus();
@@ -205,7 +205,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser fixedWidthLine() =>
       ref(indent).flatten('Indent expected') &
       string(': ') &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser block() =>
       ref(namedBlock, 'comment') |
@@ -222,7 +222,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser namedBlockContent(String name) => ref(namedBlockEnd, name)
       .neg()
@@ -232,7 +232,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser namedBlockEnd(String name) =>
       ref(indent).flatten('Block end indent expected') &
       stringIgnoreCase('#+end_$name') &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser greaterBlock() =>
       ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
@@ -250,7 +250,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser indent() => lineStart() & anyOf(' \t').star();
 
-  Parser lineTrailing() => any().starLazy(lineEnd());
+  Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
   Parser table() => ref(tableLine).plus();
 
@@ -262,7 +262,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(indent).flatten('Indent expected') &
       char('|') &
       ref(tableCell).star() &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser tableCell() =>
       ref(tableCellLeading).flatten('Cell leading content expected') &
@@ -280,13 +280,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableRowRule() =>
       ref(indent).flatten('Indent expected') &
-      (string('|-') & ref(lineTrailing) & lineEnd())
+      (string('|-') & ref(lineTrailing))
           .flatten('Trailing line content expected');
 
   Parser tableDotElDivider() =>
       ref(indent).flatten('Indent expected') &
       (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
-      (ref(lineTrailing) & lineEnd()).flatten('Trailing line content expected');
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser timestamp() =>
       ref(timestampDiary) |
