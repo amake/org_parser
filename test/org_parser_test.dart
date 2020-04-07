@@ -61,9 +61,9 @@ bar
         ]
       ]);
       result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
-      final values = result.value as List;
-      final sections = values[1] as List<OrgSection>;
-      final title = sections[0].headline.title.children[0] as OrgPlainText;
+      final document = result.value as OrgDocument;
+      final title =
+          document.children[0].headline.title.children[0] as OrgPlainText;
       expect(title.content, 'Title foo bar ');
     });
     test('parse a section', () {
@@ -105,13 +105,11 @@ bar
       expect(grammar.parse(doc).isSuccess, true);
       final parsed = parser.parse(doc);
       expect(parsed.isSuccess, true);
-      final values = parsed.value as List;
-      final firstContent = values[0] as OrgContent;
-      final paragraph = firstContent.children[0] as OrgParagraph;
+      final document = parsed.value as OrgDocument;
+      final paragraph = document.content.children[0] as OrgParagraph;
       final text = paragraph.body.children[0] as OrgPlainText;
       expect(text.content, 'An introduction.\n\n');
-      final sections = values[1] as List;
-      final topSection = sections[0] as OrgSection;
+      final topSection = document.children[0];
       final topContent0 = topSection.headline.title.children[0] as OrgPlainText;
       expect(topContent0.content, 'A Headline');
       expect(topSection.children.length, 2);

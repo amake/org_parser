@@ -25,6 +25,14 @@ abstract class OrgTree {
   }
 }
 
+class OrgDocument extends OrgTree {
+  OrgDocument(OrgContent content, Iterable<OrgSection> sections)
+      : super(content, sections);
+
+  @override
+  int get level => 0;
+}
+
 class OrgHeadline {
   OrgHeadline(
     this.stars,

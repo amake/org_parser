@@ -8,6 +8,13 @@ class OrgParser extends GrammarParser {
 
 class OrgParserDefinition extends OrgGrammarDefinition {
   @override
+  Parser start() => super.start().map((items) {
+        final topContent = items[0] as OrgContent;
+        final sections = items[1] as List;
+        return OrgDocument(topContent, List.unmodifiable(sections));
+      });
+
+  @override
   Parser document() => super.document().map((items) {
         final firstContent = items[0] as OrgContent;
         final sections = items[1] as List;
