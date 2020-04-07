@@ -228,7 +228,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final cells = items[2] as List;
         final trailing = items[3] as String;
         if (trailing.trim().isNotEmpty) {
-          cells.add(trailing.trim());
+          cells.add(OrgContent([OrgPlainText(trailing.trim())]));
         }
         return OrgTableCellRow(indent, cells.cast<OrgContent>());
       });
