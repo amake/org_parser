@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:org_parser/org_parser.dart';
 import 'package:org_parser/src/parser.dart';
+import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -106,7 +107,8 @@ bar
       expect(parsed.isSuccess, true);
       final values = parsed.value as List;
       final firstContent = values[0] as OrgContent;
-      final text = firstContent.children[0] as OrgPlainText;
+      final paragraph = firstContent.children[0] as OrgParagraph;
+      final text = paragraph.body.children[0] as OrgPlainText;
       expect(text.content, 'An introduction.\n\n');
       final sections = values[1] as List;
       final topSection = sections[0] as OrgSection;
@@ -116,212 +118,133 @@ bar
     });
   });
 
-  group('content grammar', () {
-    final grammar = OrgContentGrammar();
-    final parser = OrgContentParser();
-    test('content parsing', () {
-      final result = grammar.parse('''foo bar
+  group('content grammar parts', () {
+    final grammarDefinition = OrgContentGrammarDefinition();
+    Parser buildSpecific(Parser Function() start) {
+      return grammarDefinition.build(start: start).end();
+    }
+
+    final fullParser = OrgContentParser();
+
+    test('paragraph', () {
+      final parser = buildSpecific(grammarDefinition.paragraph);
+      var result = parser.parse('''foo bar
 biz baz''');
-      expect(result.value, ['foo bar\nbiz baz']);
-    });
-    test('link grammar', () {
-      var result = grammar.parse('[[http://example.com][example]]');
       expect(result.value, [
-        [
-          '[',
-          ['[', 'http://example.com', ']'],
-          ['[', 'example', ']'],
-          ']'
-        ]
+        '',
+        ['foo bar\nbiz baz']
       ]);
-      result = grammar.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
-      expect(result.value, [
-        [
-          '[',
-          ['[', '*[wtf] what?', ']'],
-          ['[', '[lots][of][boxes]', ']'],
-          ']'
-        ]
-      ]);
-      result = parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
-      final content = result.value as OrgContent;
-      final link = content.children[0] as OrgLink;
-      expect(link.location, '*[wtf] what?');
-      expect(link.description, '[lots][of][boxes]');
-    });
-    test('complex content', () {
-      final result =
-          grammar.parse('''go to [[http://example.com][example]] for *fun*,
+      result = parser.parse('''go to [[http://example.com][example]] for *fun*,
 maybe''');
       expect(result.value, [
-        'go to ',
+        '',
         [
-          '[',
-          ['[', 'http://example.com', ']'],
-          ['[', 'example', ']'],
-          ']'
-        ],
-        ' for ',
-        ['*', 'fun', '*'],
-        ',\nmaybe'
+          'go to ',
+          [
+            '[',
+            ['[', 'http://example.com', ']'],
+            ['[', 'example', ']'],
+            ']'
+          ],
+          ' for ',
+          ['*', 'fun', '*'],
+          ',\nmaybe'
+        ]
+      ]);
+    });
+    test('link', () {
+      final parser = buildSpecific(grammarDefinition.link);
+      var result = parser.parse('[[http://example.com][example]]');
+      expect(result.value, [
+        '[',
+        ['[', 'http://example.com', ']'],
+        ['[', 'example', ']'],
+        ']'
+      ]);
+      result = parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
+      expect(result.value, [
+        '[',
+        ['[', '*[wtf] what?', ']'],
+        ['[', '[lots][of][boxes]', ']'],
+        ']'
       ]);
     });
     test('markup', () {
-      var result = grammar.parse('''a/b
+      final parser = buildSpecific(grammarDefinition.markups);
+      var result = parser.parse('''a/b
 c/d''');
-      expect(result.value, ['a/b\nc/d'], reason: 'bad pre/post chars');
-      result = grammar.parse('''a /b
+      expect(result.isFailure, true, reason: 'bad pre/post chars');
+      result = parser.parse('''a /b
 c/d''');
-      expect(result.value, ['a /b\nc/d'], reason: 'bad post char');
-      result = grammar.parse('''a/b
+      expect(result.isFailure, true, reason: 'bad post char');
+      result = parser.parse('''a/b
 c/ d''');
-      expect(result.value, ['a/b\nc/ d'], reason: 'bad pre char');
-      result = grammar.parse('/a/');
-      expect(result.value, [
-        ['/', 'a', '/']
-      ]);
-      result = grammar.parse('/abc/');
-      expect(result.value, [
-        ['/', 'abc', '/']
-      ]);
-      result = grammar.parse('/a b/');
-      expect(result.value, [
-        ['/', 'a b', '/']
-      ]);
-      result = grammar.parse('//');
-      expect(result.value, ['//'], reason: 'body is required');
-      result = grammar.parse('~,~');
-      expect(result.value, [
-        ['~', ',', '~']
-      ]);
-      result = grammar.parse("~'~");
-      expect(result.value, [
-        ['~', "'", '~']
-      ]);
+      expect(result.isFailure, true, reason: 'bad pre char');
+      result = parser.parse('/a/');
+      expect(result.value, ['/', 'a', '/']);
+      result = parser.parse('/abc/');
+      expect(result.value, ['/', 'abc', '/']);
+      result = parser.parse('/a b/');
+      expect(result.value, ['/', 'a b', '/']);
+      result = parser.parse('//');
+      expect(result.isFailure, true, reason: 'body is required');
+      result = parser.parse('~,~');
+      expect(result.value, ['~', ',', '~']);
+      result = parser.parse("~'~");
+      expect(result.value, ['~', "'", '~']);
     });
-    test('meta', () {
-      var result = grammar.parse('''#+blah
-foo''');
-      expect(result.value, [
-        ['', '#+blah', '\n'],
-        'foo'
-      ]);
-      result = grammar.parse('''   #+blah
-foo''');
-      expect(result.value, [
-        ['   ', '#+blah', '\n'],
-        'foo'
-      ]);
-      // TODO(aaron): Figure out why this fails without the leading 'a'
-      result = grammar.parse('''a
-#+blah
-foo''');
-      expect(result.value, [
-        'a\n',
-        ['', '#+blah', '\n'],
-        'foo'
-      ]);
-      result = grammar.parse('''a   #+blah
-foo''');
-      expect(result.value, ['a   #+blah\nfoo'],
-          reason: 'only leading space is allowed');
+    test('affiliated keyword', () {
+      final parser = buildSpecific(grammarDefinition.affiliatedKeyword);
+      var result = parser.parse('  #+blah');
+      expect(result.value, ['  ', '#+blah', '']);
+      result = parser.parse('''a   #+blah''');
+      expect(result.isFailure, true, reason: 'only leading space is allowed');
     });
-    test('links', () {
-      var result = grammar.parse('a http://example.com b');
-      expect(result.value, ['a ', 'http://example.com', ' b']);
-      result = grammar.parse('a https://example.com b');
-      expect(result.value, ['a ', 'https://example.com', ' b']);
-      result = grammar.parse('a [[foo][bar]] b');
-      expect(result.value, [
-        'a ',
-        [
-          '[',
-          ['[', 'foo', ']'],
-          ['[', 'bar', ']'],
-          ']'
-        ],
-        ' b'
-      ]);
-      result = grammar.parse('a [[foo::1][bar]] b');
-      expect(result.value, [
-        'a ',
-        [
-          '[',
-          ['[', 'foo::1', ']'],
-          ['[', 'bar', ']'],
-          ']'
-        ],
-        ' b'
-      ]);
-      result = parser.parse('[[foo::1][bar]]');
-      var content = result.value as OrgContent;
-      var link = content.children[0] as OrgLink;
-      expect(link.description, 'bar');
-      expect(link.location, 'foo::1');
-      result = parser.parse('[[foo::"\\[1\\]"][bar]]');
-      content = result.value as OrgContent;
-      link = content.children[0] as OrgLink;
-      expect(link.description, 'bar');
-      expect(link.location, 'foo::"[1]"');
-    });
-    test('blocks', () {
-      var result = grammar.parse('''#+begin_src sh
+    test('block', () {
+      final parser = buildSpecific(grammarDefinition.block);
+      var result = parser.parse('''#+begin_src sh
   echo 'foo'
   rm bar
 #+end_src''');
       expect(result.value, [
-        [
-          '',
-          ['#+begin_src', ' sh\n'],
-          '  echo \'foo\'\n  rm bar\n',
-          ['', '#+end_src', '']
-        ]
+        '',
+        ['#+begin_src', ' sh\n'],
+        '  echo \'foo\'\n  rm bar\n',
+        ['', '#+end_src', '']
       ]);
-      result = grammar.parse('''#+BEGIN_SRC sh
+      result = parser.parse('''#+BEGIN_SRC sh
   echo 'foo'
   rm bar
 #+EnD_sRC
 ''');
       expect(result.value, [
-        [
-          '',
-          ['#+BEGIN_SRC', ' sh\n'],
-          '  echo \'foo\'\n  rm bar\n',
-          ['', '#+EnD_sRC', '\n']
-        ]
+        '',
+        ['#+BEGIN_SRC', ' sh\n'],
+        '  echo \'foo\'\n  rm bar\n',
+        ['', '#+EnD_sRC', '\n']
       ]);
-      result = parser.parse('''#+begin_src sh
-  echo 'foo'
-  rm bar
-#+end_src
-''');
-      final block = result.value.children[0] as OrgBlock;
-      final body = block.body as OrgMarkup;
-      expect(block.header, '#+begin_src sh\n');
-      expect(body.content, '  echo \'foo\'\n  rm bar\n');
-      expect(block.footer, '#+end_src\n');
     });
-    test('greater blocks', () {
-      var result = grammar.parse('''#+begin_quote
+    test('greater block', () {
+      final parser = buildSpecific(grammarDefinition.greaterBlock);
+      var result = parser.parse('''#+begin_quote
   foo *bar*
 #+end_quote''');
       expect(result.value, [
+        '',
+        ['#+begin_quote', '\n'],
         [
-          '',
-          ['#+begin_quote', '\n'],
-          [
-            '  foo ',
-            ['*', 'bar', '*'],
-            '\n'
-          ],
-          ['', '#+end_quote', '']
-        ]
+          '  foo ',
+          ['*', 'bar', '*'],
+          '\n'
+        ],
+        ['', '#+end_quote', '']
       ]);
-      result = grammar.parse('''#+BEGIN_QUOTE
+      result = parser.parse('''#+BEGIN_QUOTE
   foo /bar/
 #+EnD_qUOtE
 ''');
-      expect(result.value, [
+      expect(
+        result.value,
         [
           '',
           ['#+BEGIN_QUOTE', '\n'],
@@ -332,137 +255,141 @@ foo''');
           ],
           ['', '#+EnD_qUOtE', '\n']
         ],
-      ]);
-      result = parser.parse('''#+begin_center
-  foo ~bar~
-  bizbaz
-#+end_center
-''');
-      final block = result.value.children[0] as OrgBlock;
-      expect(block.header, '#+begin_center\n');
-      final body = block.body as OrgContent;
-      final child = body.children[0] as OrgPlainText;
-      expect(child.content, '  foo ');
-      expect(block.footer, '#+end_center\n');
+      );
     });
-    test('tables', () {
-      var result = grammar.parse('''  | foo | bar | baz |
+    test('table', () {
+      final parser = buildSpecific(grammarDefinition.table);
+      var result = parser.parse('''  | foo | bar | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
 ''');
       expect(result.value, [
         [
+          '  ',
+          '|',
           [
-            '  ',
-            '|',
             [
-              [
-                ' ',
-                ['foo'],
-                ' |'
-              ],
-              [
-                ' ',
-                ['bar'],
-                ' |'
-              ],
-              [
-                ' ',
-                ['baz'],
-                ' |'
-              ]
+              ' ',
+              ['foo'],
+              ' |'
             ],
-            '\n'
+            [
+              ' ',
+              ['bar'],
+              ' |'
+            ],
+            [
+              ' ',
+              ['baz'],
+              ' |'
+            ]
           ],
-          ['  ', '|-----+-----+-----|\n'],
+          '\n'
+        ],
+        ['  ', '|-----+-----+-----|\n'],
+        [
+          '  ',
+          '|',
           [
-            '  ',
-            '|',
             [
-              [
-                '   ',
-                ['1'],
-                ' |'
-              ],
-              [
-                '   ',
-                ['2'],
-                ' |'
-              ],
-              [
-                '   ',
-                ['3'],
-                ' |'
-              ]
+              '   ',
+              ['1'],
+              ' |'
             ],
-            '\n'
-          ]
+            [
+              '   ',
+              ['2'],
+              ' |'
+            ],
+            [
+              '   ',
+              ['3'],
+              ' |'
+            ]
+          ],
+          '\n'
         ]
       ]);
-      result = parser.parse('''  | foo | *bar* | baz |
-  |-----+-----+-----|
-  |   1 |   2 |   3 |
-''');
-      final table = result.value.children[0] as OrgTable;
-      final row0 = table.rows[0] as OrgTableCellRow;
-      final row0Cell0 = row0.cells[0].children[0] as OrgPlainText;
-      expect(row0Cell0.content, 'foo');
-      final row0Cell1 = row0.cells[1].children[0] as OrgMarkup;
-      expect(row0Cell1.content, '*bar*');
-      expect(row0.cells.length, 3);
-      final row1 = table.rows[1] as OrgTableDividerRow;
-      expect(row1 != null, true);
-      final row2 = table.rows[2] as OrgTableCellRow;
-      expect(row2.cells.length, 3);
     });
     test('timestamps', () {
-      var result = grammar.parse('''<2020-03-12 Wed>''');
+      final parser = buildSpecific(grammarDefinition.timestamp);
+      var result = parser.parse('''<2020-03-12 Wed>''');
       expect(result.value, [
-        [
-          '<',
-          ['2020', '-', '03', '-', '12', 'Wed'],
-          null,
-          [],
-          '>'
-        ]
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        null,
+        [],
+        '>'
       ]);
-      result = grammar.parse('''<2020-03-12 Wed 8:34>''');
+      result = parser.parse('''<2020-03-12 Wed 8:34>''');
       expect(result.value, [
-        [
-          '<',
-          ['2020', '-', '03', '-', '12', 'Wed'],
-          ['8', ':', '34'],
-          [],
-          '>'
-        ]
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['8', ':', '34'],
+        [],
+        '>'
       ]);
-      result = grammar.parse('''<2020-03-12 Wed 8:34 +1w>''');
+      result = parser.parse('''<2020-03-12 Wed 8:34 +1w>''');
+      expect(result.value, [
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['8', ':', '34'],
+        [
+          ['+', '1', 'w']
+        ],
+        '>'
+      ]);
+      result = parser.parse('''<2020-03-12 Wed 8:34 +1w --2d>''');
+      expect(result.value, [
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['8', ':', '34'],
+        [
+          ['+', '1', 'w'],
+          ['--', '2', 'd']
+        ],
+        '>'
+      ]);
+      result = parser.parse('''[2020-03-12 Wed 18:34 .+1w --12d]''');
+      expect(result.value, [
+        '[',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['18', ':', '34'],
+        [
+          ['.+', '1', 'w'],
+          ['--', '12', 'd']
+        ],
+        ']'
+      ]);
+      result = parser.parse('''[2020-03-12 Wed 18:34-19:35 .+1w --12d]''');
+      expect(result.value, [
+        '[',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        [
+          ['18', ':', '34'],
+          '-',
+          ['19', ':', '35']
+        ],
+        [
+          ['.+', '1', 'w'],
+          ['--', '12', 'd']
+        ],
+        ']'
+      ]);
+      result = parser.parse(
+          '''[2020-03-11 Wed 18:34 .+1w --12d]--[2020-03-12 Wed 18:34 .+1w --12d]''');
       expect(result.value, [
         [
-          '<',
-          ['2020', '-', '03', '-', '12', 'Wed'],
-          ['8', ':', '34'],
+          '[',
+          ['2020', '-', '03', '-', '11', 'Wed'],
+          ['18', ':', '34'],
           [
-            ['+', '1', 'w']
+            ['.+', '1', 'w'],
+            ['--', '12', 'd']
           ],
-          '>'
-        ]
-      ]);
-      result = grammar.parse('''<2020-03-12 Wed 8:34 +1w --2d>''');
-      expect(result.value, [
-        [
-          '<',
-          ['2020', '-', '03', '-', '12', 'Wed'],
-          ['8', ':', '34'],
-          [
-            ['+', '1', 'w'],
-            ['--', '2', 'd']
-          ],
-          '>'
-        ]
-      ]);
-      result = grammar.parse('''[2020-03-12 Wed 18:34 .+1w --12d]''');
-      expect(result.value, [
+          ']'
+        ],
+        '--',
         [
           '[',
           ['2020', '-', '03', '-', '12', 'Wed'],
@@ -474,133 +401,147 @@ foo''');
           ']'
         ]
       ]);
-      result = grammar.parse('''[2020-03-12 Wed 18:34-19:35 .+1w --12d]''');
+      result = parser.parse('''<%%(what (the (f)))>''');
       expect(result.value, [
+        '<%%',
         [
-          '[',
-          ['2020', '-', '03', '-', '12', 'Wed'],
+          '(',
           [
-            ['18', ':', '34'],
-            '-',
-            ['19', ':', '35']
+            'what',
+            [
+              '(',
+              [
+                'the',
+                [
+                  '(',
+                  ['f'],
+                  ')'
+                ]
+              ],
+              ')'
+            ]
           ],
-          [
-            ['.+', '1', 'w'],
-            ['--', '12', 'd']
-          ],
-          ']'
-        ]
+          ')'
+        ],
+        '>'
       ]);
-      result = grammar.parse(
-          '''[2020-03-11 Wed 18:34 .+1w --12d]--[2020-03-12 Wed 18:34 .+1w --12d]''');
+      result = parser.parse('''<%%(what (the (f))>''');
+      expect(result.isFailure, true, reason: 'Invalid sexp');
+      result = parser.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
+      expect(result.isFailure, true, reason: 'Seconds not supported');
+    });
+    test('fixed-width area', () {
+      final parser = buildSpecific(grammarDefinition.fixedWidthArea);
+      var result = parser.parse('  : foo');
+      expect(result.value, [
+        ['  ', ': ', 'foo']
+      ]);
+      result = parser.parse('''  : foo
+  : bar''');
+      expect(result.value, [
+        ['  ', ': ', 'foo\n'],
+        ['  ', ': ', 'bar']
+      ]);
+    });
+    test('list', () {
+      final parser = buildSpecific(grammarDefinition.list);
+      var result = parser.parse('- foo');
       expect(result.value, [
         [
+          '',
           [
-            '[',
-            ['2020', '-', '03', '-', '11', 'Wed'],
-            ['18', ':', '34'],
-            [
-              ['.+', '1', 'w'],
-              ['--', '12', 'd']
-            ],
-            ']'
-          ],
-          '--',
-          [
-            '[',
-            ['2020', '-', '03', '-', '12', 'Wed'],
-            ['18', ':', '34'],
-            [
-              ['.+', '1', 'w'],
-              ['--', '12', 'd']
-            ],
-            ']'
+            '- ',
+            null,
+            null,
+            ['foo']
           ]
         ]
       ]);
-      result = grammar.parse('''<%%(what (the (f)))>''');
+      result = parser.parse('''- foo
+  - bar''');
       expect(result.value, [
         [
-          '<%%',
+          '',
           [
-            '(',
+            '- ',
+            null,
+            null,
             [
-              'what',
+              'foo\n',
               [
-                '(',
                 [
-                  'the',
+                  '  ',
                   [
-                    '(',
-                    ['f'],
-                    ')'
+                    '- ',
+                    null,
+                    null,
+                    ['bar']
                   ]
-                ],
-                ')'
+                ]
               ]
-            ],
-            ')'
-          ],
-          '>'
-        ]
-      ]);
-      result = grammar.parse('''<%%(what (the (f))>''');
-      expect(result.value, ['<%%(what (the (f))>'], reason: 'Invalid sexp');
-      result = grammar.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
-      expect(result.value, ['[2020-03-11 Wed 18:34:56 .+1w --12d]'],
-          reason: 'Seconds not supported');
-    });
-    test('fixed-width area', () {
-      var result = grammar.parse('  : foo');
-      expect(result.value, [
-        [
-          ['  ', ': ', 'foo']
-        ]
-      ]);
-      result = grammar.parse('''  : foo
-  : bar''');
-      expect(result.value, [
-        [
-          ['  ', ': ', 'foo\n'],
-          ['  ', ': ', 'bar']
-        ]
-      ]);
-    });
-    test('lists', () {
-      var result = grammar.parse('- foo');
-      expect(result.value, [
-        [
-          [
-            '',
-            [
-              '- ',
-              null,
-              null,
-              ['foo']
             ]
           ]
         ]
       ]);
-      result = grammar.parse('''- foo
-  - bar''');
+      result = parser.parse('''- foo
+
+  bar''');
       expect(result.value, [
         [
+          '',
           [
-            '',
+            '- ',
+            null,
+            null,
+            ['foo\n\n  bar']
+          ]
+        ]
+      ]);
+      result = parser.parse('  - foo\n'
+          ' \n'
+          '    bar');
+      expect(result.value, [
+        [
+          '  ',
+          [
+            '- ',
+            null,
+            null,
+            ['foo\n \n    bar']
+          ]
+        ]
+      ]);
+      result = parser.parse('''30. [@30] foo
+   - bar :: baz
+     blah
+   - [ ] *bazinga*''');
+      expect(result.value, [
+        [
+          '',
+          [
+            ['30', '.', ' '],
+            ['[@', '30', ']'],
+            null,
             [
-              '- ',
-              null,
-              null,
+              'foo\n',
               [
-                'foo\n',
                 [
+                  '   ',
                   [
-                    '  ',
+                    '- ',
+                    null,
+                    ['bar', ' :: '],
+                    ['baz\n     blah\n']
+                  ]
+                ],
+                [
+                  '   ',
+                  [
+                    '- ',
+                    ['[', ' ', ']'],
+                    null,
                     [
-                      '- ',
-                      null,
-                      null,
-                      ['bar']
+                      ['*', 'bazinga', '*']
                     ]
                   ]
                 ]
@@ -609,39 +550,123 @@ foo''');
           ]
         ]
       ]);
-      result = grammar.parse('''- foo
+    });
+  });
+  group('content grammar complete', () {
+    final parser = OrgContentGrammar();
+    test('paragraph', () {
+      final result = parser.parse('''foo bar *biz*
 
-  bar''');
+  #+begin_quote
+    blah
+  #+end_quote
+bazinga''');
       expect(result.value, [
         [
+          '',
           [
-            '',
+            'foo bar ',
+            ['*', 'biz', '*'],
+            '\n\n'
+          ]
+        ],
+        [
+          '  ',
+          ['#+begin_quote', '\n'],
+          ['    blah\n'],
+          ['  ', '#+end_quote', '\n']
+        ],
+        [
+          '',
+          ['bazinga']
+        ]
+      ]);
+    });
+    test('link', () {
+      var result = parser.parse('a http://example.com b');
+      expect(result.value, [
+        [
+          '',
+          ['a ', 'http://example.com', ' b']
+        ]
+      ]);
+      result = parser.parse('a https://example.com b');
+      expect(result.value, [
+        [
+          '',
+          ['a ', 'https://example.com', ' b']
+        ]
+      ]);
+      result = parser.parse('a [[foo][bar]] b');
+      expect(result.value, [
+        [
+          '',
+          [
+            'a ',
             [
-              '- ',
-              null,
-              null,
-              ['foo\n\n  bar']
-            ]
+              '[',
+              ['[', 'foo', ']'],
+              ['[', 'bar', ']'],
+              ']'
+            ],
+            ' b'
           ]
         ]
       ]);
-      result = grammar.parse('  - foo\n'
-          ' \n'
-          '    bar');
+      result = parser.parse('a [[foo::1][bar]] b');
       expect(result.value, [
         [
+          '',
           [
-            '  ',
+            'a ',
             [
-              '- ',
-              null,
-              null,
-              ['foo\n \n    bar']
-            ]
+              '[',
+              ['[', 'foo::1', ']'],
+              ['[', 'bar', ']'],
+              ']'
+            ],
+            ' b'
           ]
         ]
       ]);
-      result = grammar.parse('''- foo
+    });
+    test('affiliated keyword', () {
+      var result = parser.parse('''#+blah
+foo''');
+      expect(result.value, [
+        ['', '#+blah', '\n'],
+        [
+          '',
+          ['foo']
+        ]
+      ]);
+      result = parser.parse('''   #+blah
+foo''');
+      expect(result.value, [
+        ['   ', '#+blah', '\n'],
+        [
+          '',
+          ['foo']
+        ]
+      ]);
+      // TODO(aaron): Figure out why this fails without the leading 'a'
+      result = parser.parse('''a
+#+blah
+foo''');
+      expect(result.value, [
+        [
+          '',
+          ['a\n']
+        ],
+        ['', '#+blah', '\n'],
+        [
+          '',
+          ['foo']
+        ]
+      ]);
+    });
+    test('list', () {
+      final result = parser.parse('''- foo
 
 
   bar''');
@@ -657,49 +682,80 @@ foo''');
             ]
           ]
         ],
-        '\n  bar'
-      ]);
-      result = grammar.parse('''30. [@30] foo
-   - bar :: baz
-     blah
-   - [ ] *bazinga*''');
-      expect(result.value, [
         [
-          [
-            '',
-            [
-              ['30', '.', ' '],
-              ['[@', '30', ']'],
-              null,
-              [
-                'foo\n',
-                [
-                  [
-                    '   ',
-                    [
-                      '- ',
-                      null,
-                      ['bar', ' :: '],
-                      ['baz\n     blah\n']
-                    ]
-                  ],
-                  [
-                    '   ',
-                    [
-                      '- ',
-                      ['[', ' ', ']'],
-                      null,
-                      [
-                        ['*', 'bazinga', '*']
-                      ]
-                    ]
-                  ]
-                ]
-              ]
-            ]
-          ]
+          // TODO(aaron): Fix this bad indent
+          '',
+          ['\n  bar']
         ]
       ]);
+    });
+  });
+  group('content parser parts', () {
+    final parserDefinition = OrgContentParserDefinition();
+    Parser buildSpecific(Parser Function() start) {
+      return parserDefinition.build(start: start).end();
+    }
+
+    test('link', () {
+      final parser = buildSpecific(parserDefinition.link);
+      var result =
+          parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
+      var link = result.value as OrgLink;
+      expect(link.location, '*[wtf] what?');
+      expect(link.description, '[lots][of][boxes]');
+      result = parser.parse('[[foo::1][bar]]');
+      link = result.value as OrgLink;
+      expect(link.description, 'bar');
+      expect(link.location, 'foo::1');
+      result = parser.parse('[[foo::"\\[1\\]"][bar]]');
+      link = result.value as OrgLink;
+      expect(link.description, 'bar');
+      expect(link.location, 'foo::"[1]"');
+    });
+    test('block', () {
+      final parser = buildSpecific(parserDefinition.block);
+      final result = parser.parse('''#+begin_src sh
+  echo 'foo'
+  rm bar
+#+end_src
+''');
+      final block = result.value as OrgBlock;
+      final body = block.body as OrgMarkup;
+      expect(block.header, '#+begin_src sh\n');
+      expect(body.content, '  echo \'foo\'\n  rm bar\n');
+      expect(block.footer, '#+end_src\n');
+    });
+    test('greater block', () {
+      final parser = buildSpecific(parserDefinition.greaterBlock);
+      final result = parser.parse('''#+begin_center
+  foo ~bar~
+  bizbaz
+#+end_center
+''');
+      final block = result.value as OrgBlock;
+      expect(block.header, '#+begin_center\n');
+      final body = block.body as OrgContent;
+      final child = body.children[0] as OrgPlainText;
+      expect(child.content, '  foo ');
+      expect(block.footer, '#+end_center\n');
+    });
+    test('table', () {
+      final parser = buildSpecific(parserDefinition.table);
+      final result = parser.parse('''  | foo | *bar* | baz |
+  |-----+-----+-----|
+  |   1 |   2 |   3 |
+''');
+      final table = result.value as OrgTable;
+      final row0 = table.rows[0] as OrgTableCellRow;
+      final row0Cell0 = row0.cells[0].children[0] as OrgPlainText;
+      expect(row0Cell0.content, 'foo');
+      final row0Cell1 = row0.cells[1].children[0] as OrgMarkup;
+      expect(row0Cell1.content, '*bar*');
+      expect(row0.cells.length, 3);
+      final row1 = table.rows[1] as OrgTableDividerRow;
+      expect(row1 != null, true);
+      final row2 = table.rows[2] as OrgTableCellRow;
+      expect(row2.cells.length, 3);
     });
   });
   test('complex document', () {
