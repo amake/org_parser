@@ -423,7 +423,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
 
   Parser listItemContents() {
-    final end = ref(listItemAnyStart) | endOfInput();
+    final end = ref(listItemAnyStart) | ref(element, false) | endOfInput();
     return (ref(element) | ref(textRun, end)).star();
   }
 

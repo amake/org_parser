@@ -587,6 +587,35 @@ c/ d''');
         ],
         ''
       ]);
+      result = parser.parse('''- foo
+  #+begin_src sh
+    echo bar
+  #+end_src''');
+      expect(result.value, [
+        [
+          [
+            '',
+            [
+              '- ',
+              null,
+              null,
+              [
+                'foo\n',
+                [
+                  '  ',
+                  [
+                    ['#+begin_src', ' sh\n'],
+                    '    echo bar\n',
+                    ['  ', '#+end_src']
+                  ],
+                  ''
+                ]
+              ]
+            ]
+          ]
+        ],
+        ''
+      ]);
     });
   });
   group('content grammar complete', () {
