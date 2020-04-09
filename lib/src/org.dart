@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:org_parser/org_parser.dart';
+
 bool isOrgLocalSectionUrl(String url) => url.startsWith('*');
 
 /// Return the title of the section pointed to by the URL. The URL must be one
@@ -26,6 +28,9 @@ abstract class OrgTree {
 }
 
 class OrgDocument extends OrgTree {
+  factory OrgDocument.parse(String text) =>
+      OrgParser().parse(text).value as OrgDocument;
+
   OrgDocument(OrgContent content, Iterable<OrgSection> sections)
       : super(content, sections);
 
