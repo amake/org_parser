@@ -162,32 +162,36 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser fixedWidthArea() => super.fixedWidthArea().castList().map((items) {
-        final firstLine = items[0] as List;
+        final body = items[0] as List;
+        final firstLine = body[0] as List;
         final indent = firstLine[0] as String;
-        final body = firstLine.skip(1).join() +
-            items.skip(1).expand((line) => line as List).join();
-        return OrgFixedWidthArea(indent, body);
+        final content = firstLine.skip(1).join() +
+            body.skip(1).expand((line) => line as List).join();
+        final trailing = items[1] as String;
+        return OrgFixedWidthArea(indent, content, trailing);
       });
 
   @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
         final indent = parts[0] as String;
-        final header = parts[1] as String;
-        final body = parts[2] as String;
-        final footer = parts[3] as String;
+        final body = parts[1] as List;
+        final header = body[0] as String;
+        final content = body[1] as String;
+        final footer = body[2] as String;
+        final trailing = parts[2] as String;
         OrgContentElement bodyContent;
         switch (name) {
           case 'example':
           case 'export':
-            bodyContent = OrgMarkup(body, OrgStyle.verbatim);
+            bodyContent = OrgMarkup(content, OrgStyle.verbatim);
             break;
           case 'src':
-            bodyContent = OrgMarkup(body, OrgStyle.code);
+            bodyContent = OrgMarkup(content, OrgStyle.code);
             break;
           default:
-            bodyContent = OrgPlainText(body);
+            bodyContent = OrgPlainText(content);
         }
-        return OrgBlock(indent, header, bodyContent, footer);
+        return OrgBlock(indent, header, bodyContent, footer, trailing);
       });
 
   @override
@@ -201,10 +205,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser greaterBlock() => super.greaterBlock().map((parts) {
         final indent = parts[0] as String;
-        final header = parts[1] as String;
-        final body = parts[2] as OrgContent;
-        final footer = parts[3] as String;
-        return OrgBlock(indent, header, body, footer);
+        final body = parts[1] as List;
+        final header = body[0] as String;
+        final content = body[1] as OrgContent;
+        final footer = body[2] as String;
+        final trailing = parts[2] as String;
+        return OrgBlock(indent, header, content, footer, trailing);
       });
 
   @override
@@ -214,8 +220,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
-  Parser table() =>
-      super.table().castList<OrgTableRow>().map((rows) => OrgTable(rows));
+  Parser table() => super.table().map((items) {
+        final rows = items[0] as List;
+        final trailing = items[1] as String;
+        return OrgTable(rows.cast<OrgTableRow>(), trailing);
+      });
 
   @override
   Parser tableDotElDivider() => super
@@ -260,8 +269,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.keyword().map((value) => OrgKeyword(value as String));
 
   @override
-  Parser list() =>
-      super.list().castList<OrgListItem>().map((items) => OrgList(items));
+  Parser list() => super.list().map((items) {
+        final listItems = items[0] as List;
+        final trailing = items[1] as String;
+        return OrgList(listItems.cast<OrgListItem>(), trailing);
+      });
 
   @override
   Parser listItemOrdered() => super.listItemOrdered().map((values) {

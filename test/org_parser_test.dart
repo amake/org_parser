@@ -122,8 +122,6 @@ bar
       return grammarDefinition.build(start: start).end();
     }
 
-    final fullParser = OrgContentParser();
-
     test('paragraph', () {
       final parser = buildSpecific(grammarDefinition.paragraph);
       var result = parser.parse('''foo bar
@@ -206,9 +204,12 @@ c/ d''');
 #+end_src''');
       expect(result.value, [
         '',
-        ['#+begin_src', ' sh\n'],
-        '  echo \'foo\'\n  rm bar\n',
-        ['', '#+end_src', '']
+        [
+          ['#+begin_src', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+end_src']
+        ],
+        ''
       ]);
       result = parser.parse('''#+BEGIN_SRC sh
   echo 'foo'
@@ -217,9 +218,12 @@ c/ d''');
 ''');
       expect(result.value, [
         '',
-        ['#+BEGIN_SRC', ' sh\n'],
-        '  echo \'foo\'\n  rm bar\n',
-        ['', '#+EnD_sRC', '\n']
+        [
+          ['#+BEGIN_SRC', ' sh\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+EnD_sRC']
+        ],
+        '\n'
       ]);
     });
     test('greater block', () {
@@ -229,84 +233,90 @@ c/ d''');
 #+end_quote''');
       expect(result.value, [
         '',
-        ['#+begin_quote', '\n'],
         [
-          '  foo ',
-          ['*', 'bar', '*'],
-          '\n'
+          ['#+begin_quote', '\n'],
+          [
+            '  foo ',
+            ['*', 'bar', '*'],
+            '\n'
+          ],
+          ['', '#+end_quote']
         ],
-        ['', '#+end_quote', '']
+        ''
       ]);
       result = parser.parse('''#+BEGIN_QUOTE
   foo /bar/
 #+EnD_qUOtE
 ''');
-      expect(
-        result.value,
+      expect(result.value, [
+        '',
         [
-          '',
           ['#+BEGIN_QUOTE', '\n'],
           [
             '  foo ',
             ['/', 'bar', '/'],
             '\n'
           ],
-          ['', '#+EnD_qUOtE', '\n']
+          ['', '#+EnD_qUOtE']
         ],
-      );
+        '\n'
+      ]);
     });
     test('table', () {
       final parser = buildSpecific(grammarDefinition.table);
-      var result = parser.parse('''  | foo | bar | baz |
+      final result = parser.parse('''  | foo | bar | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
 ''');
       expect(result.value, [
         [
-          '  ',
-          '|',
           [
+            '  ',
+            '|',
             [
-              ' ',
-              ['foo'],
-              ' |'
+              [
+                ' ',
+                ['foo'],
+                ' |'
+              ],
+              [
+                ' ',
+                ['bar'],
+                ' |'
+              ],
+              [
+                ' ',
+                ['baz'],
+                ' |'
+              ]
             ],
-            [
-              ' ',
-              ['bar'],
-              ' |'
-            ],
-            [
-              ' ',
-              ['baz'],
-              ' |'
-            ]
+            '\n'
           ],
-          '\n'
+          ['  ', '|-----+-----+-----|\n'],
+          [
+            '  ',
+            '|',
+            [
+              [
+                '   ',
+                ['1'],
+                ' |'
+              ],
+              [
+                '   ',
+                ['2'],
+                ' |'
+              ],
+              [
+                '   ',
+                ['3'],
+                ' |'
+              ]
+            ],
+            '\n'
+          ]
         ],
-        ['  ', '|-----+-----+-----|\n'],
-        [
-          '  ',
-          '|',
-          [
-            [
-              '   ',
-              ['1'],
-              ' |'
-            ],
-            [
-              '   ',
-              ['2'],
-              ' |'
-            ],
-            [
-              '   ',
-              ['3'],
-              ' |'
-            ]
-          ],
-          '\n'
-        ]
+        ''
       ]);
     });
     test('timestamps', () {
@@ -432,13 +442,19 @@ c/ d''');
       final parser = buildSpecific(grammarDefinition.fixedWidthArea);
       var result = parser.parse('  : foo');
       expect(result.value, [
-        ['  ', ': ', 'foo']
+        [
+          ['  ', ': ', 'foo']
+        ],
+        ''
       ]);
       result = parser.parse('''  : foo
   : bar''');
       expect(result.value, [
-        ['  ', ': ', 'foo\n'],
-        ['  ', ': ', 'bar']
+        [
+          ['  ', ': ', 'foo\n'],
+          ['  ', ': ', 'bar']
+        ],
+        ''
       ]);
     });
     test('list', () {
@@ -446,68 +462,85 @@ c/ d''');
       var result = parser.parse('- foo');
       expect(result.value, [
         [
-          '',
           [
-            '- ',
-            null,
-            null,
-            ['foo']
+            '',
+            [
+              '- ',
+              null,
+              null,
+              ['foo']
+            ]
           ]
-        ]
+        ],
+        ''
       ]);
       result = parser.parse('''- foo
   - bar''');
       expect(result.value, [
         [
-          '',
           [
-            '- ',
-            null,
-            null,
+            '',
             [
-              'foo\n',
+              '- ',
+              null,
+              null,
               [
+                'foo\n',
                 [
-                  '  ',
                   [
-                    '- ',
-                    null,
-                    null,
-                    ['bar']
-                  ]
+                    [
+                      '  ',
+                      [
+                        '- ',
+                        null,
+                        null,
+                        ['bar']
+                      ]
+                    ]
+                  ],
+                  ''
                 ]
               ]
             ]
           ]
-        ]
+        ],
+        ''
       ]);
       result = parser.parse('''- foo
 
   bar''');
       expect(result.value, [
         [
-          '',
           [
-            '- ',
-            null,
-            null,
-            ['foo\n\n  bar']
+            '',
+            [
+              '- ',
+              null,
+              null,
+              ['foo\n\n  bar']
+            ]
           ]
-        ]
+        ],
+        ''
       ]);
-      result = parser.parse('  - foo\n'
-          ' \n'
-          '    bar');
+      result = parser.parse(
+        '  - foo\n'
+        ' \n'
+        '    bar',
+      );
       expect(result.value, [
         [
-          '  ',
           [
-            '- ',
-            null,
-            null,
-            ['foo\n \n    bar']
+            '  ',
+            [
+              '- ',
+              null,
+              null,
+              ['foo\n \n    bar']
+            ]
           ]
-        ]
+        ],
+        ''
       ]);
       result = parser.parse('''30. [@30] foo
    - bar :: baz
@@ -515,38 +548,44 @@ c/ d''');
    - [ ] *bazinga*''');
       expect(result.value, [
         [
-          '',
           [
-            ['30', '.', ' '],
-            ['[@', '30', ']'],
-            null,
+            '',
             [
-              'foo\n',
+              ['30', '.', ' '],
+              ['[@', '30', ']'],
+              null,
               [
+                'foo\n',
                 [
-                  '   ',
                   [
-                    '- ',
-                    null,
-                    ['bar', ' :: '],
-                    ['baz\n     blah\n']
-                  ]
-                ],
-                [
-                  '   ',
-                  [
-                    '- ',
-                    ['[', ' ', ']'],
-                    null,
                     [
-                      ['*', 'bazinga', '*']
+                      '   ',
+                      [
+                        '- ',
+                        null,
+                        ['bar', ' :: '],
+                        ['baz\n     blah\n']
+                      ]
+                    ],
+                    [
+                      '   ',
+                      [
+                        '- ',
+                        ['[', ' ', ']'],
+                        null,
+                        [
+                          ['*', 'bazinga', '*']
+                        ]
+                      ]
                     ]
-                  ]
+                  ],
+                  ''
                 ]
               ]
             ]
           ]
-        ]
+        ],
+        ''
       ]);
     });
   });
@@ -570,9 +609,12 @@ bazinga''');
         ],
         [
           '  ',
-          ['#+begin_quote', '\n'],
-          ['    blah\n'],
-          ['  ', '#+end_quote', '\n']
+          [
+            ['#+begin_quote', '\n'],
+            ['    blah\n'],
+            ['  ', '#+end_quote']
+          ],
+          '\n'
         ],
         [
           '',
@@ -671,19 +713,21 @@ foo''');
       expect(result.value, [
         [
           [
-            '',
             [
-              '- ',
-              null,
-              null,
-              ['foo\n\n']
+              '',
+              [
+                '- ',
+                null,
+                null,
+                ['foo\n\n']
+              ]
             ]
-          ]
+          ],
+          '\n'
         ],
         [
-          // TODO(aaron): Fix this bad indent
-          '',
-          ['\n  bar']
+          '  ',
+          ['bar']
         ]
       ]);
     });
@@ -721,7 +765,8 @@ foo''');
       final body = block.body as OrgMarkup;
       expect(block.header, '#+begin_src sh\n');
       expect(body.content, '  echo \'foo\'\n  rm bar\n');
-      expect(block.footer, '#+end_src\n');
+      expect(block.footer, '#+end_src');
+      expect(block.trailing, '\n');
     });
     test('greater block', () {
       final parser = buildSpecific(parserDefinition.greaterBlock);
@@ -735,7 +780,8 @@ foo''');
       final body = block.body as OrgContent;
       final child = body.children[0] as OrgPlainText;
       expect(child.content, '  foo ');
-      expect(block.footer, '#+end_center\n');
+      expect(block.footer, '#+end_center');
+      expect(block.trailing, '\n');
     });
     test('table', () {
       final parser = buildSpecific(parserDefinition.table);

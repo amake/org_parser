@@ -105,6 +105,12 @@ mixin SingleContentElement {
   bool contains(Pattern pattern) => content.contains(pattern);
 }
 
+mixin IndentedElement {
+  String get indent;
+
+  String get trailing;
+}
+
 class OrgContent extends OrgContentElement {
   OrgContent(Iterable<OrgContentElement> children)
       : children = List.unmodifiable(children),
@@ -170,16 +176,20 @@ class OrgMeta extends OrgContentElement {
   }
 }
 
-class OrgBlock extends OrgContentElement {
-  OrgBlock(this.indent, this.header, this.body, this.footer)
+class OrgBlock extends OrgContentElement with IndentedElement {
+  OrgBlock(this.indent, this.header, this.body, this.footer, this.trailing)
       : assert(indent != null),
         assert(header != null),
         assert(body != null),
-        assert(footer != null);
+        assert(footer != null),
+        assert(trailing != null);
+  @override
   final String indent;
   final String header;
   final OrgContentElement body;
   final String footer;
+  @override
+  final String trailing;
 
   @override
   bool contains(Pattern pattern) =>
@@ -188,13 +198,17 @@ class OrgBlock extends OrgContentElement {
       footer.contains(pattern);
 }
 
-class OrgTable extends OrgContentElement {
-  OrgTable(Iterable<OrgTableRow> rows)
-      : rows = List.unmodifiable(rows ?? const <OrgTableRow>[]);
+class OrgTable extends OrgContentElement with IndentedElement {
+  OrgTable(Iterable<OrgTableRow> rows, this.trailing)
+      : assert(trailing != null),
+        rows = List.unmodifiable(rows ?? const <OrgTableRow>[]);
 
   final List<OrgTableRow> rows;
 
+  @override
   String get indent => rows.isEmpty ? '' : rows.first.indent;
+  @override
+  final String trailing;
 
   bool get rectangular =>
       rows
@@ -257,13 +271,16 @@ class OrgKeyword extends OrgContentElement with SingleContentElement {
   final String content;
 }
 
-class OrgFixedWidthArea extends OrgContentElement {
-  OrgFixedWidthArea(this.indent, this.content)
+class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
+  OrgFixedWidthArea(this.indent, this.content, this.trailing)
       : assert(indent != null),
-        assert(content != null);
-
+        assert(content != null),
+        assert(trailing != null);
+  @override
   final String indent;
   final String content;
+  @override
+  final String trailing;
 
   @override
   bool contains(Pattern pattern) {
@@ -271,10 +288,16 @@ class OrgFixedWidthArea extends OrgContentElement {
   }
 }
 
-class OrgList extends OrgContentElement {
-  OrgList(Iterable<OrgListItem> items)
-      : items = List.unmodifiable(items ?? const <OrgListItem>[]);
+class OrgList extends OrgContentElement with IndentedElement {
+  OrgList(Iterable<OrgListItem> items, this.trailing)
+      : assert(trailing != null),
+        items = List.unmodifiable(items ?? const <OrgListItem>[]);
   final List<OrgListItem> items;
+
+  @override
+  String get indent => items.isEmpty ? '' : items.first.indent;
+  @override
+  final String trailing;
 
   @override
   bool contains(Pattern pattern) => items.any((item) => item.contains(pattern));

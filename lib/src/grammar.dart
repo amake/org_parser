@@ -192,15 +192,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
 
-  Parser affiliatedKeyword() =>
-      ref(indent).flatten('Indent expected') &
-      ref(affiliatedKeywordBody).flatten('Affiliated keyword body expected') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+  Parser affiliatedKeyword() => indented(
+        ref(affiliatedKeywordBody).flatten('Affiliated keyword body expected'),
+      );
 
   // TODO(aaron): Actually parse real keywords
   Parser affiliatedKeywordBody() => string('#+') & whitespace().neg().plus();
 
-  Parser fixedWidthArea() => ref(fixedWidthLine).plus();
+  Parser fixedWidthArea() => ref(fixedWidthLine).plus() & ref(blankLines);
 
   Parser fixedWidthLine() =>
       ref(indent).flatten('Indent expected') &
@@ -214,11 +213,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(namedBlock, 'src') |
       ref(namedBlock, 'verse');
 
-  Parser namedBlock(String name) =>
-      ref(indent).flatten('Indent expected') &
-      ref(namedBlockStart, name) &
-      ref(namedBlockContent, name) &
-      ref(namedBlockEnd, name);
+  Parser namedBlock(String name) => indented(
+        ref(namedBlockStart, name) &
+            ref(namedBlockContent, name) &
+            ref(namedBlockEnd, name),
+      );
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &
@@ -231,17 +230,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlockEnd(String name) =>
       ref(indent).flatten('Block end indent expected') &
-      stringIgnoreCase('#+end_$name') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      stringIgnoreCase('#+end_$name');
 
   Parser greaterBlock() =>
       ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
 
-  Parser namedGreaterBlock(String name) =>
-      ref(indent).flatten('Indent expected') &
-      ref(namedBlockStart, name) &
-      namedGreaterBlockContent(name) &
-      ref(namedBlockEnd, name);
+  Parser namedGreaterBlock(String name) => indented(
+        ref(namedBlockStart, name) &
+            namedGreaterBlockContent(name) &
+            ref(namedBlockEnd, name),
+      );
 
   Parser namedGreaterBlockContent(String name) {
     final end = ref(namedBlockEnd, name);
@@ -250,9 +248,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser indent() => lineStart() & anyOf(' \t').star();
 
+  Parser indented(Parser parser) =>
+      ref(indent).flatten('Indent expected') &
+      parser &
+      (ref(lineTrailing) & ref(blankLines))
+          .flatten('Trailing line content expected');
+
+  Parser blankLines() =>
+      Token.newlineParser().star().flatten('Blank lines expected');
+
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
-  Parser table() => ref(tableLine).plus();
+  Parser table() => ref(tableLine).plus() & blankLines();
 
   Parser tableLine() => ref(tableRow) | ref(tableDotElDivider);
 
@@ -370,7 +377,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('CLOCK:') |
       string('CLOSED:');
 
-  Parser list() => ref(listItem).plus();
+  Parser list() => ref(listItem).plus() & ref(blankLines);
 
   Parser listItem() => ref(listItemUnordered) | ref(listItemOrdered);
 
