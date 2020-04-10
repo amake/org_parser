@@ -22,7 +22,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser _headline() =>
       lineStart() &
       ref(stars).trim() &
-      ref(keyword).trim().optional() &
+      ref(todoKeyword).trim().optional() &
       ref(priority).trim().optional() &
       ref(title).optional() &
       ref(tags).optional() &
@@ -30,7 +30,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser stars() => char('*').plus().flatten('Stars expected');
 
-  Parser keyword() => string('TODO') | string('DONE');
+  Parser todoKeyword() => string('TODO') | string('DONE');
 
   Parser priority() => string('[#') & letter() & char(']');
 
