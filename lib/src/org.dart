@@ -56,7 +56,8 @@ class OrgHeadline {
   final String rawTitle;
   final List<String> tags;
 
-  int get level => stars.length;
+  // -1 for trailing space
+  int get level => stars.length - 1;
 
   bool contains(Pattern pattern) =>
       keyword != null && keyword.contains(pattern) ||

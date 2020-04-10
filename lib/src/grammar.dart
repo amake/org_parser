@@ -17,10 +17,9 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser section() => ref(headline) & ref(content).optional();
 
-  Parser headline() => drop(ref(_headline), [0, -1]);
+  Parser headline() => drop(ref(_headline), [-1]);
 
   Parser _headline() =>
-      lineStart() &
       ref(stars).trim() &
       ref(todoKeyword).trim().optional() &
       ref(priority).trim().optional() &
@@ -28,7 +27,8 @@ class OrgGrammarDefinition extends GrammarDefinition {
       ref(tags).optional() &
       lineEnd();
 
-  Parser stars() => char('*').plus().flatten('Stars expected');
+  Parser stars() =>
+      (lineStart() & char('*').plus() & char(' ')).flatten('Stars expected');
 
   Parser todoKeyword() => string('TODO') | string('DONE');
 
@@ -47,9 +47,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser content() => ref(_content).flatten('Content expected');
 
   Parser _content() =>
-      char('*').not() &
-      (ref(newline) & (char('*'))).neg().plus() &
-      ref(newline).optional();
+      ref(stars).not() & any().plusLazy(ref(stars) | endOfInput());
 
   Parser newline() => Token.newlineParser();
 }
