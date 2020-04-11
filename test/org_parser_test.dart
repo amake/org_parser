@@ -836,4 +836,9 @@ foo''');
         OrgParser().parse(File('test/org-syntax.org').readAsStringSync());
     expect(result.isSuccess, true);
   });
+  test('complex document 2', () {
+    final result =
+        OrgParser().parse(File('test/org-manual.org').readAsStringSync());
+    expect(result.isSuccess, true);
+  });
 }
