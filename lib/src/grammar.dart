@@ -247,7 +247,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     return ref(textRun, end).starLazy(end);
   }
 
-  Parser indent() => lineStart() & anyOf(' \t').star();
+  Parser indent() => lineStart() & ref(insignificantWhitespace).star();
 
   Parser indented(Parser parser) =>
       ref(indent).flatten('Indent expected') &
@@ -261,7 +261,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
   Parser lineTrailingWhitespace() =>
-      anyOf(' \t').starLazy(lineEnd()) & lineEnd();
+      ref(insignificantWhitespace).starLazy(lineEnd()) & lineEnd();
+
+  Parser insignificantWhitespace() => anyOf(' \t');
 
   Parser table() => ref(tableLine).plus() & blankLines();
 
@@ -454,7 +456,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerEnd() =>
       ref(indent).flatten('Indent expected') &
-      (stringIgnoreCase(':END:') & anyOf(' \t').star())
+      (stringIgnoreCase(':END:') & ref(insignificantWhitespace).star())
           .flatten('Drawer end expected');
 
   Parser property() =>
