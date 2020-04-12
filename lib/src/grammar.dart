@@ -468,7 +468,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser propertyKey() =>
       char(':') &
       any()
-          .plusLazy(char(':') & (anyOf(' \t') | lineEnd()))
+          .plusLazy(
+            char(':') & ref(insignificantWhitespace).plus() & lineEnd().not(),
+          )
           .flatten('Property name expected') &
       char(':');
 

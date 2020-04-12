@@ -665,6 +665,9 @@ c/ d''');
       expect(result.isFailure, true, reason: 'Value required');
       result = parser.parse(':foo:blah');
       expect(result.isFailure, true, reason: 'Delimiting space required');
+      result = parser.parse(''':foo:
+bar''');
+      expect(result.isFailure, true, reason: 'Value must be on same line');
     });
   });
 
