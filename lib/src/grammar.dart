@@ -451,8 +451,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerContent() {
     final end = ref(drawerEnd);
-    return (ref(property) | ref(element) | ref(textRun, end)).starLazy(end);
+    return (ref(property) | ref(nonDrawerElements) | ref(textRun, end))
+        .starLazy(end);
   }
+
+  Parser nonDrawerElements() => element()..replace(ref(drawer), noOpFail());
 
   Parser drawerEnd() =>
       ref(indent).flatten('Indent expected') &

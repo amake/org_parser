@@ -651,6 +651,13 @@ c/ d''');
         ],
         '\n\n'
       ]);
+      result = parser.parse(''':foo:
+:bar:
+:end:
+:end:''');
+      expect(result.isFailure, true,
+          reason: 'Nested drawer disallowed; the trailing ":end:" is '
+              'a separate paragraph, which fails the drawer-specific parser');
     });
     test('property', () {
       final parser = buildSpecific(grammarDefinition.property);
