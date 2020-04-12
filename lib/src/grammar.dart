@@ -60,21 +60,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() => ref(element).star().end();
 
-  Parser element([bool includeParagraph = true]) {
-    final elements = ref(block) |
-        ref(greaterBlock) |
-        ref(affiliatedKeyword) |
-        ref(fixedWidthArea) |
-        ref(table) |
-        ref(list);
-    return includeParagraph ? elements | ref(paragraph) : elements;
-  }
+  Parser element() =>
+      ref(block) |
+      ref(greaterBlock) |
+      ref(affiliatedKeyword) |
+      ref(fixedWidthArea) |
+      ref(table) |
+      ref(list) |
+      ref(paragraph);
 
   Parser paragraph() =>
       ref(indent).flatten('Indent expected') &
-      ref(textRun, ref(element, false)).plusLazy(ref(paragraphEnd));
+      ref(textRun, ref(nonParagraphElements)).plusLazy(ref(paragraphEnd));
 
-  Parser paragraphEnd() => endOfInput() | ref(element, false);
+  Parser nonParagraphElements() =>
+      element()..replace(ref(paragraph), noOpFail());
+
+  Parser paragraphEnd() => endOfInput() | ref(nonParagraphElements);
 
   Parser textRun([Parser limit]) => ref(object) | ref(plainText, limit);
 
@@ -421,7 +423,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
 
   Parser listItemContents() {
-    final end = ref(listItemAnyStart) | ref(element, false) | endOfInput();
+    final end =
+        ref(listItemAnyStart) | ref(nonParagraphElements) | endOfInput();
     return (ref(element) | ref(textRun, end)).star();
   }
 
