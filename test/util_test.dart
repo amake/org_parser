@@ -74,4 +74,13 @@ void main() {
       ]
     ]);
   });
+  test('no-op parser', () {
+    var parser = noOpFail();
+    var result = parser.parse('');
+    expect(result.isFailure, true);
+    parser = NoOpParser(true);
+    result = parser.parse('');
+    expect(result.isSuccess, true);
+    expect(result.value, '');
+  });
 }
