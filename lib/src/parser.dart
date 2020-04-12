@@ -316,4 +316,39 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser listTag() => super.listTag().flatten('List tag expected');
+
+  @override
+  Parser drawer() => super.drawer().map((values) {
+        final indent = values[0] as String;
+        final body = values[1] as List;
+        final header = body[0] as String;
+        final content = body[1] as OrgContent;
+        final footer = body[2] as String;
+        final trailing = values[2] as String;
+        return OrgDrawer(indent, header, content, footer, trailing);
+      });
+
+  @override
+  Parser drawerStart() => super.drawerStart().flatten('Drawer start expected');
+
+  @override
+  Parser drawerContent() => super
+      .drawerContent()
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
+
+  @override
+  Parser drawerEnd() => super.drawerEnd().flatten('Drawer end expected');
+
+  @override
+  Parser property() => super.property().map((values) {
+        final indent = values[0] as String;
+        final key = values[1] as String;
+        final value = values[2] as String;
+        final trailing = values[3] as String;
+        return OrgProperty(indent, key, value, trailing);
+      });
+
+  @override
+  Parser propertyKey() => super.propertyKey().flatten('Property key expected');
 }

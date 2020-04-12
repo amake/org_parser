@@ -366,3 +366,41 @@ class OrgParagraph extends OrgContentElement {
   bool contains(Pattern pattern) =>
       indent.contains(pattern) || body.contains(pattern);
 }
+
+class OrgDrawer extends OrgContentElement with IndentedElement {
+  OrgDrawer(this.indent, this.header, this.body, this.footer, this.trailing)
+      : assert(indent != null),
+        assert(header != null),
+        assert(body != null),
+        assert(footer != null),
+        assert(trailing != null);
+  @override
+  final String indent;
+  final String header;
+  final OrgContentElement body;
+  final String footer;
+  @override
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      header.contains(pattern) ||
+      body.contains(pattern) ||
+      footer.contains(pattern);
+}
+
+class OrgProperty extends OrgContentElement {
+  OrgProperty(this.indent, this.key, this.value, this.trailing)
+      : assert(indent != null),
+        assert(key != null),
+        assert(value != null),
+        assert(trailing != null);
+  final String indent;
+  final String key;
+  final String value;
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      key.contains(pattern) || value.contains(pattern);
+}

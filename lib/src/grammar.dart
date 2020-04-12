@@ -67,6 +67,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(fixedWidthArea) |
       ref(table) |
       ref(list) |
+      ref(drawer) |
       ref(paragraph);
 
   Parser paragraph() =>
@@ -259,6 +260,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
+  Parser lineTrailingWhitespace() =>
+      anyOf(' \t').starLazy(lineEnd()) & lineEnd();
+
   Parser table() => ref(tableLine).plus() & blankLines();
 
   Parser tableLine() => ref(tableRow) | ref(tableDotElDivider);
@@ -430,4 +434,42 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemAnyStart() =>
       ref(indent) & (ref(listUnorderedBullet) | ref(listOrderedBullet));
+
+  Parser drawer() => indented(
+        ref(drawerStart) & ref(drawerContent) & ref(drawerEnd),
+      );
+
+  Parser drawerStart() =>
+      char(':') &
+      pattern('a-zA-Z0-9_@#%')
+          .plusLazy(char(':'))
+          .flatten('Drawer start expected') &
+      char(':') &
+      lineTrailingWhitespace().flatten('Trailing whitespace expected');
+
+  Parser drawerContent() {
+    final end = ref(drawerEnd);
+    return (ref(property) | ref(element) | ref(textRun, end)).starLazy(end);
+  }
+
+  Parser drawerEnd() =>
+      ref(indent).flatten('Indent expected') &
+      (stringIgnoreCase(':END:') & anyOf(' \t').star())
+          .flatten('Drawer end expected');
+
+  Parser property() =>
+      ref(indent).flatten('Indent expected') &
+      ref(propertyKey) &
+      ref(propertyValue) &
+      (lineEnd() & ref(blankLines)).flatten('Trailing whitespace expected');
+
+  Parser propertyKey() =>
+      char(':') &
+      any()
+          .plusLazy(char(':') & (anyOf(' \t') | lineEnd()))
+          .flatten('Property name expected') &
+      char(':');
+
+  Parser propertyValue() =>
+      any().plusLazy(lineEnd()).flatten('Property value expected');
 }

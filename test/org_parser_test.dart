@@ -617,7 +617,57 @@ c/ d''');
         ''
       ]);
     });
+    test('drawer', () {
+      final parser = buildSpecific(grammarDefinition.drawer);
+      var result = parser.parse(''':foo:
+:end:''');
+      expect(result.value, [
+        '',
+        [
+          [':', 'foo', ':', '\n'],
+          [],
+          ['', ':end:']
+        ],
+        ''
+      ]);
+      result = parser.parse('''  :foo:
+  :bar: baz
+  :end:
+
+''');
+      expect(result.value, [
+        '  ',
+        [
+          [':', 'foo', ':', '\n'],
+          [
+            [
+              '  ',
+              [':', 'bar', ':'],
+              ' baz',
+              '\n'
+            ]
+          ],
+          ['  ', ':end:']
+        ],
+        '\n\n'
+      ]);
+    });
+    test('property', () {
+      final parser = buildSpecific(grammarDefinition.property);
+      var result = parser.parse(':foo: bar');
+      expect(result.value, [
+        '',
+        [':', 'foo', ':'],
+        ' bar',
+        ''
+      ]);
+      result = parser.parse(':foo:');
+      expect(result.isFailure, true, reason: 'Value required');
+      result = parser.parse(':foo:blah');
+      expect(result.isFailure, true, reason: 'Delimiting space required');
+    });
   });
+
   group('content grammar complete', () {
     final parser = OrgContentGrammar();
     test('paragraph', () {
@@ -760,6 +810,31 @@ foo''');
         ]
       ]);
     });
+    test('drawer', () {
+      final result = parser.parse(''':foo:
+:bar: baz
+:end:
+#+bazinga: bozo''');
+      expect(result.value, [
+        [
+          '',
+          [
+            [':', 'foo', ':', '\n'],
+            [
+              [
+                '',
+                [':', 'bar', ':'],
+                ' baz',
+                '\n'
+              ]
+            ],
+            ['', ':end:']
+          ],
+          '\n'
+        ],
+        ['', '#+bazinga:', ' bozo']
+      ]);
+    });
   });
   group('content parser parts', () {
     final parserDefinition = OrgContentParserDefinition();
@@ -829,6 +904,21 @@ foo''');
       expect(row1 != null, true);
       final row2 = table.rows[2] as OrgTableCellRow;
       expect(row2.cells.length, 3);
+    });
+    test('drawer', () {
+      final parser = buildSpecific(parserDefinition.drawer);
+      final result = parser.parse('''  :foo:
+  :bar: baz
+  :end:
+
+''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.header, ':foo:\n');
+      final body = drawer.body as OrgContent;
+      final property = body.children[0] as OrgProperty;
+      expect(property.key, ':bar:');
+      expect(property.value, ' baz');
+      expect(drawer.footer, '  :end:');
     });
   });
   test('complex document', () {
