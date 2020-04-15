@@ -153,6 +153,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       parser.flatten('Markup expected').map((value) => OrgMarkup(value, style));
 
   @override
+  Parser macroReference() => super
+      .macroReference()
+      .flatten('Macro reference expected')
+      .map((value) => OrgMacroReference(value));
+
+  @override
   Parser affiliatedKeyword() => super.affiliatedKeyword().map((items) {
         final indent = items[0] as String;
         final keyword = items[1] as String;

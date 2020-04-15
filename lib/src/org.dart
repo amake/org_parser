@@ -159,6 +159,12 @@ enum OrgStyle {
   code,
 }
 
+class OrgMacroReference extends OrgContentElement with SingleContentElement {
+  OrgMacroReference(this.content) : assert(content != null);
+  @override
+  final String content;
+}
+
 class OrgMeta extends OrgContentElement {
   OrgMeta(this.indent, this.keyword, this.trailing)
       : assert(indent != null),

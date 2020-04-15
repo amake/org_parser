@@ -28,6 +28,19 @@ void main() {
       expect(link.description, 'bar');
       expect(link.location, 'foo::"[1]"');
     });
+    test('macro reference', () {
+      final parser = buildSpecific(parserDefinition.macroReference);
+      var result = parser.parse('{{{name(arg1, arg2)}}}');
+      var ref = result.value as OrgMacroReference;
+      expect(ref.content, '{{{name(arg1, arg2)}}}');
+      result = parser.parse('{{{foobar}}}');
+      ref = result.value as OrgMacroReference;
+      expect(ref.content, '{{{foobar}}}');
+      result = parser.parse('{{{}}}');
+      expect(result.isFailure, true, reason: 'Body missing');
+      result = parser.parse('{{{0abc}}}');
+      expect(result.isFailure, true, reason: 'Invalid key');
+    });
     test('block', () {
       final parser = buildSpecific(parserDefinition.block);
       final result = parser.parse('''#+begin_src sh

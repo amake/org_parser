@@ -81,7 +81,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser textRun([Parser limit]) => ref(object) | ref(plainText, limit);
 
-  Parser object() => ref(link) | ref(markups) | ref(timestamp) | ref(keyword);
+  Parser object() =>
+      ref(link) |
+      ref(markups) |
+      ref(timestamp) |
+      ref(keyword) |
+      ref(macroReference);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(object) | endOfInput();
@@ -179,6 +184,22 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser markupContents(String marker) =>
       ref(markupBorder).and() & ref(markupBody, marker) & ref(markupBorder);
+
+  Parser macroReference() =>
+      string('{{{') &
+      ref(macroReferenceKey).flatten('Macro reference key expected') &
+      // TODO(aaron): Actually parse arguments
+      ref(macroReferenceArgs)
+          .optional()
+          .flatten('Macro reference args expected') &
+      string('}}}');
+
+  // See `org-element-macro-parser'
+  Parser macroReferenceKey() =>
+      pattern('a-zA-Z') & pattern('-A-Za-z0-9_').plus();
+
+  Parser macroReferenceArgs() =>
+      char('(') & any().starLazy(char(')')) & char(')');
 
   // The following markupBorder and pre/postMarkup definitions differ from the
   // org-syntax.org document; they have been updated based on the definition of

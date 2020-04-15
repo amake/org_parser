@@ -187,6 +187,17 @@ c/ d''');
       result = parser.parse("~'~");
       expect(result.value, ['~', "'", '~']);
     });
+    test('macro reference', () {
+      final parser = buildSpecific(grammarDefinition.macroReference);
+      var result = parser.parse('{{{name(arg1, arg2)}}}');
+      expect(result.value, ['{{{', 'name', '(arg1, arg2)', '}}}']);
+      result = parser.parse('{{{foobar}}}');
+      expect(result.value, ['{{{', 'foobar', '', '}}}']);
+      result = parser.parse('{{{}}}');
+      expect(result.isFailure, true, reason: 'Body missing');
+      result = parser.parse('{{{0abc}}}');
+      expect(result.isFailure, true, reason: 'Invalid key');
+    });
     test('affiliated keyword', () {
       final parser = buildSpecific(grammarDefinition.affiliatedKeyword);
       var result = parser.parse('  #+blah');
