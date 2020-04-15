@@ -8,7 +8,7 @@ bool isOrgLocalSectionUrl(String url) => url.startsWith('*');
 /// for which [isOrgLocalSectionUrl] returns true.
 String parseOrgLocalSectionUrl(String url) {
   assert(isOrgLocalSectionUrl(url));
-  return url.substring(1);
+  return url.substring(1).replaceAll(RegExp('\r?\n'), ' ');
 }
 
 abstract class OrgTree {
