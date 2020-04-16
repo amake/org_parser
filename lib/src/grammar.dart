@@ -422,9 +422,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listUnorderedBullet() => anyOf('*-+') & char(' ');
 
-  Parser listTag() =>
-      any().plusLazy(string(' :: ') | lineEnd()).flatten('Tag term expected') &
-      string(' :: ');
+  Parser listTag() {
+    final end = string(' ::') & (lineEnd() | char(' '));
+    final limit = end | lineEnd();
+    return ref(textRun, limit).plusLazy(limit) &
+        end.flatten('List tag end expected');
+  }
 
   Parser listItemOrdered() =>
       (ref(indent) & ref(listOrderedBullet).and()).flatten('Indent expected') &

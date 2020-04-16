@@ -334,14 +334,20 @@ class OrgListUnorderedItem extends OrgListItem {
     String bullet,
     String checkbox,
     this.tag,
+    this.tagDelimiter,
     OrgContent body,
-  ) : super(indent, bullet, checkbox, body);
+  )   : assert(tag == null && tagDelimiter == null ||
+            tag != null && tagDelimiter != null),
+        super(indent, bullet, checkbox, body);
 
-  final String tag;
+  final OrgContent tag;
+  final String tagDelimiter;
 
   @override
   bool contains(Pattern pattern) =>
-      tag != null && tag.contains(pattern) || super.contains(pattern);
+      tag != null && tag.contains(pattern) ||
+      tagDelimiter != null && tagDelimiter.contains(pattern) ||
+      super.contains(pattern);
 }
 
 class OrgListOrderedItem extends OrgListItem {

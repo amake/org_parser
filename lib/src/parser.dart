@@ -298,9 +298,23 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final rest = values[1] as List;
         final bullet = rest[0] as String;
         final checkBox = rest[1] as String;
-        final tag = rest[2] as String;
+        final tagParts = rest[2] as List;
+        OrgContent tag;
+        String tagDelimiter;
+        if (tagParts != null) {
+          final tagList = tagParts[0] as List;
+          tag = OrgContent(tagList.cast<OrgContentElement>());
+          tagDelimiter = tagParts[1] as String;
+        }
         final body = rest[3] as OrgContent;
-        return OrgListUnorderedItem(indent, bullet, checkBox, tag, body);
+        return OrgListUnorderedItem(
+          indent,
+          bullet,
+          checkBox,
+          tag,
+          tagDelimiter,
+          body,
+        );
       });
 
   @override
@@ -319,9 +333,6 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser listCheckBox() => super.listCheckBox().flatten('Check box expected');
-
-  @override
-  Parser listTag() => super.listTag().flatten('List tag expected');
 
   @override
   Parser drawer() => super.drawer().map((values) {
