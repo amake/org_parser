@@ -68,6 +68,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(table) |
       ref(list) |
       ref(drawer) |
+      ref(footnote) |
       ref(paragraph);
 
   Parser paragraph() =>
@@ -86,7 +87,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(markups) |
       ref(timestamp) |
       ref(keyword) |
-      ref(macroReference);
+      ref(macroReference) |
+      ref(footnoteReference);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(object) | endOfInput();
@@ -503,4 +505,34 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser propertyValue() =>
       any().plusLazy(lineEnd()).flatten('Property value expected');
+
+  Parser footnoteReference() =>
+      ref(footnoteReferenceNamed) | ref(footnoteReferenceInline);
+
+  Parser footnoteReferenceNamed() =>
+      string('[fn:') & ref(footnoteName) & char(']');
+
+  Parser footnoteReferenceInline() =>
+      string('[fn:') &
+      ref(footnoteName).optional() &
+      char(':') &
+      ref(footnoteDefinition) &
+      char(']');
+
+  Parser footnoteName() =>
+      pattern('-_A-Za-z0-9').plus().flatten('Footnote name expected');
+
+  Parser footnoteDefinition() => textRun(char(']')).plusLazy(char(']'));
+
+  Parser footnote() => drop(ref(_footnote), [0]);
+
+  Parser _footnote() =>
+      lineStart() & ref(footnoteReferenceNamed) & ref(footnoteBody);
+
+  Parser footnoteBody() {
+    final end = endOfInput() |
+        lineStart() & ref(footnoteReferenceNamed) |
+        ref(nonParagraphElements);
+    return ref(textRun, end).plusLazy(end);
+  }
 }

@@ -368,4 +368,49 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser propertyKey() => super.propertyKey().flatten('Property key expected');
+
+  @override
+  Parser footnoteReferenceNamed() =>
+      super.footnoteReferenceNamed().map((values) {
+        final leading = values[0] as String;
+        final name = values[1] as String;
+        final trailing = values[2] as String;
+        return OrgFootnoteReference.named(leading, name, trailing);
+      });
+
+  @override
+  Parser footnoteReferenceInline() =>
+      super.footnoteReferenceInline().map((values) {
+        final leading = values[0] as String;
+        final name = values[1] as String;
+        final delimiter = values[2] as String;
+        final content = values[3] as OrgContent;
+        final trailing = values[4] as String;
+        return OrgFootnoteReference(
+          leading,
+          name,
+          delimiter,
+          content,
+          trailing,
+        );
+      });
+
+  @override
+  Parser footnoteDefinition() => super
+      .footnoteDefinition()
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
+
+  @override
+  Parser footnote() => super.footnote().map((values) {
+        final marker = values[0] as OrgFootnoteReference;
+        final content = values[1] as OrgContent;
+        return OrgFootnote(marker, content);
+      });
+
+  @override
+  Parser footnoteBody() => super
+      .footnoteBody()
+      .castList<OrgContentElement>()
+      .map((elems) => OrgContent(elems));
 }

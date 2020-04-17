@@ -416,3 +416,42 @@ class OrgProperty extends OrgContentElement {
   bool contains(Pattern pattern) =>
       key.contains(pattern) || value.contains(pattern);
 }
+
+class OrgFootnote extends OrgContentElement {
+  OrgFootnote(this.marker, this.content)
+      : assert(marker != null),
+        assert(content != null);
+  final OrgFootnoteReference marker;
+  final OrgContent content;
+
+  @override
+  bool contains(Pattern pattern) =>
+      marker.contains(pattern) || content.contains(pattern);
+}
+
+class OrgFootnoteReference extends OrgContentElement {
+  OrgFootnoteReference.named(String leading, String name, String trailing)
+      : this(leading, name, null, null, trailing);
+
+  OrgFootnoteReference(
+    this.leading,
+    this.name,
+    this.definitionDelimiter,
+    this.definition,
+    this.trailing,
+  )   : assert(leading != null),
+        assert(trailing != null);
+  final String leading;
+  final String name;
+  final String definitionDelimiter;
+  final OrgContent definition;
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      name != null && name.contains(pattern) ||
+      definitionDelimiter != null && definitionDelimiter.contains(pattern) ||
+      definition != null && definition.contains(pattern) ||
+      trailing.contains(pattern);
+}

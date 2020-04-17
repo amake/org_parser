@@ -708,6 +708,60 @@ c/ d''');
 bar''');
       expect(result.isFailure, true, reason: 'Value must be on same line');
     });
+    test('footnote', () {
+      final parser = buildSpecific(grammarDefinition.footnote);
+      var result = parser.parse('[fn:1] foo *bar*');
+      expect(result.value, [
+        ['[fn:', '1', ']'],
+        [
+          ' foo ',
+          ['*', 'bar', '*']
+        ]
+      ]);
+      result = parser.parse('''[fn:1] foo *bar*
+baz bazinga
+
+''');
+      expect(result.value, [
+        ['[fn:', '1', ']'],
+        [
+          ' foo ',
+          ['*', 'bar', '*'],
+          '\nbaz bazinga\n\n'
+        ]
+      ]);
+      result = parser.parse(' [fn:1] foo *bar*');
+      expect(result.isFailure, true, reason: 'Indent not allowed');
+      result = parser.parse('[fn:1: blah] foo *bar*');
+      expect(result.isFailure, true, reason: 'Only simple references allowed');
+    });
+    test('footnote reference', () {
+      final parser = buildSpecific(grammarDefinition.footnoteReference);
+      var result = parser.parse('[fn:1]');
+      expect(result.value, ['[fn:', '1', ']']);
+      result = parser.parse('[fn:abc123]');
+      expect(result.value, ['[fn:', 'abc123', ']']);
+      result = parser.parse('[fn:abc123: who what why]');
+      expect(result.value, [
+        '[fn:',
+        'abc123',
+        ':',
+        [' who what why'],
+        ']'
+      ]);
+      result = parser.parse('[fn:abc123: who *what* why]');
+      expect(result.value, [
+        '[fn:',
+        'abc123',
+        ':',
+        [
+          ' who ',
+          ['*', 'what', '*'],
+          ' why'
+        ],
+        ']'
+      ]);
+    });
   });
 
   group('content grammar complete', () {

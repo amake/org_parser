@@ -103,6 +103,42 @@ void main() {
       expect(property.value, ' baz');
       expect(drawer.footer, '  :end:');
     });
+    test('footnote', () {
+      final parser = buildSpecific(parserDefinition.footnote);
+      var result = parser.parse('[fn:1] foo *bar* biz baz');
+      final footnote = result.value as OrgFootnote;
+      expect(footnote.marker.name, '1');
+      final firstText = footnote.content.children[0] as OrgPlainText;
+      expect(firstText.content, ' foo ');
+      result = parser.parse(' [fn:2] bazinga');
+      expect(result.isFailure, true, reason: 'Indent not allowed');
+    });
+    test('footnote reference', () {
+      final parser = buildSpecific(parserDefinition.footnoteReference);
+      var result = parser.parse('[fn:1]');
+      final named = result.value as OrgFootnoteReference;
+      expect(named.leading, '[fn:');
+      expect(named.name, '1');
+      expect(named.definitionDelimiter, null);
+      expect(named.definition, null);
+      expect(named.trailing, ']');
+      result = parser.parse('[fn:: who /what/ why]');
+      final anonymous = result.value as OrgFootnoteReference;
+      expect(anonymous.leading, '[fn:');
+      expect(anonymous.name, null);
+      expect(anonymous.definitionDelimiter, ':');
+      var defText0 = anonymous.definition.children[0] as OrgPlainText;
+      expect(defText0.content, ' who ');
+      expect(anonymous.trailing, ']');
+      result = parser.parse('[fn:abc123: when /where/ how]');
+      final inline = result.value as OrgFootnoteReference;
+      expect(inline.leading, '[fn:');
+      expect(inline.name, 'abc123');
+      expect(inline.definitionDelimiter, ':');
+      defText0 = inline.definition.children[0] as OrgPlainText;
+      expect(defText0.content, ' when ');
+      expect(inline.trailing, ']');
+    });
   });
   test('complex document', () {
     final result =
