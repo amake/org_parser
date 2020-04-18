@@ -1,12 +1,10 @@
 import 'package:org_parser/org_parser.dart';
-import 'package:org_parser/src/parser.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('structural grammar', () {
     final grammar = OrgGrammar();
-    final parser = OrgParser();
     test('parse content', () {
       final result = grammar.parse('''foo
 bar
@@ -38,7 +36,7 @@ bar
       ]);
     });
     test('parse a complex header', () {
-      var result = grammar.parse('** TODO [#A] Title foo bar :biz:baz:');
+      final result = grammar.parse('** TODO [#A] Title foo bar :biz:baz:');
       expect(result.value, [
         null,
         [
@@ -58,11 +56,6 @@ bar
           ]
         ]
       ]);
-      result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
-      final document = result.value as OrgDocument;
-      final title =
-          document.children[0].headline.title.children[0] as OrgPlainText;
-      expect(title.content, 'Title foo bar ');
     });
     test('parse a section', () {
       final result = grammar.parse('''* Title
@@ -87,30 +80,6 @@ bar
       ]) {
         expect(grammar.parse(valid).isSuccess, true);
       }
-    });
-    test('example document', () {
-      const doc = '''An introduction.
-
-* A Headline
-
-  Some text. *bold*
-
-** Sub-Topic 1
-
-** Sub-Topic 2
-
-*** Additional entry''';
-      expect(grammar.parse(doc).isSuccess, true);
-      final parsed = parser.parse(doc);
-      expect(parsed.isSuccess, true);
-      final document = parsed.value as OrgDocument;
-      final paragraph = document.content.children[0] as OrgParagraph;
-      final text = paragraph.body.children[0] as OrgPlainText;
-      expect(text.content, 'An introduction.\n\n');
-      final topSection = document.children[0];
-      final topContent0 = topSection.headline.title.children[0] as OrgPlainText;
-      expect(topContent0.content, 'A Headline');
-      expect(topSection.children.length, 2);
     });
   });
 

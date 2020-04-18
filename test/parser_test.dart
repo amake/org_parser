@@ -140,14 +140,55 @@ void main() {
       expect(inline.trailing, ']');
     });
   });
-  test('complex document', () {
-    final result =
-        OrgParser().parse(File('test/org-syntax.org').readAsStringSync());
-    expect(result.isSuccess, true);
+  group('document parser parts', () {
+    final parserDefinition = OrgParserDefinition();
+    Parser buildSpecific(Parser Function() start) {
+      return parserDefinition.build(start: start).end();
+    }
+
+    test('header', () {
+      final parser = buildSpecific(parserDefinition.headline);
+      final result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
+      final headline = result.value as OrgHeadline;
+      final title = headline.title.children[0] as OrgPlainText;
+      expect(title.content, 'Title foo bar ');
+    });
   });
-  test('complex document 2', () {
-    final result =
-        OrgParser().parse(File('test/org-manual.org').readAsStringSync());
-    expect(result.isSuccess, true);
+  group('parser complete', () {
+    final parser = OrgParser();
+    test('example document', () {
+      const doc = '''An introduction.
+
+* A Headline
+
+  Some text. *bold*
+
+** Sub-Topic 1
+
+** Sub-Topic 2
+
+*** Additional entry''';
+      expect(parser.parse(doc).isSuccess, true);
+      final parsed = parser.parse(doc);
+      expect(parsed.isSuccess, true);
+      final document = parsed.value as OrgDocument;
+      final paragraph = document.content.children[0] as OrgParagraph;
+      final text = paragraph.body.children[0] as OrgPlainText;
+      expect(text.content, 'An introduction.\n\n');
+      final topSection = document.children[0];
+      final topContent0 = topSection.headline.title.children[0] as OrgPlainText;
+      expect(topContent0.content, 'A Headline');
+      expect(topSection.children.length, 2);
+    });
+    test('complex document', () {
+      final result =
+          parser.parse(File('test/org-syntax.org').readAsStringSync());
+      expect(result.isSuccess, true);
+    });
+    test('complex document 2', () {
+      final result =
+          parser.parse(File('test/org-manual.org').readAsStringSync());
+      expect(result.isSuccess, true);
+    });
   });
 }
