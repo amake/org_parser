@@ -198,8 +198,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser markupBorder() => whitespace().neg();
 
-  Parser markupBody(String marker) =>
-      (ref(markupBorder) & char(marker)).neg().star();
+  // TODO(aaron): Simplify this?
+  Parser markupBody(String marker) => ref(anyChar)
+      .starLazy(
+        ref(markupBorder) & char(marker) & (ref(postMarkup) | endOfInput()),
+      )
+      // Join instead of flatten to drop escape chars
+      .map((items) => items.join());
 
   Parser preMarkup() => whitespace() | anyIn('-(\'"{');
 

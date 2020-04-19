@@ -173,6 +173,8 @@ c/ d''');
       expect(result.value, ['~', ',', '~']);
       result = parser.parse("~'~");
       expect(result.value, ['~', "'", '~']);
+      result = parser.parse('=+LEVEL=3+boss-TODO​="DONE"=');
+      expect(result.value, ['=', '+LEVEL=3+boss-TODO​="DONE"', '=']);
     });
     test('macro reference', () {
       final parser = buildSpecific(grammarDefinition.macroReference);
