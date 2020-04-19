@@ -17,7 +17,13 @@ bar
         null,
         [
           [
-            ['* ', null, null, 'Title', null],
+            [
+              '* ',
+              null,
+              null,
+              ['Title'],
+              null
+            ],
             null
           ]
         ]
@@ -29,7 +35,13 @@ bar
         null,
         [
           [
-            ['* ', 'TODO', null, 'Title', null],
+            [
+              '* ',
+              'TODO',
+              null,
+              ['Title'],
+              null
+            ],
             null
           ]
         ]
@@ -45,7 +57,7 @@ bar
               '** ',
               'TODO',
               ['[#', 'A', ']'],
-              'Title foo bar ',
+              ['Title foo bar '],
               [
                 ':',
                 ['biz', 'baz'],
@@ -65,7 +77,13 @@ bar
         null,
         [
           [
-            ['* ', null, null, 'Title', null],
+            [
+              '* ',
+              null,
+              null,
+              ['Title'],
+              null
+            ],
             '  Content1\n  Content2'
           ]
         ]

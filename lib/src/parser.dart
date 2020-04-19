@@ -1,5 +1,6 @@
 import 'package:org_parser/org_parser.dart';
 import 'package:org_parser/src/org.dart';
+import 'package:org_parser/src/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 class OrgParser extends GrammarParser {
@@ -55,23 +56,27 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final stars = items[0] as String;
         final keyword = items[1] as String;
         final priority = items[2] as String;
-        final rawTitle = items[3] as String;
-        final titleElements = OrgContentParser.textRunParser()
-            .star()
-            .castList<OrgContentElement>()
-            .parse(rawTitle)
-            .value;
-        final title = OrgContent(titleElements);
+        final title = items[3] as Token;
         final tags = items[4] as List;
         return OrgHeadline(
           stars,
           keyword,
           priority,
-          title,
-          rawTitle,
+          title.value as OrgContent,
+          title.input,
           tags?.cast<String>(),
         );
       });
+
+  @override
+  Parser title() {
+    final limit = ref(tags) | lineEnd();
+    return OrgContentParser.textRun(limit)
+        .plusLazy(limit)
+        .castList<OrgContentElement>()
+        .map((items) => OrgContent(items))
+        .token();
+  }
 
   @override
   Parser priority() => super.priority().flatten('Priority expected');
@@ -88,9 +93,9 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 class OrgContentParser extends GrammarParser {
   OrgContentParser() : super(OrgContentParserDefinition());
 
-  static Parser textRunParser() {
+  static Parser textRun([Parser limit]) {
     final definition = OrgContentParserDefinition();
-    return definition.build(start: definition.textRun);
+    return definition.build(start: definition.textRun, arguments: [limit]);
   }
 }
 

@@ -34,8 +34,10 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser priority() => string('[#') & letter() & char(']');
 
-  Parser title() =>
-      (ref(tags) | ref(newline)).neg().star().flatten('Title expected');
+  Parser title() {
+    final limit = ref(tags) | lineEnd();
+    return OrgContentGrammar.textRun(limit).plusLazy(limit);
+  }
 
   Parser tags() =>
       char(':') &
@@ -48,12 +50,15 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser _content() =>
       ref(stars).not() & any().plusLazy(ref(stars) | endOfInput());
-
-  Parser newline() => Token.newlineParser();
 }
 
 class OrgContentGrammar extends GrammarParser {
   OrgContentGrammar() : super(OrgContentGrammarDefinition());
+
+  static Parser textRun([Parser limit]) {
+    final definition = OrgContentGrammarDefinition();
+    return definition.build(start: definition.textRun, arguments: [limit]);
+  }
 }
 
 class OrgContentGrammarDefinition extends GrammarDefinition {
