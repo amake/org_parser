@@ -136,16 +136,16 @@ class Frame {
 class Tracer {
   final List<Frame> stack = [Frame('root')];
 
-  void push(String name) {
-    final frame = Frame(name)..start();
+  void push(Parser parser) {
+    final frame = Frame(parser.runtimeType.toString())..start();
     stack.last.children.add(frame);
     stack.add(frame);
   }
 
-  void pop(String value) {
+  void pop(Object result) {
     stack.removeLast()
       ..stop()
-      ..name += ' $value';
+      ..name += ' $result';
   }
 
   Frame get _root => stack.first;
@@ -159,9 +159,9 @@ class Tracer {
 Parser trace(Parser parser, Tracer tracer) {
   return transformParser(parser, (each) {
     return ContinuationParser(each, (continuation, context) {
-      tracer.push(each.toString());
+      tracer.push(each);
       final result = continuation(context);
-      tracer.pop(result.toString());
+      tracer.pop(result);
       return result;
     });
   });
