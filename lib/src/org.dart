@@ -25,6 +25,9 @@ abstract class OrgTree {
     }
     return includeChildren && children.any((child) => child.contains(pattern));
   }
+
+  @override
+  String toString() => runtimeType.toString();
 }
 
 class OrgDocument extends OrgTree {
@@ -36,6 +39,9 @@ class OrgDocument extends OrgTree {
 
   @override
   int get level => 0;
+
+  @override
+  String toString() => 'OrgDocument';
 }
 
 class OrgHeadline {
@@ -63,6 +69,9 @@ class OrgHeadline {
       keyword != null && keyword.contains(pattern) ||
       title != null && title.contains(pattern) ||
       tags.any((tag) => tag.contains(pattern));
+
+  @override
+  String toString() => 'OrgHeadline';
 }
 
 class OrgSection extends OrgTree {
@@ -93,6 +102,9 @@ class OrgSection extends OrgTree {
   bool contains(Pattern pattern, {bool includeChildren = true}) =>
       headline.contains(pattern) ||
       super.contains(pattern, includeChildren: includeChildren);
+
+  @override
+  String toString() => 'OrgSection';
 }
 
 // ignore: one_member_abstracts
@@ -122,12 +134,19 @@ class OrgContent extends OrgContentElement {
   @override
   bool contains(Pattern pattern) =>
       children.any((child) => child.contains(pattern));
+
+  @override
+  String toString() => 'OrgContent';
 }
 
 class OrgPlainText extends OrgContentElement with SingleContentElement {
   OrgPlainText(this.content) : assert(content != null);
+
   @override
   final String content;
+
+  @override
+  String toString() => 'OrgPlainText';
 }
 
 class OrgLink extends OrgContentElement {
@@ -139,6 +158,9 @@ class OrgLink extends OrgContentElement {
   bool contains(Pattern pattern) =>
       location.contains(pattern) ||
       description != null && description.contains(pattern);
+
+  @override
+  String toString() => 'OrgLink';
 }
 
 class OrgMarkup extends OrgContentElement with SingleContentElement {
@@ -148,6 +170,9 @@ class OrgMarkup extends OrgContentElement with SingleContentElement {
   @override
   final String content;
   final OrgStyle style;
+
+  @override
+  String toString() => 'OrgMarkup';
 }
 
 enum OrgStyle {
@@ -161,8 +186,12 @@ enum OrgStyle {
 
 class OrgMacroReference extends OrgContentElement with SingleContentElement {
   OrgMacroReference(this.content) : assert(content != null);
+
   @override
   final String content;
+
+  @override
+  String toString() => 'OrgMacroReference';
 }
 
 class OrgMeta extends OrgContentElement {
@@ -181,6 +210,9 @@ class OrgMeta extends OrgContentElement {
         keyword.contains(pattern) ||
         trailing.contains(pattern);
   }
+
+  @override
+  String toString() => 'OrgMeta';
 }
 
 class OrgBlock extends OrgContentElement with IndentedElement {
@@ -203,6 +235,9 @@ class OrgBlock extends OrgContentElement with IndentedElement {
       header.contains(pattern) ||
       body.contains(pattern) ||
       footer.contains(pattern);
+
+  @override
+  String toString() => 'OrgBlock';
 }
 
 class OrgTable extends OrgContentElement with IndentedElement {
@@ -229,6 +264,9 @@ class OrgTable extends OrgContentElement with IndentedElement {
 
   @override
   bool contains(Pattern pattern) => rows.any((row) => row.contains(pattern));
+
+  @override
+  String toString() => 'OrgTable';
 }
 
 abstract class OrgTableRow extends OrgContentElement {
@@ -237,6 +275,9 @@ abstract class OrgTableRow extends OrgContentElement {
   final String indent;
 
   int get cellCount;
+
+  @override
+  String toString() => runtimeType.toString();
 }
 
 class OrgTableDividerRow extends OrgTableRow {
@@ -247,6 +288,9 @@ class OrgTableDividerRow extends OrgTableRow {
 
   @override
   bool contains(Pattern pattern) => false;
+
+  @override
+  String toString() => 'OrgTableDividerRow';
 }
 
 class OrgTableCellRow extends OrgTableRow {
@@ -261,6 +305,9 @@ class OrgTableCellRow extends OrgTableRow {
 
   @override
   bool contains(Pattern pattern) => cells.any((cell) => cell.contains(pattern));
+
+  @override
+  String toString() => 'OrgTableCellRow';
 }
 
 class OrgTimestamp extends OrgContentElement with SingleContentElement {
@@ -269,6 +316,9 @@ class OrgTimestamp extends OrgContentElement with SingleContentElement {
   // TODO(aaron): Expose actual data
   @override
   final String content;
+
+  @override
+  String toString() => 'OrgTimestamp';
 }
 
 class OrgKeyword extends OrgContentElement with SingleContentElement {
@@ -276,6 +326,9 @@ class OrgKeyword extends OrgContentElement with SingleContentElement {
 
   @override
   final String content;
+
+  @override
+  String toString() => 'OrgKeyword';
 }
 
 class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
@@ -290,9 +343,11 @@ class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
   final String trailing;
 
   @override
-  bool contains(Pattern pattern) {
-    return indent.contains(pattern) || content.contains(pattern);
-  }
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) || content.contains(pattern);
+
+  @override
+  String toString() => 'OrgFixedWidthArea';
 }
 
 class OrgList extends OrgContentElement with IndentedElement {
@@ -308,9 +363,12 @@ class OrgList extends OrgContentElement with IndentedElement {
 
   @override
   bool contains(Pattern pattern) => items.any((item) => item.contains(pattern));
+
+  @override
+  String toString() => 'OrgList';
 }
 
-class OrgListItem extends OrgContentElement {
+abstract class OrgListItem extends OrgContentElement {
   OrgListItem(this.indent, this.bullet, this.checkbox, this.body)
       : assert(indent != null),
         assert(bullet != null);
@@ -326,6 +384,9 @@ class OrgListItem extends OrgContentElement {
       bullet.contains(pattern) ||
       checkbox != null && checkbox.contains(pattern) ||
       body != null && body.contains(pattern);
+
+  @override
+  String toString() => runtimeType.toString();
 }
 
 class OrgListUnorderedItem extends OrgListItem {
@@ -348,6 +409,9 @@ class OrgListUnorderedItem extends OrgListItem {
       tag != null && tag.contains(pattern) ||
       tagDelimiter != null && tagDelimiter.contains(pattern) ||
       super.contains(pattern);
+
+  @override
+  String toString() => 'OrgListUnorderedItem';
 }
 
 class OrgListOrderedItem extends OrgListItem {
@@ -365,6 +429,9 @@ class OrgListOrderedItem extends OrgListItem {
   bool contains(Pattern pattern) =>
       counterSet != null && counterSet.contains(pattern) ||
       super.contains(pattern);
+
+  @override
+  String toString() => 'OrgListOrderedItem';
 }
 
 class OrgParagraph extends OrgContentElement {
@@ -377,6 +444,9 @@ class OrgParagraph extends OrgContentElement {
   @override
   bool contains(Pattern pattern) =>
       indent.contains(pattern) || body.contains(pattern);
+
+  @override
+  String toString() => 'OrgParagraph';
 }
 
 class OrgDrawer extends OrgContentElement with IndentedElement {
@@ -399,6 +469,9 @@ class OrgDrawer extends OrgContentElement with IndentedElement {
       header.contains(pattern) ||
       body.contains(pattern) ||
       footer.contains(pattern);
+
+  @override
+  String toString() => 'OrgDrawer';
 }
 
 class OrgProperty extends OrgContentElement {
@@ -415,6 +488,9 @@ class OrgProperty extends OrgContentElement {
   @override
   bool contains(Pattern pattern) =>
       key.contains(pattern) || value.contains(pattern);
+
+  @override
+  String toString() => 'OrgProperty';
 }
 
 class OrgFootnote extends OrgContentElement {
@@ -427,6 +503,9 @@ class OrgFootnote extends OrgContentElement {
   @override
   bool contains(Pattern pattern) =>
       marker.contains(pattern) || content.contains(pattern);
+
+  @override
+  String toString() => 'OrgFootnote';
 }
 
 class OrgFootnoteReference extends OrgContentElement {
@@ -454,4 +533,7 @@ class OrgFootnoteReference extends OrgContentElement {
       definitionDelimiter != null && definitionDelimiter.contains(pattern) ||
       definition != null && definition.contains(pattern) ||
       trailing.contains(pattern);
+
+  @override
+  String toString() => 'OrgFootnoteReference';
 }
