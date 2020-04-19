@@ -87,8 +87,10 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser content() => super
       .content()
-      .map((content) => OrgContentParser().parse(content as String).value);
+      .map((content) => _orgContentParser.parse(content as String).value);
 }
+
+final _orgContentParser = OrgContentParser();
 
 class OrgContentParser extends GrammarParser {
   OrgContentParser() : super(OrgContentParserDefinition());
