@@ -156,8 +156,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser code() => mapMarkup(super.code(), OrgStyle.code);
 
-  Parser mapMarkup(Parser parser, OrgStyle style) =>
-      parser.flatten('Markup expected').map((value) => OrgMarkup(value, style));
+  Parser mapMarkup(Parser parser, OrgStyle style) => parser.map((values) {
+        final leading = values[0] as String;
+        final content = values[1] as String;
+        final trailing = values[2] as String;
+        return OrgMarkup(leading, content, trailing, style);
+      });
 
   @override
   Parser macroReference() => super
@@ -196,10 +200,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         switch (name) {
           case 'example':
           case 'export':
-            bodyContent = OrgMarkup(content, OrgStyle.verbatim);
+            bodyContent = OrgMarkup.just(content, OrgStyle.verbatim);
             break;
           case 'src':
-            bodyContent = OrgMarkup(content, OrgStyle.code);
+            bodyContent = OrgMarkup.just(content, OrgStyle.code);
             break;
           default:
             bodyContent = OrgPlainText(content);

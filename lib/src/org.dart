@@ -163,16 +163,33 @@ class OrgLink extends OrgContentElement {
   String toString() => 'OrgLink';
 }
 
-class OrgMarkup extends OrgContentElement with SingleContentElement {
-  OrgMarkup(this.content, this.style)
-      : assert(content != null),
+class OrgMarkup extends OrgContentElement {
+  // TODO(aaron): Get rid of this hack
+  OrgMarkup.just(String content, OrgStyle style) : this('', content, '', style);
+
+  OrgMarkup(
+    this.leadingDecoration,
+    this.content,
+    this.trailingDecoration,
+    this.style,
+  )   : assert(leadingDecoration != null),
+        assert(content != null),
+        assert(trailingDecoration != null),
         assert(style != null);
-  @override
+
+  final String leadingDecoration;
   final String content;
+  final String trailingDecoration;
   final OrgStyle style;
 
   @override
   String toString() => 'OrgMarkup';
+
+  @override
+  bool contains(Pattern pattern) =>
+      leadingDecoration.contains(pattern) ||
+      content.contains(pattern) ||
+      trailingDecoration.contains(pattern);
 }
 
 enum OrgStyle {
