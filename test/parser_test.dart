@@ -182,6 +182,31 @@ void main() {
       expect(topContent0.content, 'A Headline');
       expect(topSection.children.length, 2);
     });
+    test('footnotes', () {
+      final parser = OrgParser();
+      final result = parser.parse('''[fn:1] foo bar
+
+biz baz
+
+[fn:2] bazinga
+
+
+bazoonga''');
+      expect(result.isSuccess, true);
+      final document = result.value as OrgDocument;
+      final footnote0 = document.content.children[0] as OrgFootnote;
+      expect(footnote0.marker.name, '1');
+      final footnote0Body = footnote0.content.children[0] as OrgPlainText;
+      expect(footnote0Body.content, ' foo bar\n\nbiz baz\n\n');
+      final footnote1 = document.content.children[1] as OrgFootnote;
+      final footnote1Body0 = footnote1.content.children[0] as OrgPlainText;
+      expect(footnote1Body0.content, ' bazinga');
+      final footnote1Body1 = footnote1.content.children[1] as OrgPlainText;
+      expect(footnote1Body1.content, '\n\n\n');
+      final paragraph = document.content.children[2] as OrgParagraph;
+      final paragraphBody = paragraph.body.children[0] as OrgPlainText;
+      expect(paragraphBody.content, 'bazoonga');
+    });
     test('complex document', () {
       final result =
           parser.parse(File('test/org-syntax.org').readAsStringSync());

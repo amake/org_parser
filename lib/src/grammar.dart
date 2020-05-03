@@ -537,12 +537,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser footnote() => drop(ref(_footnote), [0]);
 
   Parser _footnote() =>
-      lineStart() & ref(footnoteReferenceNamed) & ref(footnoteBody);
+      lineStart() &
+      ref(footnoteReferenceNamed) &
+      ref(footnoteBody) &
+      Token.newlineParser()
+          .repeat(0, 3)
+          .flatten('Footnote trailing content expected');
 
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref(footnoteReferenceNamed) |
-        ref(nonParagraphElements);
+        Token.newlineParser().repeat(3);
     return ref(textRun, end).plusLazy(end);
   }
 }

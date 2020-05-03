@@ -415,7 +415,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser footnote() => super.footnote().map((values) {
         final marker = values[0] as OrgFootnoteReference;
-        final content = values[1] as OrgContent;
+        var content = values[1] as OrgContent;
+        final trailing = values[2] as String;
+        if (trailing.isNotEmpty) {
+          content = OrgContent(content.children + [OrgPlainText(trailing)]);
+        }
         return OrgFootnote(marker, content);
       });
 

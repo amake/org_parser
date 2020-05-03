@@ -705,7 +705,8 @@ bar''');
         [
           ' foo ',
           ['*', 'bar', '*']
-        ]
+        ],
+        ''
       ]);
       result = parser.parse('''[fn:1] foo *bar*
 baz bazinga
@@ -717,7 +718,8 @@ baz bazinga
           ' foo ',
           ['*', 'bar', '*'],
           '\nbaz bazinga\n\n'
-        ]
+        ],
+        ''
       ]);
       result = parser.parse(' [fn:1] foo *bar*');
       expect(result.isFailure, true, reason: 'Indent not allowed');
