@@ -217,5 +217,10 @@ bazoonga''');
           parser.parse(File('test/org-manual.org').readAsStringSync());
       expect(result.isSuccess, true);
     });
+    test('readme example', () {
+      final doc = OrgDocument.parse('''* TODO [#A] foo bar
+        baz buzz''');
+      expect(doc.children[0].headline.keyword, 'TODO');
+    });
   });
 }
