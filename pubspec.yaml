@@ -1,7 +1,6 @@
 name: org_parser
 description: An Org-mode parser for Dart
 version: 0.0.1
-author: Aaron Madlon-Kay <aaron@madlon-kay.com>
 homepage: https://github.com/amake/org_parser
 
 environment:
