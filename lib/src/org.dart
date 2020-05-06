@@ -271,13 +271,14 @@ class OrgTable extends OrgContentElement with IndentedElement {
 
   bool get rectangular =>
       rows
+          .whereType<OrgTableCellRow>()
           .map((row) => row.cellCount)
-          .where((count) => count >= 0)
           .toSet()
           .length <
       2;
 
-  int get columnCount => rows.map((row) => row.cellCount).reduce(max);
+  int get columnCount =>
+      rows.whereType<OrgTableCellRow>().map((row) => row.cellCount).reduce(max);
 
   @override
   bool contains(Pattern pattern) => rows.any((row) => row.contains(pattern));
@@ -291,17 +292,12 @@ abstract class OrgTableRow extends OrgContentElement {
 
   final String indent;
 
-  int get cellCount;
-
   @override
   String toString() => runtimeType.toString();
 }
 
 class OrgTableDividerRow extends OrgTableRow {
   OrgTableDividerRow(String indent) : super(indent);
-
-  @override
-  int get cellCount => -1;
 
   @override
   bool contains(Pattern pattern) => false;
@@ -317,7 +313,6 @@ class OrgTableCellRow extends OrgTableRow {
 
   final List<OrgContent> cells;
 
-  @override
   int get cellCount => cells.length;
 
   @override
