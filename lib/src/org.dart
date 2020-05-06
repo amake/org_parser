@@ -280,6 +280,18 @@ class OrgTable extends OrgContentElement with IndentedElement {
   int get columnCount =>
       rows.whereType<OrgTableCellRow>().map((row) => row.cellCount).reduce(max);
 
+  bool columnIsNumeric(int colIdx) {
+    final cells = rows
+        .whereType<OrgTableCellRow>()
+        .map((row) => row.cells[colIdx])
+        .toList(growable: false);
+    final totalCount = cells.length;
+    final emptyCount = cells.where(_tableCellIsEmpty).length;
+    final nonEmptyCount = totalCount - emptyCount;
+    final numberCount = cells.where(_tableCellIsNumeric).length;
+    return numberCount / nonEmptyCount >= _orgTableNumberFraction;
+  }
+
   @override
   bool contains(Pattern pattern) => rows.any((row) => row.contains(pattern));
 
@@ -321,6 +333,27 @@ class OrgTableCellRow extends OrgTableRow {
   @override
   String toString() => 'OrgTableCellRow';
 }
+
+bool _tableCellIsNumeric(OrgContent cell) {
+  if (cell.children.length == 1) {
+    final content = cell.children.first;
+    if (content is OrgPlainText) {
+      return _orgTableNumberRegexp.hasMatch(content.content);
+    }
+  }
+  return false;
+}
+
+bool _tableCellIsEmpty(OrgContent cell) => cell.children.isEmpty;
+
+// Default number-detecting regexp from org-mode 20200504, converted with:
+//   (kill-new (rxt-elisp-to-pcre org-table-number-regexp))
+final _orgTableNumberRegexp = RegExp(
+    r'^([><]?[.\^+\-0-9]*[0-9][:%)(xDdEe.\^+\-0-9]*|[><]?[+\-]?0[Xx][.[:xdigit:]]+|[><]?[+\-]?[0-9]+#[.A-Za-z0-9]+|nan|[u+\-]?inf)$');
+
+// Default fraction of non-empty cells in a column to make the column
+// right-aligned. From org-mode 20200504.
+const _orgTableNumberFraction = 0.5;
 
 class OrgTimestamp extends OrgContentElement with SingleContentElement {
   OrgTimestamp(this.content) : assert(content != null);
