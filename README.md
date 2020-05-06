@@ -56,7 +56,7 @@ applications.
 
     ```org
     | foo | bar |
-    |-----|-----|
+    |-----+-----|
     | biz | baz |
     ```
 - Lists
