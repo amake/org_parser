@@ -2,12 +2,32 @@ import 'package:petitparser/petitparser.dart';
 
 const kUnlimitedSeparatingLineBreaks = -1;
 
+/// Returns a parser that applies [parser] to a uniformly indented region
+/// starting at the current position.
+///
+/// [indentAdjust] allows applying an offset to the current position for
+/// determining the required level of indentation.
+///
+/// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
+/// allowed without considering the region to have ended. The default is
+/// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
+/// allowed.
 Parser indentedRegion(
         {Parser parser,
         int indentAdjust = 0,
         int maxSeparatingLineBreaks = -1}) =>
     IndentedRegionParser(parser, indentAdjust, maxSeparatingLineBreaks);
 
+/// A parser that applies [parser] to a uniformly indented region
+/// starting at the current position.
+///
+/// [indentAdjust] allows applying an offset to the current position for
+/// determining the required level of indentation.
+///
+/// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
+/// allowed without considering the region to have ended. The default is
+/// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
+/// allowed.
 class IndentedRegionParser extends DelegateParser {
   IndentedRegionParser(
       Parser delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
