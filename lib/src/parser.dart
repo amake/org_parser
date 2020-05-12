@@ -1,6 +1,6 @@
 import 'package:org_parser/org_parser.dart';
 import 'package:org_parser/src/org.dart';
-import 'package:org_parser/src/util.dart';
+import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 class OrgParser extends GrammarParser {

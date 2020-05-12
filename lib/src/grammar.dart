@@ -1,6 +1,6 @@
 library org_parser;
 
-import 'package:org_parser/src/util.dart';
+import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 // See https://orgmode.org/worg/dev/org-syntax.html
