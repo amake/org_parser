@@ -922,5 +922,55 @@ foo''');
         ['', '#+bazinga:', ' bozo']
       ]);
     });
+    test('block', () {
+      final result = parser.parse('''- foo
+  #+begin_example
+    bar
+
+
+  #+end_example
+  baz
+''');
+      expect(
+        result.value,
+        [
+          [
+            [
+              [
+                '',
+                [
+                  '- ',
+                  null,
+                  null,
+                  [
+                    'foo\n',
+                    [
+                      '  ',
+                      [
+                        ['#+begin_example', '\n'],
+                        '    bar\n\n\n',
+                        ['  ', '#+end_example']
+                      ],
+                      '\n'
+                    ],
+                    [
+                      '  ',
+                      ['baz\n']
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            ''
+          ]
+        ],
+        // This parse result is incompatible with the requirement that 3
+        // linebreaks ends a list item, given the current implementation of
+        // IndentedRegionParser
+        //
+        // TODO(aaron): Fix block parsing inside list item
+        skip: true,
+      );
+    });
   });
 }
