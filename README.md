@@ -20,6 +20,8 @@ baz buzz''');
 print(doc.children[0].headline.keyword); // TODO
 ```
 
+See the [example](./example/example.dart) for more.
+
 # Caveats
 
 This parser was developed for an application that is halfway between
