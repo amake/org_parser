@@ -17,7 +17,7 @@ import 'package:org_parser/org_parser.dart';
 
 final doc = OrgDocument.parse('''* TODO [#A] foo bar
 baz buzz''');
-print(doc.children[0].headline.keyword); # TODO
+print(doc.children[0].headline.keyword); // TODO
 ```
 
 # Caveats
