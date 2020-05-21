@@ -1,3 +1,7 @@
+## [0.1.1+1] - 2020-05-21
+
+* Add example
+
 ## [0.1.1] - 2020-05-06
 
 * Added `OrgTable.columnIsNumeric` API for determining if a table column is
