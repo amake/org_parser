@@ -257,6 +257,19 @@ class OrgBlock extends OrgContentElement with IndentedElement {
   String toString() => 'OrgBlock';
 }
 
+class OrgSrcBlock extends OrgBlock {
+  OrgSrcBlock(
+    this.language,
+    String indent,
+    String header,
+    OrgContentElement body,
+    String footer,
+    String trailing,
+  ) : super(indent, header, body, footer, trailing);
+
+  final String language;
+}
+
 class OrgTable extends OrgContentElement with IndentedElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing)
       : assert(trailing != null),

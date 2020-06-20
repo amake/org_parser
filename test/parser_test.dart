@@ -43,13 +43,28 @@ void main() {
     });
     test('block', () {
       final parser = buildSpecific(parserDefinition.block);
+      final result = parser.parse('''#+begin_example
+  echo 'foo'
+  rm bar
+#+end_example
+''');
+      final block = result.value as OrgBlock;
+      final body = block.body as OrgMarkup;
+      expect(block.header, '#+begin_example\n');
+      expect(body.content, '  echo \'foo\'\n  rm bar\n');
+      expect(block.footer, '#+end_example');
+      expect(block.trailing, '\n');
+    });
+    test('source block', () {
+      final parser = buildSpecific(parserDefinition.block);
       final result = parser.parse('''#+begin_src sh
   echo 'foo'
   rm bar
 #+end_src
 ''');
-      final block = result.value as OrgBlock;
-      final body = block.body as OrgMarkup;
+      final block = result.value as OrgSrcBlock;
+      final body = block.body as OrgPlainText;
+      expect(block.language, 'sh');
       expect(block.header, '#+begin_src sh\n');
       expect(body.content, '  echo \'foo\'\n  rm bar\n');
       expect(block.footer, '#+end_src');

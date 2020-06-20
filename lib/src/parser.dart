@@ -202,14 +202,36 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           case 'export':
             bodyContent = OrgMarkup.just(content, OrgStyle.verbatim);
             break;
-          case 'src':
-            bodyContent = OrgMarkup.just(content, OrgStyle.code);
-            break;
           default:
             bodyContent = OrgPlainText(content);
         }
         return OrgBlock(indent, header, bodyContent, footer, trailing);
       });
+
+  @override
+  Parser srcBlock() => super.srcBlock().map((parts) {
+        final indent = parts[0] as String;
+        final body = parts[1] as List;
+        final headerToken = body[0] as Token;
+        final headerParts = headerToken.value as List;
+        final language = headerParts[2] as String;
+        final header = headerToken.input;
+        final content = body[1] as String;
+        final footer = body[2] as String;
+        final trailing = parts[2] as String;
+        final bodyContent = OrgPlainText(content);
+        return OrgSrcBlock(
+          language,
+          indent,
+          header,
+          bodyContent,
+          footer,
+          trailing,
+        );
+      });
+
+  @override
+  Parser srcBlockStart() => super.srcBlockStart().token();
 
   @override
   Parser namedBlockStart(String name) =>

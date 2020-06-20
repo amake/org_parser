@@ -203,7 +203,7 @@ c/ d''');
       expect(result.value, [
         '',
         [
-          ['#+begin_src', ' sh\n'],
+          ['#+begin_src', ' ', 'sh', '\n'],
           '  echo \'foo\'\n  rm bar\n',
           ['', '#+end_src']
         ],
@@ -217,7 +217,7 @@ c/ d''');
       expect(result.value, [
         '',
         [
-          ['#+BEGIN_SRC', ' sh\n'],
+          ['#+BEGIN_SRC', ' ', 'sh', '\n'],
           '  echo \'foo\'\n  rm bar\n',
           ['', '#+EnD_sRC']
         ],
@@ -605,7 +605,7 @@ c/ d''');
                 [
                   '  ',
                   [
-                    ['#+begin_src', ' sh\n'],
+                    ['#+begin_src', ' ', 'sh', '\n'],
                     '    echo bar\n',
                     ['  ', '#+end_src']
                   ],

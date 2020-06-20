@@ -244,14 +244,26 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(namedBlock, 'comment') |
       ref(namedBlock, 'example') |
       ref(namedBlock, 'export') |
-      ref(namedBlock, 'src') |
+      ref(srcBlock) |
       ref(namedBlock, 'verse');
+
+  Parser srcBlock() => indented(
+        ref(srcBlockStart) &
+            ref(namedBlockContent, 'src') &
+            ref(namedBlockEnd, 'src'),
+      );
 
   Parser namedBlock(String name) => indented(
         ref(namedBlockStart, name) &
             ref(namedBlockContent, name) &
             ref(namedBlockEnd, name),
       );
+
+  Parser srcBlockStart() =>
+      stringIgnoreCase('#+begin_src') &
+      whitespace().plus().flatten('Separating whitespace expected') &
+      whitespace().neg().plus().flatten('Language token expected') &
+      ref(lineTrailing).flatten('Trailing line content expected');
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &
