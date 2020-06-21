@@ -261,9 +261,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser srcBlockStart() =>
       stringIgnoreCase('#+begin_src') &
-      whitespace().plus().flatten('Separating whitespace expected') &
-      whitespace().neg().plus().flatten('Language token expected') &
+      ref(srcBlockLanguageToken).optional() &
       ref(lineTrailing).flatten('Trailing line content expected');
+
+  Parser srcBlockLanguageToken() =>
+      ref(insignificantWhitespace)
+          .plus()
+          .flatten('Separating whitespace expected') &
+      whitespace().neg().plus().flatten('Language token expected');
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &

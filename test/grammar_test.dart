@@ -203,7 +203,11 @@ c/ d''');
       expect(result.value, [
         '',
         [
-          ['#+begin_src', ' ', 'sh', '\n'],
+          [
+            '#+begin_src',
+            [' ', 'sh'],
+            '\n'
+          ],
           '  echo \'foo\'\n  rm bar\n',
           ['', '#+end_src']
         ],
@@ -217,9 +221,27 @@ c/ d''');
       expect(result.value, [
         '',
         [
-          ['#+BEGIN_SRC', ' ', 'sh', '\n'],
+          [
+            '#+BEGIN_SRC',
+            [' ', 'sh'],
+            '\n'
+          ],
           '  echo \'foo\'\n  rm bar\n',
           ['', '#+EnD_sRC']
+        ],
+        '\n'
+      ]);
+      result = parser.parse('''#+begin_src
+  echo 'foo'
+  rm bar
+#+end_src
+''');
+      expect(result.value, [
+        '',
+        [
+          ['#+begin_src', null, '\n'],
+          '  echo \'foo\'\n  rm bar\n',
+          ['', '#+end_src']
         ],
         '\n'
       ]);
@@ -605,7 +627,11 @@ c/ d''');
                 [
                   '  ',
                   [
-                    ['#+begin_src', ' ', 'sh', '\n'],
+                    [
+                      '#+begin_src',
+                      [' ', 'sh'],
+                      '\n'
+                    ],
                     '    echo bar\n',
                     ['  ', '#+end_src']
                   ],
