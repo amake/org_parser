@@ -18,7 +18,7 @@ Parser indentedRegion(
         int maxSeparatingLineBreaks = -1}) =>
     IndentedRegionParser(parser, indentAdjust, maxSeparatingLineBreaks);
 
-/// A parser that applies [parser] to a uniformly indented region
+/// A parser that applies [delegate] to a uniformly indented region
 /// starting at the current position.
 ///
 /// [indentAdjust] allows applying an offset to the current position for
