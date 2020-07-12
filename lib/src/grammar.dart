@@ -68,6 +68,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser element() =>
       ref(block) |
       ref(greaterBlock) |
+      ref(latexBlock) |
       ref(affiliatedKeyword) |
       ref(fixedWidthArea) |
       ref(table) |
@@ -567,4 +568,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
         Token.newlineParser().repeat(3);
     return ref(textRun, end).plusLazy(end);
   }
+
+  Parser latexBlock() => indented(
+        ref(latexBlockStart) & ref(latexBlockContent) & ref(latexBlockEnd),
+      );
+
+  Parser latexBlockStart() =>
+      string(r'\begin{') &
+      (char('}').neg().plusLazy(char('}')))
+          .flatten('LaTeX environment expected') &
+      char('}');
+
+  Parser latexBlockContent() =>
+      ref(latexBlockEnd).neg().star().flatten('LaTeX block content expected');
+
+  Parser latexBlockEnd() =>
+      string(r'\end{') &
+      (char('}').neg().plusLazy(char('}')))
+          .flatten('LaTeX environment expected') &
+      char('}');
 }

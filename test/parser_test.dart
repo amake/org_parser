@@ -156,6 +156,17 @@ void main() {
       expect(defText0.content, ' when ');
       expect(inline.trailing, ']');
     });
+    test('LaTeX block', () {
+      final parser = buildSpecific(parserDefinition.latexBlock);
+      final result = parser.parse(r'''\begin{equation}
+\nabla \cdot \mathbf{B} = 0
+\end{equation}
+''');
+      final latex = result.value as OrgLatexBlock;
+      expect(latex.begin, r'\begin{equation}');
+      expect(latex.content, '\n\\nabla \\cdot \\mathbf{B} = 0\n');
+      expect(latex.end, '\\end{equation}');
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

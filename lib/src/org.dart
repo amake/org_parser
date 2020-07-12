@@ -595,3 +595,34 @@ class OrgFootnoteReference extends OrgContentElement {
   @override
   String toString() => 'OrgFootnoteReference';
 }
+
+class OrgLatexBlock extends OrgContentElement {
+  OrgLatexBlock(
+    this.leading,
+    this.begin,
+    this.content,
+    this.end,
+    this.trailing,
+  )   : assert(leading != null),
+        assert(begin != null),
+        assert(content != null),
+        assert(end != null),
+        assert(trailing != null);
+
+  final String leading;
+  final String begin;
+  final String content;
+  final String end;
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      begin.contains(pattern) ||
+      content.contains(pattern) ||
+      end.contains(pattern) ||
+      trailing.contains(pattern);
+
+  @override
+  String toString() => 'OrgLatexBlock';
+}

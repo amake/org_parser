@@ -998,5 +998,22 @@ foo''');
         skip: true,
       );
     });
+    test('LaTeX block', () {
+      final result = parser.parse(r'''\begin{equation}
+\nabla \cdot \mathbf{B} = 0
+\end{equation}
+''');
+      expect(result.value, [
+        [
+          '',
+          [
+            ['\\begin{', 'equation', '}'],
+            '\n\\nabla \\cdot \\mathbf{B} = 0\n',
+            ['\\end{', 'equation', '}']
+          ],
+          '\n'
+        ]
+      ]);
+    });
   });
 }

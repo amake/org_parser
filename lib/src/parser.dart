@@ -453,4 +453,23 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .footnoteBody()
       .castList<OrgContentElement>()
       .map((elems) => OrgContent(elems));
+
+  @override
+  Parser latexBlock() => super.latexBlock().map((values) {
+        final leading = values[0] as String;
+        final body = values[1] as List;
+        final begin = body[0] as String;
+        final content = body[1] as String;
+        final end = body[2] as String;
+        final trailing = values[2] as String;
+        return OrgLatexBlock(leading, begin, content, end, trailing);
+      });
+
+  @override
+  Parser latexBlockStart() =>
+      super.latexBlockStart().flatten('LaTeX block start expected');
+
+  @override
+  Parser latexBlockEnd() =>
+      super.latexBlockEnd().flatten('LaTeX block end expected');
 }
