@@ -1,3 +1,7 @@
+## [0.3.0] - 2020-07-14
+
+* Parse inline and block LaTeX fragments
+
 ## [0.2.0] - 2020-06-20
 
 * Parse src blocks (`#+begin_src`) as `OrgSrcBlock`; language of block is
