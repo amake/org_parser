@@ -172,6 +172,29 @@ void main() {
           '\n\\begin{matrix}\n   a & b \\\\\n   c & d\n\\end{matrix}\n');
       expect(latex.end, '\\end{equation}');
     });
+    test('inline LaTeX', () {
+      final parser = buildSpecific(parserDefinition.latexInline);
+      var result = parser.parse(r'$i$');
+      var latex = result.value as OrgLatexInline;
+      expect(latex.leadingDecoration, r'$');
+      expect(latex.content, r'i');
+      expect(latex.trailingDecoration, r'$');
+      result = parser.parse(r'$$ a^2 $$');
+      latex = result.value as OrgLatexInline;
+      expect(latex.leadingDecoration, r'$$');
+      expect(latex.content, r' a^2 ');
+      expect(latex.trailingDecoration, r'$$');
+      result = parser.parse(r'\( foo \)');
+      latex = result.value as OrgLatexInline;
+      expect(latex.leadingDecoration, r'\(');
+      expect(latex.content, r' foo ');
+      expect(latex.trailingDecoration, r'\)');
+      result = parser.parse(r'\[ bar \]');
+      latex = result.value as OrgLatexInline;
+      expect(latex.leadingDecoration, r'\[');
+      expect(latex.content, r' bar ');
+      expect(latex.trailingDecoration, r'\]');
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

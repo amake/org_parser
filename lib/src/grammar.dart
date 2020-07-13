@@ -94,7 +94,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(timestamp) |
       ref(keyword) |
       ref(macroReference) |
-      ref(footnoteReference);
+      ref(footnoteReference) |
+      ref(latexInline);
 
   Parser plainText([Parser limit]) {
     var fullLimit = ref(object) | endOfInput();
@@ -571,4 +572,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser latexBlock() => indented(LatexBlockParser());
+
+  Parser latexInline() =>
+      ref(_latexInline, r'$$', r'$$') |
+      ref(_latexInline, r'\(', r'\)') |
+      ref(_latexInline, r'\[', r'\]') |
+      drop(_markup(r'$'), [0, -1]);
+
+  Parser _latexInline(String start, String end) =>
+      string(start) &
+      string(end).neg().plusLazy(string(end)).flatten('LaTeX body expected') &
+      string(end);
 }

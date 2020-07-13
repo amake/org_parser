@@ -473,4 +473,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           trailing,
         );
       });
+
+  @override
+  Parser latexInline() => super.latexInline().map((values) {
+        final leading = values[0] as String;
+        final body = values[1] as String;
+        final trailing = values[2] as String;
+        return OrgLatexInline(leading, body, trailing);
+      });
 }

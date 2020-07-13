@@ -629,3 +629,26 @@ class OrgLatexBlock extends OrgContentElement {
   @override
   String toString() => 'OrgLatexBlock';
 }
+
+class OrgLatexInline extends OrgContentElement {
+  OrgLatexInline(
+    this.leadingDecoration,
+    this.content,
+    this.trailingDecoration,
+  )   : assert(leadingDecoration != null),
+        assert(content != null),
+        assert(trailingDecoration != null);
+
+  final String leadingDecoration;
+  final String content;
+  final String trailingDecoration;
+
+  @override
+  String toString() => 'OrgLatexInline';
+
+  @override
+  bool contains(Pattern pattern) =>
+      leadingDecoration.contains(pattern) ||
+      content.contains(pattern) ||
+      trailingDecoration.contains(pattern);
+}

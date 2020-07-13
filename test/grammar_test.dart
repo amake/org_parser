@@ -1033,5 +1033,63 @@ foo''');
         ]
       ]);
     });
+    test('inline LaTeX', () {
+      var result = parser.parse(r'foo $bar$ baz');
+      expect(result.value, [
+        [
+          '',
+          [
+            'foo ',
+            [r'$', 'bar', r'$'],
+            ' baz'
+          ]
+        ]
+      ]);
+      result = parser.parse(r'from $i$ to $j$');
+      expect(result.value, [
+        [
+          '',
+          [
+            'from ',
+            [r'$', 'i', r'$'],
+            ' to ',
+            [r'$', 'j', r'$']
+          ]
+        ]
+      ]);
+      result = parser.parse(r'foo $$ a^2 + b^2 + c^2 $$ baz');
+      expect(result.value, [
+        [
+          '',
+          [
+            'foo ',
+            [r'$$', ' a^2 + b^2 + c^2 ', r'$$'],
+            ' baz'
+          ]
+        ]
+      ]);
+      result = parser.parse(r'foo \(1/0\) baz');
+      expect(result.value, [
+        [
+          '',
+          [
+            'foo ',
+            ['\\(', '1/0', '\\)'],
+            ' baz'
+          ]
+        ]
+      ]);
+      result = parser.parse(r'foo \[\infty\] baz');
+      expect(result.value, [
+        [
+          '',
+          [
+            'foo ',
+            ['\\[', '\\infty', '\\]'],
+            ' baz'
+          ]
+        ]
+      ]);
+    });
   });
 }
