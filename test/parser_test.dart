@@ -163,6 +163,7 @@ void main() {
 \end{equation}
 ''');
       final latex = result.value as OrgLatexBlock;
+      expect(latex.environment, 'equation');
       expect(latex.begin, r'\begin{equation}');
       expect(latex.content, '\n\\nabla \\cdot \\mathbf{B} = 0\n');
       expect(latex.end, '\\end{equation}');

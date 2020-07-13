@@ -596,20 +596,22 @@ class OrgFootnoteReference extends OrgContentElement {
   String toString() => 'OrgFootnoteReference';
 }
 
-// TODO(aaron): Break out environment name
 class OrgLatexBlock extends OrgContentElement {
   OrgLatexBlock(
+    this.environment,
     this.leading,
     this.begin,
     this.content,
     this.end,
     this.trailing,
-  )   : assert(leading != null),
+  )   : assert(environment != null),
+        assert(leading != null),
         assert(begin != null),
         assert(content != null),
         assert(end != null),
         assert(trailing != null);
 
+  final String environment;
   final String leading;
   final String begin;
   final String content;
