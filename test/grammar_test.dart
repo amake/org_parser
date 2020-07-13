@@ -999,7 +999,7 @@ foo''');
       );
     });
     test('LaTeX block', () {
-      final result = parser.parse(r'''\begin{equation}
+      var result = parser.parse(r'''\begin{equation}
 \nabla \cdot \mathbf{B} = 0
 \end{equation}
 ''');
@@ -1009,7 +1009,25 @@ foo''');
           [
             ['\\begin{', 'equation', '}'],
             '\n\\nabla \\cdot \\mathbf{B} = 0\n',
-            ['\\end{', 'equation', '}']
+            '\\end{equation}'
+          ],
+          '\n'
+        ]
+      ]);
+      result = parser.parse(r'''\begin{equation}
+\begin{cases}
+   a &\text{if } b \\
+   c &\text{if } d
+\end{cases} + 1
+\end{equation}
+''');
+      expect(result.value, [
+        [
+          '',
+          [
+            ['\\begin{', 'equation', '}'],
+            '\n\\begin{cases}\n   a &\\text{if } b \\\\\n   c &\\text{if } d\n\\end{cases} + 1\n',
+            '\\end{equation}'
           ],
           '\n'
         ]

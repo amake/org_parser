@@ -569,22 +569,5 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     return ref(textRun, end).plusLazy(end);
   }
 
-  Parser latexBlock() => indented(
-        ref(latexBlockStart) & ref(latexBlockContent) & ref(latexBlockEnd),
-      );
-
-  Parser latexBlockStart() =>
-      string(r'\begin{') &
-      (char('}').neg().plusLazy(char('}')))
-          .flatten('LaTeX environment expected') &
-      char('}');
-
-  Parser latexBlockContent() =>
-      ref(latexBlockEnd).neg().star().flatten('LaTeX block content expected');
-
-  Parser latexBlockEnd() =>
-      string(r'\end{') &
-      (char('}').neg().plusLazy(char('}')))
-          .flatten('LaTeX environment expected') &
-      char('}');
+  Parser latexBlock() => indented(LatexBlockParser());
 }

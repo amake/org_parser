@@ -159,13 +159,17 @@ void main() {
     test('LaTeX block', () {
       final parser = buildSpecific(parserDefinition.latexBlock);
       final result = parser.parse(r'''\begin{equation}
-\nabla \cdot \mathbf{B} = 0
+\begin{matrix}
+   a & b \\
+   c & d
+\end{matrix}
 \end{equation}
 ''');
       final latex = result.value as OrgLatexBlock;
       expect(latex.environment, 'equation');
       expect(latex.begin, r'\begin{equation}');
-      expect(latex.content, '\n\\nabla \\cdot \\mathbf{B} = 0\n');
+      expect(latex.content,
+          '\n\\begin{matrix}\n   a & b \\\\\n   c & d\n\\end{matrix}\n');
       expect(latex.end, '\\end{equation}');
     });
   });

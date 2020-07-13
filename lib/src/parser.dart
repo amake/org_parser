@@ -458,9 +458,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser latexBlock() => super.latexBlock().map((values) {
         final leading = values[0] as String;
         final body = values[1] as List;
-        final blockStart = body[0] as Token<List>;
-        final begin = blockStart.input;
-        final environment = blockStart.value[1] as String;
+        final blockStart = body[0] as List;
+        final begin = blockStart.join('');
+        final environment = blockStart[1] as String;
         final content = body[1] as String;
         final end = body[2] as String;
         final trailing = values[2] as String;
@@ -473,11 +473,4 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           trailing,
         );
       });
-
-  @override
-  Parser latexBlockStart() => super.latexBlockStart().token();
-
-  @override
-  Parser latexBlockEnd() =>
-      super.latexBlockEnd().flatten('LaTeX block end expected');
 }
