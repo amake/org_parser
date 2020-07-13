@@ -241,6 +241,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(': ') &
       ref(lineTrailing).flatten('Trailing line content expected');
 
+  // TODO(aaron): Handle arbitrary blocks? See LatexBlockParser
   Parser block() =>
       ref(namedBlock, 'comment') |
       ref(namedBlock, 'example') |
