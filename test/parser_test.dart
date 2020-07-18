@@ -261,6 +261,12 @@ bazoonga''');
       final paragraphBody = paragraph.body.children[0] as OrgPlainText;
       expect(paragraphBody.content, 'bazoonga');
     });
+    test('https://github.com/amake/orgro/issues/16', () {
+      final result = parser.parse('* AB:CD: foo');
+      final document = result.value as OrgDocument;
+      final section = document.children[0];
+      expect(section.headline.rawTitle, 'AB:CD: foo');
+    });
     test('complex document', () {
       final result =
           parser.parse(File('test/org-syntax.org').readAsStringSync());
