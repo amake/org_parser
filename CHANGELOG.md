@@ -1,3 +1,7 @@
+## [0.3.1] - 2020-07-18
+
+* Fix section headline parsing error
+
 ## [0.3.0] - 2020-07-14
 
 * Parse inline and block LaTeX fragments
