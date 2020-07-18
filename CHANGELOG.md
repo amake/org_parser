@@ -1,3 +1,7 @@
+## [0.3.2] - 2020-07-18
+
+* More accurate tag handling in section headlines
+
 ## [0.3.1] - 2020-07-18
 
 * Fix section headline parsing error
