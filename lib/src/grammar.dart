@@ -42,7 +42,8 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser tags() =>
       string(' :') &
       ref(tag).separatedBy(char(':'), includeSeparators: false) &
-      char(':');
+      char(':') &
+      lineEnd().and();
 
   Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten('Tags expected');
 

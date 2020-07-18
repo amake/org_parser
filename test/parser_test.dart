@@ -263,10 +263,18 @@ bazoonga''');
       expect(paragraphBody.content, 'bazoonga');
     });
     test('https://github.com/amake/orgro/issues/16', () {
-      final result = parser.parse('* AB:CD: foo');
-      final document = result.value as OrgDocument;
-      final section = document.children[0];
+      var result = parser.parse('* AB:CD: foo');
+      var document = result.value as OrgDocument;
+      var section = document.children[0];
       expect(section.headline.rawTitle, 'AB:CD: foo');
+      result = parser.parse('* foo :AB:CD: bar');
+      document = result.value as OrgDocument;
+      section = document.children[0];
+      expect(section.headline.rawTitle, 'foo :AB:CD: bar');
+      result = parser.parse('* foo:AB:CD:');
+      document = result.value as OrgDocument;
+      section = document.children[0];
+      expect(section.headline.rawTitle, 'foo:AB:CD:');
     });
     test('complex document', () {
       final result =
