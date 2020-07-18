@@ -57,9 +57,9 @@ bar
               '** ',
               'TODO',
               ['[#', 'A', ']'],
-              ['Title foo bar '],
+              ['Title foo bar'],
               [
-                ':',
+                ' :',
                 ['biz', 'baz'],
                 ':'
               ]
