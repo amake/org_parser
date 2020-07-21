@@ -1,3 +1,7 @@
+## [0.4.0] - 2020-07-21
+
+* Parse entities (`\frac12` → ½, etc.)
+
 ## [0.3.2] - 2020-07-18
 
 * More accurate tag handling in section headlines
