@@ -107,3 +107,21 @@ applications.
     ```org
     {{{kbd(C-c C-c)}}}
     ```
+
+- LaTeX fragments
+
+    ```org
+    Then we add $a^2$ to \(b^2\)
+    ```
+
+    ```org
+    \begin{equation}
+    \nabla \times \mathbf{B} = \frac{1}{c}\left( 4\pi\mathbf{J} + \frac{\partial \mathbf{E}}{\partial t}\right)
+    \end{equation}
+    ```
+
+- Entities
+
+    ```org
+    a\leftrightarrow{}b conversion
+    ```
