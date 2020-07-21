@@ -92,6 +92,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser object() =>
       ref(link) |
       ref(markups) |
+      ref(entity) |
       ref(timestamp) |
       ref(keyword) |
       ref(macroReference) |
@@ -212,6 +213,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser preMarkup() => whitespace() | anyIn('-(\'"{');
 
   Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
+
+  // Adapted from `org-fontify-entities' in org-20200716
+
+  Parser entity() =>
+      char(r'\') &
+      ref(entityBody).flatten('Entity body expected') &
+      ref(entityEnd).flatten('Entity end expected');
+
+  Parser entityBody() =>
+      string('there4') |
+      (string('sup') & anyOf('123')) |
+      (string('frac') & anyOf('13') & anyOf('24')) |
+      pattern('a-zA-Z').plus();
+
+  Parser entityEnd() =>
+      // TODO(aaron): PetitParser's letter() is not the same as Emacs's [:alpha:]
+      lineEnd().and() | string('{}') | (letter() | char('\n')).not();
 
   Parser macroReference() =>
       string('{{{') &

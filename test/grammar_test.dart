@@ -780,6 +780,25 @@ baz bazinga
         ']'
       ]);
     });
+    test('entity', () {
+      final parser = buildSpecific(grammarDefinition.entity);
+      var result = parser.parse(r'\there4');
+      expect(result.value, ['\\', 'there4', '']);
+      result = parser.parse(r'\sup1');
+      expect(result.value, ['\\', 'sup1', '']);
+      result = parser.parse(r'\sup5');
+      expect(result.isFailure, true);
+      result = parser.parse(r'\frac12');
+      expect(result.value, ['\\', 'frac12', '']);
+      result = parser.parse(r'\frac15');
+      expect(result.isFailure, true);
+      result = parser.parse(r'\foobar');
+      expect(result.value, ['\\', 'foobar', '']);
+      result = parser.parse(r'\foobar2');
+      expect(result.isFailure, true);
+      result = parser.parse(r'\foobar{}');
+      expect(result.value, ['\\', 'foobar', '{}']);
+    });
   });
 
   group('content grammar complete', () {
@@ -1088,6 +1107,62 @@ foo''');
             'foo ',
             ['\\[', '\\infty', '\\]'],
             ' baz'
+          ]
+        ]
+      ]);
+    });
+    test('entity', () {
+      var result = parser.parse(r'I think \there4 I am');
+      expect(result.value, [
+        [
+          '',
+          [
+            'I think ',
+            ['\\', 'there4', ''],
+            ' I am'
+          ]
+        ]
+      ]);
+      result = parser.parse(r'''I think \there4
+I am''');
+      expect(result.value, [
+        [
+          '',
+          [
+            'I think ',
+            ['\\', 'there4', ''],
+            '\nI am'
+          ]
+        ]
+      ]);
+      result = parser.parse(r'I think \there4');
+      expect(result.value, [
+        [
+          '',
+          [
+            'I think ',
+            ['\\', 'there4', ''],
+          ]
+        ]
+      ]);
+      result = parser.parse(r'I think \there4{}');
+      expect(result.value, [
+        [
+          '',
+          [
+            'I think ',
+            ['\\', 'there4', '{}'],
+          ]
+        ]
+      ]);
+      result = parser.parse(r'I think \there4{}I am');
+      expect(result.value, [
+        [
+          '',
+          [
+            'I think ',
+            ['\\', 'there4', '{}'],
+            'I am'
           ]
         ]
       ]);

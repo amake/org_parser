@@ -195,6 +195,19 @@ void main() {
       expect(latex.content, r' bar ');
       expect(latex.trailingDecoration, r'\]');
     });
+    test('entity', () {
+      final parser = buildSpecific(parserDefinition.entity);
+      var result = parser.parse(r'\frac12');
+      var entity = result.value as OrgEntity;
+      expect(entity.leading, r'\');
+      expect(entity.name, r'frac12');
+      expect(entity.trailing, '');
+      result = parser.parse(r'\foobar{}');
+      entity = result.value as OrgEntity;
+      expect(entity.leading, r'\');
+      expect(entity.name, r'foobar');
+      expect(entity.trailing, '{}');
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

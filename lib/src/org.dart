@@ -652,3 +652,19 @@ class OrgLatexInline extends OrgContentElement {
       content.contains(pattern) ||
       trailingDecoration.contains(pattern);
 }
+
+class OrgEntity extends OrgContentElement {
+  OrgEntity(this.leading, this.name, this.trailing)
+      : assert(leading != null),
+        assert(name != null),
+        assert(trailing != null);
+  final String leading;
+  final String name;
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      name.contains(pattern) ||
+      trailing.contains(pattern);
+}

@@ -164,6 +164,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser entity() => super.entity().map((values) {
+        final leading = values[0] as String;
+        final name = values[1] as String;
+        final trailing = values[2] as String;
+        return OrgEntity(leading, name, trailing);
+      });
+
+  @override
   Parser macroReference() => super
       .macroReference()
       .flatten('Macro reference expected')
