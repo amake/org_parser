@@ -28,6 +28,20 @@ void main() {
       expect(link.description, 'bar');
       expect(link.location, 'foo::"[1]"');
     });
+    test('markup', () {
+      final parser = buildSpecific(parserDefinition.markups);
+      var result = parser.parse('''/foo
+bar/''');
+      final markup = result.value as OrgMarkup;
+      expect(markup.content, 'foo\nbar');
+      expect(markup.leadingDecoration, '/');
+      expect(markup.trailingDecoration, '/');
+      expect(markup.style, OrgStyle.italic);
+      result = parser.parse('''/foo
+
+bar/''');
+      expect(result.isFailure, true);
+    });
     test('macro reference', () {
       final parser = buildSpecific(parserDefinition.macroReference);
       var result = parser.parse('{{{name(arg1, arg2)}}}');

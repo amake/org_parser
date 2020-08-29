@@ -176,6 +176,13 @@ c/ d''');
       expect(result.value, ['~', "'", '~']);
       result = parser.parse('=+LEVEL=3+boss-TODO​="DONE"=');
       expect(result.value, ['=', '+LEVEL=3+boss-TODO​="DONE"', '=']);
+      result = parser.parse('''+foo
+bar+''');
+      expect(result.value, ['+', 'foo\nbar', '+']);
+      result = parser.parse('''+foo
+
+bar+''');
+      expect(true, result.isFailure);
     });
     test('macro reference', () {
       final parser = buildSpecific(grammarDefinition.macroReference);
