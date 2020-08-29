@@ -1,3 +1,8 @@
+## [0.4.1] - 2020-08-29
+
+* Fix inline style markup (`*foo*`, `+bar+`, etc.) to span at most one line
+  break
+
 ## [0.4.0] - 2020-07-21
 
 * Parse entities (`\frac12` → ½, etc.)
