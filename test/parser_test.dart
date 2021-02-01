@@ -121,18 +121,27 @@ bar/''');
     });
     test('drawer', () {
       final parser = buildSpecific(parserDefinition.drawer);
-      final result = parser.parse('''  :foo:
+      var result = parser.parse('''  :foo:
   :bar: baz
   :end:
 
 ''');
-      final drawer = result.value as OrgDrawer;
+      var drawer = result.value as OrgDrawer;
       expect(drawer.header, ':foo:\n');
-      final body = drawer.body as OrgContent;
+      var body = drawer.body as OrgContent;
       final property = body.children[0] as OrgProperty;
       expect(property.key, ':bar:');
       expect(property.value, ' baz');
       expect(drawer.footer, '  :end:');
+      result = parser.parse(''':LOGBOOK:
+a
+:END:
+''');
+      drawer = result.value as OrgDrawer;
+      expect(drawer.header, ':LOGBOOK:\n');
+      body = drawer.body as OrgContent;
+      final text = body.children[0] as OrgPlainText;
+      expect(text.content, 'a\n');
     });
     test('footnote', () {
       final parser = buildSpecific(parserDefinition.footnote);
