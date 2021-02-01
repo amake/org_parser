@@ -79,7 +79,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(paragraph);
 
   Parser paragraph() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Paragraph indent expected') &
       ref(textRun, ref(nonParagraphElements)).plusLazy(ref(paragraphEnd));
 
   Parser nonParagraphElements() =>
@@ -268,7 +268,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser fixedWidthArea() => ref(fixedWidthLine).plus() & ref(blankLines);
 
   Parser fixedWidthLine() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Fixed-width line indent expected') &
       string(': ') &
       ref(lineTrailing).flatten('Trailing line content expected');
 
@@ -355,7 +355,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser tableRow() => ref(tableRowRule) | ref(tableRowStandard);
 
   Parser tableRowStandard() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Table row indent expected') &
       char('|') &
       ref(tableCell).star() &
       ref(lineTrailing).flatten('Trailing line content expected');
@@ -375,12 +375,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser tableRowRule() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Table row rule indent expected') &
       (string('|-') & ref(lineTrailing))
           .flatten('Trailing line content expected');
 
   Parser tableDotElDivider() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Table.el divider indent expected') &
       (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
       ref(lineTrailing).flatten('Trailing line content expected');
 
@@ -472,7 +472,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemUnordered() =>
       (ref(indent) & ref(listUnorderedBullet).and())
-          .flatten('Indent expected') &
+          .flatten('List item (unordered) indent expected') &
       indentedRegion(
         parser: ref(listUnorderedBullet).flatten('Unordered bullet expected') &
             ref(listCheckBox).trim(char(' ')).optional() &
@@ -492,7 +492,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser listItemOrdered() =>
-      (ref(indent) & ref(listOrderedBullet).and()).flatten('Indent expected') &
+      (ref(indent) & ref(listOrderedBullet).and())
+          .flatten('List item (ordered) indent expected') &
       indentedRegion(
         parser: ref(listOrderedBullet) &
             ref(listCounterSet).trim(char(' ')).optional() &
@@ -544,12 +545,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser nonDrawerElements() => element()..replace(ref(drawer), noOpFail());
 
   Parser drawerEnd() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Drawer end indent expected') &
       (stringIgnoreCase(':END:') & ref(insignificantWhitespace).star())
           .flatten('Drawer end expected');
 
   Parser property() =>
-      ref(indent).flatten('Indent expected') &
+      ref(indent).flatten('Property indent expected') &
       ref(propertyKey) &
       ref(propertyValue) &
       (lineEnd() & ref(blankLines)).flatten('Trailing whitespace expected');
