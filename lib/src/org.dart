@@ -389,6 +389,31 @@ class OrgKeyword extends OrgContentElement with SingleContentElement {
   String toString() => 'OrgKeyword';
 }
 
+class OrgPlanningLine extends OrgContentElement with IndentedElement {
+  OrgPlanningLine(this.indent, this.keyword, this.body, this.trailing)
+      : assert(indent != null),
+        assert(keyword != null),
+        assert(body != null),
+        assert(trailing != null);
+
+  @override
+  final String indent;
+  final OrgKeyword keyword;
+  final OrgContent body;
+  @override
+  final String trailing;
+
+  @override
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) ||
+      keyword.contains(pattern) ||
+      body.contains(pattern) ||
+      trailing.contains(pattern);
+
+  @override
+  String toString() => 'OrgPlanningLine';
+}
+
 class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing)
       : assert(indent != null),
@@ -402,7 +427,9 @@ class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
 
   @override
   bool contains(Pattern pattern) =>
-      indent.contains(pattern) || content.contains(pattern);
+      indent.contains(pattern) ||
+      content.contains(pattern) ||
+      trailing.contains(pattern);
 
   @override
   String toString() => 'OrgFixedWidthArea';

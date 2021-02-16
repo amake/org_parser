@@ -119,6 +119,15 @@ bar/''');
       final row2 = table.rows[2] as OrgTableCellRow;
       expect(row2.cells.length, 3);
     });
+    test('planning line', () {
+      final parser = buildSpecific(parserDefinition.planningLine);
+      final result = parser.parse(
+          'CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49');
+      final planningLine = result.value as OrgPlanningLine;
+      expect(planningLine.keyword.content, 'CLOCK:');
+      final text = planningLine.body.children.last as OrgPlainText;
+      expect(text.content, ' =>  0:49');
+    });
     test('drawer', () {
       final parser = buildSpecific(parserDefinition.drawer);
       var result = parser.parse('''  :foo:

@@ -319,6 +319,17 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.keyword().map((value) => OrgKeyword(value as String));
 
   @override
+  Parser planningLine() => super.planningLine().map((values) {
+        final indent = values[0] as String;
+        final rest = values[1] as List;
+        final keyword = rest[0] as OrgKeyword;
+        final bodyElems = rest[1] as List;
+        final body = OrgContent(bodyElems.cast<OrgContentElement>());
+        final trailing = values[2] as String;
+        return OrgPlanningLine(indent, keyword, body, trailing);
+      });
+
+  @override
   Parser list() => super.list().map((items) {
         final listItems = items[0] as List;
         final trailing = items[1] as String;

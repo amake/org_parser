@@ -74,6 +74,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(fixedWidthArea) |
       ref(table) |
       ref(list) |
+      ref(planningLine) |
       ref(drawer) |
       ref(footnote) |
       ref(paragraph);
@@ -465,6 +466,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('DEADLINE:') |
       string('CLOCK:') |
       string('CLOSED:');
+
+  Parser planningLine() => indented(ref(_planningLine));
+
+  Parser _planningLine() {
+    final limit = lineEnd() | endOfInput();
+    return ref(keyword) & ref(textRun, limit).plusLazy(limit);
+  }
 
   Parser list() => ref(listItem).plus() & ref(blankLines);
 
