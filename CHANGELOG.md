@@ -18,6 +18,7 @@
 ## [0.3.0] - 2020-07-14
 
 * Parse inline and block LaTeX fragments
+  ([#1](https://github.com/amake/org_parser/issues/1))
 
 ## [0.2.0] - 2020-06-20
 
