@@ -1,3 +1,9 @@
+## [0.5.0] - 2021-12-16
+
+* Fix parsing of non-property drawer content
+* Parse planning/clock lines as separate elements
+  ([#2](https://github.com/amake/org_parser/issues/2))
+
 ## [0.4.1] - 2020-08-29
 
 * Fix inline style markup (`*foo*`, `+bar+`, etc.) to span at most one line
