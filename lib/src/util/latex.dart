@@ -11,7 +11,7 @@ class LatexBlockParser extends DelegateParser {
 
   @override
   Result parseOn(Context context) {
-    final result = super.parseOn(context);
+    final result = delegate.parseOn(context);
     if (result.isSuccess) {
       final environment = result.value[1] as String;
       final end = '\\end{$environment}';
@@ -23,4 +23,7 @@ class LatexBlockParser extends DelegateParser {
     }
     return result;
   }
+
+  @override
+  Parser copy() => this;
 }

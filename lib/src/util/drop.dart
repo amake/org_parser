@@ -9,7 +9,7 @@ import 'package:petitparser/petitparser.dart';
 /// but the first and last letter parsed. For the input `'abc'` it returns
 /// `['b']`.
 ///
-/// Mirrors [Parser.permute] in PetitParser.
+/// Mirrors Parser.permute in PetitParser.
 Parser<List<R>> drop<R>(Parser<R> parser, List<int> indexes) {
   return parser.castList<R>().map<List<R>>((list) {
     var result = list;

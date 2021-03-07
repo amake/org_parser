@@ -116,7 +116,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser protocol() => string('http') & char('s').optional() | string('mailto');
 
-  Parser path2() => (whitespace() | anyIn('()<>')).neg().plus();
+  Parser path2() => (whitespace() | anyOf('()<>')).neg().plus();
 
   /*
     Default value of org-link-brackets-re (org-20200302):
@@ -151,7 +151,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       // Join instead of flatten to drop escape chars
       ref(linkChar).plusLazy(char(']')).map((items) => items.join());
 
-  Parser linkChar() => ref(linkEscape).pick(1) | any();
+  Parser linkChar() => ref(linkEscape).castList().pick(1) | any();
 
   Parser linkEscape() => char('\\') & anyOf('[]\\');
 
@@ -161,7 +161,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
       char(']');
 
-  Parser anyChar() => ref(escape).pick(0) | any();
+  Parser anyChar() => ref(escape).castList().pick(0) | any();
 
   Parser escape() => any() & char('\u200b'); // zero-width space
 
@@ -222,9 +222,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       // Join instead of flatten to drop escape chars
       .map((items) => items.join());
 
-  Parser preMarkup() => whitespace() | anyIn('-(\'"{');
+  Parser preMarkup() => whitespace() | anyOf('-(\'"{');
 
-  Parser postMarkup() => whitespace() | anyIn('-.,:!?;\'")}[');
+  Parser postMarkup() => whitespace() | anyOf('-.,:!?;\'")}[');
 
   // Adapted from `org-fontify-entities' in org-20200716
 

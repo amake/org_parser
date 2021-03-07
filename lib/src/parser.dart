@@ -82,7 +82,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   Parser priority() => super.priority().flatten('Priority expected');
 
   @override
-  Parser tags() => super.tags().pick(1);
+  Parser tags() => super.tags().castList().pick(1);
 
   @override
   Parser content() => super
@@ -132,10 +132,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser linkPart() => super.linkPart().pick(1);
+  Parser linkPart() => super.linkPart().castList().pick(1);
 
   @override
-  Parser linkDescription() => super.linkDescription().pick(1);
+  Parser linkDescription() => super.linkDescription().castList().pick(1);
 
   @override
   Parser bold() => mapMarkup(super.bold(), OrgStyle.bold);
@@ -242,7 +242,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser srcBlockStart() => super.srcBlockStart().token();
 
   @override
-  Parser srcBlockLanguageToken() => super.srcBlockLanguageToken().pick(1);
+  Parser srcBlockLanguageToken() =>
+      super.srcBlockLanguageToken().castList().pick(1);
 
   @override
   Parser namedBlockStart(String name) =>
@@ -279,12 +280,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser tableDotElDivider() => super
       .tableDotElDivider()
+      .castList()
       .pick(0)
       .map((indent) => OrgTableDividerRow(indent as String));
 
   @override
   Parser tableRowRule() => super
       .tableRowRule()
+      .castList()
       .pick(0)
       .map((item) => OrgTableDividerRow(item as String));
 
@@ -300,7 +303,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser tableCell() => super.tableCell().pick(1);
+  Parser tableCell() => super.tableCell().castList().pick(1);
 
   @override
   Parser tableCellContents() => super

@@ -23,7 +23,7 @@ class ResultPredicateParser<T> extends DelegateParser<T> {
 
   @override
   Result<T> parseOn(Context context) {
-    final result = super.parseOn(context);
+    final result = delegate.parseOn(context) as Result<T>;
     if (result.isSuccess) {
       if (predicate(context.buffer, context.position, result.position)) {
         return result;
@@ -33,4 +33,7 @@ class ResultPredicateParser<T> extends DelegateParser<T> {
     }
     return result;
   }
+
+  @override
+  Parser<T> copy() => ResultPredicateParser(delegate, predicate, message);
 }
