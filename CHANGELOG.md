@@ -1,3 +1,7 @@
+## [1.0.0-nullsafety.0]
+
+* Migrate to non-nullable by default
+
 ## [0.5.0] - 2021-12-16
 
 * Fix parsing of non-property drawer content
