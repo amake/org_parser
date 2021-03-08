@@ -10,8 +10,7 @@ Parser<void> startOfInput([String message = 'start of input expected']) =>
 class StartOfInputParser extends Parser<void> {
   final String message;
 
-  StartOfInputParser(this.message)
-      : assert(message != null, 'message must not be null');
+  StartOfInputParser(this.message);
 
   @override
   Result parseOn(Context context) {

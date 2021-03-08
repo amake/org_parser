@@ -56,9 +56,10 @@ class OrgGrammarDefinition extends GrammarDefinition {
 class OrgContentGrammar extends GrammarParser {
   OrgContentGrammar() : super(OrgContentGrammarDefinition());
 
-  static Parser textRun([Parser limit]) {
+  static Parser textRun([Parser? limit]) {
     final definition = OrgContentGrammarDefinition();
-    return definition.build(start: definition.textRun, arguments: [limit]);
+    final args = limit == null ? const <Object>[] : [limit];
+    return definition.build(start: definition.textRun, arguments: args);
   }
 }
 
@@ -88,7 +89,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser paragraphEnd() => endOfInput() | ref(nonParagraphElements);
 
-  Parser textRun([Parser limit]) => ref(object) | ref(plainText, limit);
+  Parser textRun([Parser? limit]) => ref(object) | ref(plainText, limit);
 
   Parser object() =>
       ref(link) |
@@ -100,7 +101,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref(footnoteReference) |
       ref(latexInline);
 
-  Parser plainText([Parser limit]) {
+  Parser plainText([Parser? limit]) {
     var fullLimit = ref(object) | endOfInput();
     if (limit != null) {
       fullLimit |= limit;

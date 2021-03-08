@@ -14,9 +14,7 @@ class ResultPredicateParser<T> extends DelegateParser<T> {
     Parser child,
     this.predicate,
     this.message,
-  )   : assert(predicate != null),
-        assert(message != null),
-        super(child);
+  ) : super(child);
 
   final Predicate predicate;
   final String message;

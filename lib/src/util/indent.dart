@@ -13,7 +13,7 @@ const kUnlimitedSeparatingLineBreaks = -1;
 /// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
 /// allowed.
 Parser indentedRegion(
-        {Parser parser,
+        {Parser? parser,
         int indentAdjust = 0,
         int maxSeparatingLineBreaks = -1}) =>
     IndentedRegionParser(parser, indentAdjust, maxSeparatingLineBreaks);
@@ -30,7 +30,7 @@ Parser indentedRegion(
 /// allowed.
 class IndentedRegionParser extends DelegateParser {
   IndentedRegionParser(
-      Parser delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
+      Parser? delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
       : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
             maxSeparatingLineBreaks > 0),
         super(delegate ?? any().star().flatten('Region content expected'));

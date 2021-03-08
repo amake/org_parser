@@ -119,8 +119,8 @@ const _htmlTemplate = '''<!DOCTYPE html>
 class Frame {
   Frame(this.name);
   String name;
-  int _begin;
-  int _end;
+  int? _begin;
+  int? _end;
   final List<Frame> children = [];
 
   void start() => _begin = DateTime.now().millisecondsSinceEpoch;
@@ -128,7 +128,7 @@ class Frame {
 
   Map<String, Object> get asMap => {
         'name': name,
-        'value': _end - _begin,
+        'value': _end! - _begin!,
         'children': children.map((child) => child.asMap).toList(growable: false)
       };
 }

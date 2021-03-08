@@ -10,14 +10,14 @@ class OrgParser extends GrammarParser {
 class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser start() => super.start().map((items) {
-        final topContent = items[0] as OrgContent;
+        final topContent = items[0] as OrgContent?;
         final sections = items[1] as List;
         return OrgDocument(topContent, List.unmodifiable(sections));
       });
 
   @override
   Parser document() => super.document().map((items) {
-        final firstContent = items[0] as OrgContent;
+        final firstContent = items[0] as OrgContent?;
         final sections = items[1] as List;
         return [firstContent, _nestSections(sections.cast<OrgSection>())];
       });
@@ -47,23 +47,23 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser section() => super.section().map((items) {
         final headline = items[0] as OrgHeadline;
-        final content = items[1] as OrgContent;
+        final content = items[1] as OrgContent?;
         return OrgSection(headline, content);
       });
 
   @override
   Parser headline() => super.headline().map((items) {
         final stars = items[0] as String;
-        final keyword = items[1] as String;
-        final priority = items[2] as String;
-        final title = items[3] as Token;
-        final tags = items[4] as List;
+        final keyword = items[1] as String?;
+        final priority = items[2] as String?;
+        final title = items[3] as Token?;
+        final tags = items[4] as List?;
         return OrgHeadline(
           stars,
           keyword,
           priority,
-          title.value as OrgContent,
-          title.input,
+          title?.value as OrgContent,
+          title?.input,
           tags?.cast<String>(),
         );
       });
@@ -95,9 +95,10 @@ final _orgContentParser = OrgContentParser();
 class OrgContentParser extends GrammarParser {
   OrgContentParser() : super(OrgContentParserDefinition());
 
-  static Parser textRun([Parser limit]) {
+  static Parser textRun([Parser? limit]) {
     final definition = OrgContentParserDefinition();
-    return definition.build(start: definition.textRun, arguments: [limit]);
+    final args = limit == null ? const <Object>[] : [limit];
+    return definition.build(start: definition.textRun, arguments: args);
   }
 }
 
@@ -117,7 +118,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser plainText([Parser limit]) =>
+  Parser plainText([Parser? limit]) =>
       super.plainText(limit).map((value) => OrgPlainText(value as String));
 
   @override
@@ -127,7 +128,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser regularLink() => super.regularLink().castList().map((values) {
         final location = values[1] as String;
-        final description = values.length > 3 ? values[2] as String : null;
+        final description = values.length > 3 ? values[2] as String? : null;
         return OrgLink(location, description);
       });
 
@@ -344,9 +345,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final indent = values[0] as String;
         final rest = values[1] as List;
         final bullet = rest[0] as String;
-        final counterSet = rest[1] as String;
-        final checkBox = rest[2] as String;
-        final body = rest[3] as OrgContent;
+        final counterSet = rest[1] as String?;
+        final checkBox = rest[2] as String?;
+        final body = rest[3] as OrgContent?;
         return OrgListOrderedItem(indent, bullet, counterSet, checkBox, body);
       });
 
@@ -355,16 +356,16 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final indent = values[0] as String;
         final rest = values[1] as List;
         final bullet = rest[0] as String;
-        final checkBox = rest[1] as String;
-        final tagParts = rest[2] as List;
-        OrgContent tag;
-        String tagDelimiter;
+        final checkBox = rest[1] as String?;
+        final tagParts = rest[2] as List?;
+        OrgContent? tag;
+        String? tagDelimiter;
         if (tagParts != null) {
           final tagList = tagParts[0] as List;
           tag = OrgContent(tagList.cast<OrgContentElement>());
           tagDelimiter = tagParts[1] as String;
         }
-        final body = rest[3] as OrgContent;
+        final body = rest[3] as OrgContent?;
         return OrgListUnorderedItem(
           indent,
           bullet,
@@ -440,9 +441,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser footnoteReferenceInline() =>
       super.footnoteReferenceInline().map((values) {
         final leading = values[0] as String;
-        final name = values[1] as String;
-        final delimiter = values[2] as String;
-        final content = values[3] as OrgContent;
+        final name = values[1] as String?;
+        final delimiter = values[2] as String?;
+        final content = values[3] as OrgContent?;
         final trailing = values[4] as String;
         return OrgFootnoteReference(
           leading,
