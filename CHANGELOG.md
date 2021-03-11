@@ -1,4 +1,4 @@
-## [1.0.0-nullsafety.0]
+## [1.0.0]
 
 * Migrate to non-nullable by default
 
