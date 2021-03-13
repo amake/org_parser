@@ -1,3 +1,7 @@
+## [1.0.1]
+
+* Fix nullability errors in headline, src block
+
 ## [1.0.0]
 
 * Migrate to non-nullable by default
