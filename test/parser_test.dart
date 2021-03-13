@@ -55,6 +55,19 @@ bar/''');
       result = parser.parse('{{{0abc}}}');
       expect(result.isFailure, true, reason: 'Invalid key');
     });
+    test('fixed-width area', () {
+      final parser = buildSpecific(parserDefinition.fixedWidthArea);
+      var result = parser.parse(''': foo
+: bar
+''');
+      var area = result.value as OrgFixedWidthArea;
+      expect(area.content, ''': foo
+: bar
+''');
+      result = parser.parse(': ');
+      area = result.value as OrgFixedWidthArea;
+      expect(area.content, ': ');
+    });
     test('block', () {
       final parser = buildSpecific(parserDefinition.block);
       final result = parser.parse('''#+begin_example
@@ -107,12 +120,12 @@ bar/''');
     });
     test('table', () {
       final parser = buildSpecific(parserDefinition.table);
-      final result = parser.parse('''  | foo | *bar* | baz |
+      var result = parser.parse('''  | foo | *bar* | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
 ''');
-      final table = result.value as OrgTable;
-      final row0 = table.rows[0] as OrgTableCellRow;
+      var table = result.value as OrgTable;
+      var row0 = table.rows[0] as OrgTableCellRow;
       final row0Cell0 = row0.cells[0].children[0] as OrgPlainText;
       expect(row0Cell0.content, 'foo');
       final row0Cell1 = row0.cells[1].children[0] as OrgMarkup;
@@ -123,6 +136,10 @@ bar/''');
       expect(table.rows[1] is OrgTableDividerRow, true);
       final row2 = table.rows[2] as OrgTableCellRow;
       expect(row2.cells.length, 3);
+      result = parser.parse('||');
+      table = result.value as OrgTable;
+      row0 = table.rows[0] as OrgTableCellRow;
+      expect(row0.cells[0].children.isEmpty, true);
     });
     test('planning line', () {
       final parser = buildSpecific(parserDefinition.planningLine);
@@ -156,6 +173,11 @@ a
       body = drawer.body as OrgContent;
       final text = body.children[0] as OrgPlainText;
       expect(text.content, 'a\n');
+      result = parser.parse(''':FOOBAR:
+:END:''');
+      drawer = result.value as OrgDrawer;
+      body = drawer.body as OrgContent;
+      expect(body.children.isEmpty, true);
     });
     test('footnote', () {
       final parser = buildSpecific(parserDefinition.footnote);
