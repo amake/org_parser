@@ -248,11 +248,14 @@ a
 
     test('header', () {
       final parser = buildSpecific(parserDefinition.headline);
-      final result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
-      final headline = result.value as OrgHeadline;
+      var result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
+      var headline = result.value as OrgHeadline;
       final title = headline.title!.children[0] as OrgPlainText;
       expect(title.content, 'Title foo bar');
       expect(headline.tags, ['biz', 'baz']);
+      result = parser.parse('* ');
+      headline = result.value as OrgHeadline;
+      expect(headline.title, null);
     });
   });
   group('parser complete', () {

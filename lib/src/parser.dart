@@ -62,7 +62,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
           stars,
           keyword,
           priority,
-          title?.value as OrgContent,
+          title?.value as OrgContent?,
           title?.input,
           tags?.cast<String>(),
         );
