@@ -262,7 +262,7 @@ class OrgSrcBlock extends OrgBlock {
     String trailing,
   ) : super(indent, header, body, footer, trailing);
 
-  final String language;
+  final String? language;
 }
 
 class OrgTable extends OrgContentElement with IndentedElement {

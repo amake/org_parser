@@ -223,7 +223,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final body = parts[1] as List;
         final headerToken = body[0] as Token;
         final headerParts = headerToken.value as List;
-        final language = headerParts[1] as String;
+        final language = headerParts[1] as String?;
         final header = headerToken.input;
         final content = body[1] as String;
         final footer = body[2] as String;
