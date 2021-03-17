@@ -312,6 +312,10 @@ a
           topSection.headline.title!.children[0] as OrgPlainText;
       expect(topContent0.content, 'A Headline');
       expect(topSection.sections.length, 2);
+      expect(document.contains('bold'), true);
+      expect(document.contains('*bold*'), false); // TODO(aaron): could improve?
+      expect(document.contains(RegExp(r'Add')), true);
+      expect(document.contains(RegExp(r'\bAdd\b')), false);
     });
     test('footnotes', () {
       final parser = OrgParser();
