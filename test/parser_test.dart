@@ -371,5 +371,37 @@ bazoonga''');
         baz buzz''');
       expect(doc.sections[0].headline.keyword, 'TODO');
     });
+    test('walk tree', () {
+      List<String> walkTree<T extends OrgNode>(
+        OrgDocument doc, {
+        bool Function(T)? kontinue,
+      }) {
+        final visited = <String>[];
+        kontinue ??= (_) => true;
+        doc.visit<T>((node) {
+          visited.add(node.toString());
+          return kontinue!.call(node);
+        });
+        return visited;
+      }
+
+      final result = parser.parse('Hello, world!');
+      final doc = result.value as OrgDocument;
+      expect(walkTree(doc), [
+        'OrgDocument',
+        'OrgContent',
+        'OrgParagraph',
+        'OrgContent',
+        'OrgPlainText'
+      ]);
+      expect(walkTree<OrgPlainText>(doc), ['OrgPlainText']);
+      expect(
+        walkTree(
+          doc,
+          kontinue: (node) => !(node is OrgParagraph),
+        ),
+        ['OrgDocument', 'OrgContent', 'OrgParagraph'],
+      );
+    });
   });
 }
