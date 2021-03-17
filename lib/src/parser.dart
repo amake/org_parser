@@ -35,7 +35,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
           .cast<OrgSection>()
           .toList();
       if (children.isNotEmpty) {
-        result.add(parent.copyWith(children: _nestSections(children)));
+        result.add(parent.copyWith(sections: _nestSections(children)));
         i += children.length;
       } else {
         result.add(parent);
@@ -73,7 +73,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
     final limit = ref(tags) | lineEnd();
     return OrgContentParser.textRun(limit)
         .plusLazy(limit)
-        .castList<OrgContentElement>()
+        .castList<OrgNode>()
         .map((items) => OrgContent(items))
         .token();
   }
@@ -104,16 +104,14 @@ class OrgContentParser extends GrammarParser {
 
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
-  Parser start() => super
-      .start()
-      .castList<OrgContentElement>()
-      .map((elems) => OrgContent(elems));
+  Parser start() =>
+      super.start().castList<OrgNode>().map((elems) => OrgContent(elems));
 
   @override
   Parser paragraph() => super.paragraph().map((items) {
         final indent = items[0] as String;
         final bodyElements = items[1] as List;
-        final body = OrgContent(bodyElements.cast<OrgContentElement>());
+        final body = OrgContent(bodyElements.cast<OrgNode>());
         return OrgParagraph(indent, body);
       });
 
@@ -205,7 +203,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final content = body[1] as String;
         final footer = body[2] as String;
         final trailing = parts[2] as String;
-        OrgContentElement bodyContent;
+        OrgNode bodyContent;
         switch (name) {
           case 'example':
           case 'export':
@@ -268,7 +266,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser namedGreaterBlockContent(String name) => super
       .namedGreaterBlockContent(name)
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override
@@ -309,7 +307,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser tableCellContents() => super
       .tableCellContents()
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override
@@ -328,7 +326,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final rest = values[1] as List;
         final keyword = rest[0] as OrgKeyword;
         final bodyElems = rest[1] as List;
-        final body = OrgContent(bodyElems.cast<OrgContentElement>());
+        final body = OrgContent(bodyElems.cast<OrgNode>());
         final trailing = values[2] as String;
         return OrgPlanningLine(indent, keyword, body, trailing);
       });
@@ -362,7 +360,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         String? tagDelimiter;
         if (tagParts != null) {
           final tagList = tagParts[0] as List;
-          tag = OrgContent(tagList.cast<OrgContentElement>());
+          tag = OrgContent(tagList.cast<OrgNode>());
           tagDelimiter = tagParts[1] as String;
         }
         final body = rest[3] as OrgContent?;
@@ -379,7 +377,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser listItemContents() => super
       .listItemContents()
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override
@@ -410,7 +408,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser drawerContent() => super
       .drawerContent()
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override
@@ -457,7 +455,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser footnoteDefinition() => super
       .footnoteDefinition()
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override
@@ -474,7 +472,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser footnoteBody() => super
       .footnoteBody()
-      .castList<OrgContentElement>()
+      .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
   @override

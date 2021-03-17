@@ -11,14 +11,23 @@ String parseOrgLocalSectionUrl(String url) {
   return url.substring(1).replaceAll(RegExp('[ \t]*\r?\n[ \t]*'), ' ');
 }
 
-abstract class OrgTree {
-  OrgTree(this.content, [Iterable<OrgSection>? children])
-      : children = List.unmodifiable(children ?? const <OrgSection>[]);
+abstract class OrgNode {
+  List<OrgNode> get children => const [];
+  bool contains(Pattern pattern);
+}
+
+abstract class OrgTree extends OrgNode {
+  OrgTree(this.content, [Iterable<OrgSection>? sections])
+      : sections = List.unmodifiable(sections ?? const <OrgSection>[]);
   final OrgContent? content;
-  final List<OrgSection> children;
+  final List<OrgSection> sections;
+
+  @override
+  List<OrgNode> get children => [if (content != null) content!, ...sections];
 
   int get level;
 
+  @override
   bool contains(Pattern pattern, {bool includeChildren = true}) {
     final content = this.content;
     if (content != null && content.contains(pattern)) {
@@ -45,7 +54,7 @@ class OrgDocument extends OrgTree {
   String toString() => 'OrgDocument';
 }
 
-class OrgHeadline {
+class OrgHeadline extends OrgNode {
   OrgHeadline(
     this.stars,
     this.keyword,
@@ -66,6 +75,10 @@ class OrgHeadline {
   // -1 for trailing space
   int get level => stars.length - 1;
 
+  @override
+  List<OrgNode> get children => title == null ? const [] : [title!];
+
+  @override
   bool contains(Pattern pattern) {
     final keyword = this.keyword;
     final title = this.title;
@@ -82,24 +95,27 @@ class OrgSection extends OrgTree {
   OrgSection(
     this.headline,
     OrgContent? content, [
-    Iterable<OrgSection>? children,
-  ]) : super(content, children);
+    Iterable<OrgSection>? sections,
+  ]) : super(content, sections);
   final OrgHeadline headline;
+
+  @override
+  List<OrgNode> get children => [headline, ...super.children];
 
   @override
   int get level => headline.level;
 
-  bool get isEmpty => content == null && children.isEmpty;
+  bool get isEmpty => content == null && sections.isEmpty;
 
   OrgSection copyWith({
     OrgHeadline? headline,
     OrgContent? content,
-    Iterable<OrgSection>? children,
+    Iterable<OrgSection>? sections,
   }) =>
       OrgSection(
         headline ?? this.headline,
         content ?? this.content,
-        children ?? this.children,
+        sections ?? this.sections,
       );
 
   @override
@@ -109,11 +125,6 @@ class OrgSection extends OrgTree {
 
   @override
   String toString() => 'OrgSection';
-}
-
-// ignore: one_member_abstracts
-abstract class OrgContentElement {
-  bool contains(Pattern pattern);
 }
 
 mixin SingleContentElement {
@@ -128,11 +139,12 @@ mixin IndentedElement {
   String get trailing;
 }
 
-class OrgContent extends OrgContentElement {
-  OrgContent(Iterable<OrgContentElement> children)
+class OrgContent extends OrgNode {
+  OrgContent(Iterable<OrgNode> children)
       : children = List.unmodifiable(children);
 
-  final List<OrgContentElement> children;
+  @override
+  final List<OrgNode> children;
 
   @override
   bool contains(Pattern pattern) =>
@@ -142,7 +154,7 @@ class OrgContent extends OrgContentElement {
   String toString() => 'OrgContent';
 }
 
-class OrgPlainText extends OrgContentElement with SingleContentElement {
+class OrgPlainText extends OrgNode with SingleContentElement {
   OrgPlainText(this.content);
 
   @override
@@ -152,7 +164,7 @@ class OrgPlainText extends OrgContentElement with SingleContentElement {
   String toString() => 'OrgPlainText';
 }
 
-class OrgLink extends OrgContentElement {
+class OrgLink extends OrgNode {
   OrgLink(this.location, this.description);
   final String location;
   final String? description;
@@ -168,7 +180,7 @@ class OrgLink extends OrgContentElement {
   String toString() => 'OrgLink';
 }
 
-class OrgMarkup extends OrgContentElement {
+class OrgMarkup extends OrgNode {
   // TODO(aaron): Get rid of this hack
   OrgMarkup.just(String content, OrgStyle style) : this('', content, '', style);
 
@@ -203,7 +215,7 @@ enum OrgStyle {
   code,
 }
 
-class OrgMacroReference extends OrgContentElement with SingleContentElement {
+class OrgMacroReference extends OrgNode with SingleContentElement {
   OrgMacroReference(this.content);
 
   @override
@@ -213,11 +225,13 @@ class OrgMacroReference extends OrgContentElement with SingleContentElement {
   String toString() => 'OrgMacroReference';
 }
 
-class OrgMeta extends OrgContentElement {
+class OrgMeta extends OrgNode with IndentedElement {
   OrgMeta(this.indent, this.keyword, this.trailing);
 
+  @override
   final String indent;
   final String keyword;
+  @override
   final String trailing;
 
   @override
@@ -231,16 +245,19 @@ class OrgMeta extends OrgContentElement {
   String toString() => 'OrgMeta';
 }
 
-class OrgBlock extends OrgContentElement with IndentedElement {
+class OrgBlock extends OrgNode with IndentedElement {
   OrgBlock(this.indent, this.header, this.body, this.footer, this.trailing);
 
   @override
   final String indent;
   final String header;
-  final OrgContentElement body;
+  final OrgNode body;
   final String footer;
   @override
   final String trailing;
+
+  @override
+  List<OrgNode> get children => [body];
 
   @override
   bool contains(Pattern pattern) =>
@@ -257,7 +274,7 @@ class OrgSrcBlock extends OrgBlock {
     this.language,
     String indent,
     String header,
-    OrgContentElement body,
+    OrgNode body,
     String footer,
     String trailing,
   ) : super(indent, header, body, footer, trailing);
@@ -265,11 +282,14 @@ class OrgSrcBlock extends OrgBlock {
   final String? language;
 }
 
-class OrgTable extends OrgContentElement with IndentedElement {
+class OrgTable extends OrgNode with IndentedElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing)
       : rows = List.unmodifiable(rows);
 
   final List<OrgTableRow> rows;
+
+  @override
+  List<OrgNode> get children => rows;
 
   @override
   String get indent => rows.isEmpty ? '' : rows.first.indent;
@@ -306,7 +326,7 @@ class OrgTable extends OrgContentElement with IndentedElement {
   String toString() => 'OrgTable';
 }
 
-abstract class OrgTableRow extends OrgContentElement {
+abstract class OrgTableRow extends OrgNode {
   OrgTableRow(this.indent);
 
   final String indent;
@@ -331,6 +351,9 @@ class OrgTableCellRow extends OrgTableRow {
         super(indent);
 
   final List<OrgContent> cells;
+
+  @override
+  List<OrgNode> get children => cells;
 
   int get cellCount => cells.length;
 
@@ -362,7 +385,7 @@ final _orgTableNumberRegexp = RegExp(
 // right-aligned. From org-mode 20200504.
 const _orgTableNumberFraction = 0.5;
 
-class OrgTimestamp extends OrgContentElement with SingleContentElement {
+class OrgTimestamp extends OrgNode with SingleContentElement {
   OrgTimestamp(this.content);
 
   // TODO(aaron): Expose actual data
@@ -373,7 +396,7 @@ class OrgTimestamp extends OrgContentElement with SingleContentElement {
   String toString() => 'OrgTimestamp';
 }
 
-class OrgKeyword extends OrgContentElement with SingleContentElement {
+class OrgKeyword extends OrgNode with SingleContentElement {
   OrgKeyword(this.content);
 
   @override
@@ -383,7 +406,7 @@ class OrgKeyword extends OrgContentElement with SingleContentElement {
   String toString() => 'OrgKeyword';
 }
 
-class OrgPlanningLine extends OrgContentElement with IndentedElement {
+class OrgPlanningLine extends OrgNode with IndentedElement {
   OrgPlanningLine(this.indent, this.keyword, this.body, this.trailing);
 
   @override
@@ -392,6 +415,9 @@ class OrgPlanningLine extends OrgContentElement with IndentedElement {
   final OrgContent body;
   @override
   final String trailing;
+
+  @override
+  List<OrgNode> get children => [keyword, body];
 
   @override
   bool contains(Pattern pattern) =>
@@ -404,7 +430,7 @@ class OrgPlanningLine extends OrgContentElement with IndentedElement {
   String toString() => 'OrgPlanningLine';
 }
 
-class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
+class OrgFixedWidthArea extends OrgNode with IndentedElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing);
 
   @override
@@ -423,7 +449,7 @@ class OrgFixedWidthArea extends OrgContentElement with IndentedElement {
   String toString() => 'OrgFixedWidthArea';
 }
 
-class OrgList extends OrgContentElement with IndentedElement {
+class OrgList extends OrgNode with IndentedElement {
   OrgList(Iterable<OrgListItem> items, this.trailing)
       : items = List.unmodifiable(items);
   final List<OrgListItem> items;
@@ -440,13 +466,16 @@ class OrgList extends OrgContentElement with IndentedElement {
   String toString() => 'OrgList';
 }
 
-abstract class OrgListItem extends OrgContentElement {
+abstract class OrgListItem extends OrgNode {
   OrgListItem(this.indent, this.bullet, this.checkbox, this.body);
 
   final String indent;
   final String bullet;
   final String? checkbox;
   final OrgContent? body;
+
+  @override
+  List<OrgNode> get children => body == null ? const [] : [body!];
 
   @override
   bool contains(Pattern pattern) {
@@ -476,6 +505,9 @@ class OrgListUnorderedItem extends OrgListItem {
 
   final OrgContent? tag;
   final String? tagDelimiter;
+
+  @override
+  List<OrgNode> get children => [if (tag != null) tag!, ...super.children];
 
   @override
   bool contains(Pattern pattern) {
@@ -512,11 +544,14 @@ class OrgListOrderedItem extends OrgListItem {
   String toString() => 'OrgListOrderedItem';
 }
 
-class OrgParagraph extends OrgContentElement {
+class OrgParagraph extends OrgNode {
   OrgParagraph(this.indent, this.body);
 
   final String indent;
   final OrgContent body;
+
+  @override
+  List<OrgNode> get children => [body];
 
   @override
   bool contains(Pattern pattern) =>
@@ -526,16 +561,19 @@ class OrgParagraph extends OrgContentElement {
   String toString() => 'OrgParagraph';
 }
 
-class OrgDrawer extends OrgContentElement with IndentedElement {
+class OrgDrawer extends OrgNode with IndentedElement {
   OrgDrawer(this.indent, this.header, this.body, this.footer, this.trailing);
 
   @override
   final String indent;
   final String header;
-  final OrgContentElement body;
+  final OrgNode body;
   final String footer;
   @override
   final String trailing;
+
+  @override
+  List<OrgNode> get children => [body];
 
   @override
   bool contains(Pattern pattern) =>
@@ -547,12 +585,14 @@ class OrgDrawer extends OrgContentElement with IndentedElement {
   String toString() => 'OrgDrawer';
 }
 
-class OrgProperty extends OrgContentElement {
+class OrgProperty extends OrgNode with IndentedElement {
   OrgProperty(this.indent, this.key, this.value, this.trailing);
 
+  @override
   final String indent;
   final String key;
   final String value;
+  @override
   final String trailing;
 
   @override
@@ -563,11 +603,14 @@ class OrgProperty extends OrgContentElement {
   String toString() => 'OrgProperty';
 }
 
-class OrgFootnote extends OrgContentElement {
+class OrgFootnote extends OrgNode {
   OrgFootnote(this.marker, this.content);
 
   final OrgFootnoteReference marker;
   final OrgContent content;
+
+  @override
+  List<OrgNode> get children => [marker, content];
 
   @override
   bool contains(Pattern pattern) =>
@@ -577,7 +620,7 @@ class OrgFootnote extends OrgContentElement {
   String toString() => 'OrgFootnote';
 }
 
-class OrgFootnoteReference extends OrgContentElement {
+class OrgFootnoteReference extends OrgNode {
   OrgFootnoteReference.named(String leading, String name, String trailing)
       : this(leading, name, null, null, trailing);
 
@@ -596,6 +639,9 @@ class OrgFootnoteReference extends OrgContentElement {
   final String trailing;
 
   @override
+  List<OrgNode> get children => [if (definition != null) definition!];
+
+  @override
   bool contains(Pattern pattern) {
     final name = this.name;
     final definitionDelimiter = this.definitionDelimiter;
@@ -611,7 +657,7 @@ class OrgFootnoteReference extends OrgContentElement {
   String toString() => 'OrgFootnoteReference';
 }
 
-class OrgLatexBlock extends OrgContentElement {
+class OrgLatexBlock extends OrgNode {
   OrgLatexBlock(
     this.environment,
     this.leading,
@@ -640,7 +686,7 @@ class OrgLatexBlock extends OrgContentElement {
   String toString() => 'OrgLatexBlock';
 }
 
-class OrgLatexInline extends OrgContentElement {
+class OrgLatexInline extends OrgNode {
   OrgLatexInline(
     this.leadingDecoration,
     this.content,
@@ -661,7 +707,7 @@ class OrgLatexInline extends OrgContentElement {
       trailingDecoration.contains(pattern);
 }
 
-class OrgEntity extends OrgContentElement {
+class OrgEntity extends OrgNode {
   OrgEntity(this.leading, this.name, this.trailing);
 
   final String leading;

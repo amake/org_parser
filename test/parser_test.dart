@@ -307,11 +307,11 @@ a
       final paragraph = document.content!.children[0] as OrgParagraph;
       final text = paragraph.body.children[0] as OrgPlainText;
       expect(text.content, 'An introduction.\n\n');
-      final topSection = document.children[0];
+      final topSection = document.sections[0];
       final topContent0 =
           topSection.headline.title!.children[0] as OrgPlainText;
       expect(topContent0.content, 'A Headline');
-      expect(topSection.children.length, 2);
+      expect(topSection.sections.length, 2);
     });
     test('footnotes', () {
       final parser = OrgParser();
@@ -341,15 +341,15 @@ bazoonga''');
     test('https://github.com/amake/orgro/issues/16', () {
       var result = parser.parse('* AB:CD: foo');
       var document = result.value as OrgDocument;
-      var section = document.children[0];
+      var section = document.sections[0];
       expect(section.headline.rawTitle, 'AB:CD: foo');
       result = parser.parse('* foo :AB:CD: bar');
       document = result.value as OrgDocument;
-      section = document.children[0];
+      section = document.sections[0];
       expect(section.headline.rawTitle, 'foo :AB:CD: bar');
       result = parser.parse('* foo:AB:CD:');
       document = result.value as OrgDocument;
-      section = document.children[0];
+      section = document.sections[0];
       expect(section.headline.rawTitle, 'foo:AB:CD:');
     });
     test('complex document', () {
@@ -365,7 +365,7 @@ bazoonga''');
     test('readme example', () {
       final doc = OrgDocument.parse('''* TODO [#A] foo bar
         baz buzz''');
-      expect(doc.children[0].headline.keyword, 'TODO');
+      expect(doc.sections[0].headline.keyword, 'TODO');
     });
   });
 }

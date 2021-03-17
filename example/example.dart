@@ -4,7 +4,7 @@ void main() {
   const docString = '''* TODO [#A] foo bar
 baz buzz''';
   final doc = OrgDocument.parse(docString);
-  final section = doc.children[0];
+  final section = doc.sections[0];
   print(section.headline.keyword);
   final title = section.headline.title!.children[0] as OrgPlainText;
   print(title.content);
