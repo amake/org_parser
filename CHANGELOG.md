@@ -1,3 +1,11 @@
+## [2.0.0]
+
+* Change class hierarchy of AST classes
+  * All classes now inherit from `OrgNode`
+  * All `OrgNode`s have a `children` property
+  * `OrgTree.children` (sections only) is now `OrgTree.sections`
+* Easily walk an AST with `OrgNode.visit`
+
 ## [1.0.1]
 
 * Fix nullability errors in headline, src block
