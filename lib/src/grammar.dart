@@ -154,7 +154,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser linkChar() => ref(linkEscape).castList().pick(1) | any();
 
-  Parser linkEscape() => char('\\') & anyOf('[]\\');
+  Parser linkEscape() => char(r'\') & anyOf(r'[]\');
 
   Parser linkDescription() =>
       char('[') &

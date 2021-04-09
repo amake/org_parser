@@ -865,21 +865,21 @@ baz bazinga
     test('entity', () {
       final parser = buildSpecific(grammarDefinition.entity);
       var result = parser.parse(r'\there4');
-      expect(result.value, ['\\', 'there4', '']);
+      expect(result.value, [r'\', 'there4', '']);
       result = parser.parse(r'\sup1');
-      expect(result.value, ['\\', 'sup1', '']);
+      expect(result.value, [r'\', 'sup1', '']);
       result = parser.parse(r'\sup5');
       expect(result.isFailure, true);
       result = parser.parse(r'\frac12');
-      expect(result.value, ['\\', 'frac12', '']);
+      expect(result.value, [r'\', 'frac12', '']);
       result = parser.parse(r'\frac15');
       expect(result.isFailure, true);
       result = parser.parse(r'\foobar');
-      expect(result.value, ['\\', 'foobar', '']);
+      expect(result.value, [r'\', 'foobar', '']);
       result = parser.parse(r'\foobar2');
       expect(result.isFailure, true);
       result = parser.parse(r'\foobar{}');
-      expect(result.value, ['\\', 'foobar', '{}']);
+      expect(result.value, [r'\', 'foobar', '{}']);
     });
   });
 
@@ -1109,9 +1109,9 @@ foo''');
         [
           '',
           [
-            ['\\begin{', 'equation', '}'],
+            [r'\begin{', 'equation', '}'],
             '\n\\nabla \\cdot \\mathbf{B} = 0\n',
-            '\\end{equation}'
+            r'\end{equation}'
           ],
           '\n'
         ]
@@ -1127,9 +1127,9 @@ foo''');
         [
           '',
           [
-            ['\\begin{', 'equation', '}'],
+            [r'\begin{', 'equation', '}'],
             '\n\\begin{cases}\n   a &\\text{if } b \\\\\n   c &\\text{if } d\n\\end{cases} + 1\n',
-            '\\end{equation}'
+            r'\end{equation}'
           ],
           '\n'
         ]
@@ -1176,7 +1176,7 @@ foo''');
           '',
           [
             'foo ',
-            ['\\(', '1/0', '\\)'],
+            [r'\(', '1/0', r'\)'],
             ' baz'
           ]
         ]
@@ -1187,7 +1187,7 @@ foo''');
           '',
           [
             'foo ',
-            ['\\[', '\\infty', '\\]'],
+            [r'\[', r'\infty', r'\]'],
             ' baz'
           ]
         ]
@@ -1200,7 +1200,7 @@ foo''');
           '',
           [
             'I think ',
-            ['\\', 'there4', ''],
+            [r'\', 'there4', ''],
             ' I am'
           ]
         ]
@@ -1212,7 +1212,7 @@ I am''');
           '',
           [
             'I think ',
-            ['\\', 'there4', ''],
+            [r'\', 'there4', ''],
             '\nI am'
           ]
         ]
@@ -1223,7 +1223,7 @@ I am''');
           '',
           [
             'I think ',
-            ['\\', 'there4', ''],
+            [r'\', 'there4', ''],
           ]
         ]
       ]);
@@ -1233,7 +1233,7 @@ I am''');
           '',
           [
             'I think ',
-            ['\\', 'there4', '{}'],
+            [r'\', 'there4', '{}'],
           ]
         ]
       ]);
@@ -1243,7 +1243,7 @@ I am''');
           '',
           [
             'I think ',
-            ['\\', 'there4', '{}'],
+            [r'\', 'there4', '{}'],
             'I am'
           ]
         ]

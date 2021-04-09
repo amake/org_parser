@@ -23,7 +23,7 @@ void main() {
       link = result.value as OrgLink;
       expect(link.description, 'bar');
       expect(link.location, 'foo::1');
-      result = parser.parse('[[foo::"\\[1\\]"][bar]]');
+      result = parser.parse(r'[[foo::"\[1\]"][bar]]');
       link = result.value as OrgLink;
       expect(link.description, 'bar');
       expect(link.location, 'foo::"[1]"');
@@ -229,7 +229,7 @@ a
       expect(latex.begin, r'\begin{equation}');
       expect(latex.content,
           '\n\\begin{matrix}\n   a & b \\\\\n   c & d\n\\end{matrix}\n');
-      expect(latex.end, '\\end{equation}');
+      expect(latex.end, r'\end{equation}');
     });
     test('inline LaTeX', () {
       final parser = buildSpecific(parserDefinition.latexInline);
