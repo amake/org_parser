@@ -150,6 +150,14 @@ maybe''');
         ['[', '[lots][of][boxes]', ']'],
         ']'
       ]);
+      result = parser.parse('http://example.com');
+      expect(result.value, 'http://example.com');
+      result = parser.parse('https://example.com');
+      expect(result.value, 'https://example.com');
+      result = parser.parse('file:example.txt');
+      expect(result.value, 'file:example.txt');
+      result = parser.parse('foobar://example.com');
+      expect(result.isFailure, true);
     });
     test('markup', () {
       final parser = buildSpecific(grammarDefinition.markups);

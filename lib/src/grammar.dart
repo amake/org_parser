@@ -115,7 +115,26 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser _plainLink() => ref(protocol) & char(':') & ref(path2);
 
-  Parser protocol() => string('http') & char('s').optional() | string('mailto');
+  // Built-in link types only
+  Parser protocol() =>
+      string('https') |
+      string('http') |
+      string('doi') |
+      string('file') |
+      string('attachment') |
+      string('docview') |
+      string('id') |
+      string('news') |
+      string('mailto') |
+      string('mhe') |
+      string('rmail') |
+      string('gnus') |
+      string('bbdb') |
+      string('irc') |
+      string('help') |
+      string('info') |
+      string('shell') |
+      string('elisp');
 
   Parser path2() => (whitespace() | anyOf('()<>')).neg().plus();
 
