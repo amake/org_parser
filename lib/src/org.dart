@@ -739,3 +739,16 @@ class OrgEntity extends OrgNode {
       name.contains(pattern) ||
       trailing.contains(pattern);
 }
+
+class OrgFileLink {
+  factory OrgFileLink.parse(String text) =>
+      OrgFileLinkParser().parse(text).value as OrgFileLink;
+
+  OrgFileLink(this.scheme, this.body, this.extra);
+  final String? scheme;
+  final String body;
+  final String? extra;
+
+  bool get isRelative =>
+      body.startsWith('.') || scheme != null && !body.startsWith('/');
+}

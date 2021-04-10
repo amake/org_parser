@@ -644,3 +644,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(end).neg().plusLazy(string(end)).flatten('LaTeX body expected') &
       string(end);
 }
+
+class OrgFileLinkGrammar extends GrammarParser {
+  OrgFileLinkGrammar() : super(OrgFileLinkGrammarDefinition());
+}
+
+class OrgFileLinkGrammarDefinition extends GrammarDefinition {
+  @override
+  Parser start() =>
+      ref(scheme) & ref(body) & (string('::') & ref(extra)).pick(1).optional();
+
+  Parser scheme() =>
+      (string('file:') | anyOf('/.').and()).flatten('Expected link scheme');
+
+  Parser body() =>
+      any().plusLazy(string('::') | endOfInput()).flatten('Expected link body');
+
+  Parser extra() => any().star().flatten('Expected link extra');
+}

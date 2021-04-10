@@ -403,5 +403,63 @@ bazoonga''');
         ['OrgDocument', 'OrgContent', 'OrgParagraph'],
       );
     });
+    group('file link', () {
+      final parser = OrgFileLinkParser();
+      test('with scheme', () {
+        var result = parser.parse('file:/home/dominik/images/jupiter.jpg');
+        var link = result.value as OrgFileLink;
+        expect(link.scheme, 'file:');
+        expect(link.body, '/home/dominik/images/jupiter.jpg');
+        expect(link.extra, null);
+        expect(link.isRelative, false);
+        result = parser.parse('file:papers/last.pdf');
+        link = result.value as OrgFileLink;
+        expect(link.scheme, 'file:');
+        expect(link.body, 'papers/last.pdf');
+        expect(link.extra, null);
+        expect(link.isRelative, true);
+      });
+      test('with extra', () {
+        final result = parser.parse('file:projects.org::some words');
+        final link = result.value as OrgFileLink;
+        expect(link.scheme, 'file:');
+        expect(link.body, 'projects.org');
+        expect(link.extra, 'some words');
+        expect(link.isRelative, true);
+      });
+      test('without scheme', () {
+        var result = parser.parse('/home/dominik/images/jupiter.jpg');
+        var link = result.value as OrgFileLink;
+        expect(link.scheme, null);
+        expect(link.body, '/home/dominik/images/jupiter.jpg');
+        expect(link.extra, null);
+        expect(link.isRelative, false);
+        result = parser.parse('./papers/last.pdf');
+        link = result.value as OrgFileLink;
+        expect(link.scheme, null);
+        expect(link.body, './papers/last.pdf');
+        expect(link.extra, null);
+        expect(link.isRelative, true);
+      });
+      test('non-files', () {
+        var result = parser.parse('https://example.com');
+        expect(result.isFailure, true);
+        result = parser.parse('mailto:me@example.com');
+        expect(result.isFailure, true);
+      });
+      test('factory', () {
+        final link = OrgFileLink.parse('file:papers/last.pdf');
+        expect(link.scheme, 'file:');
+        expect(link.body, 'papers/last.pdf');
+        expect(link.extra, null);
+        expect(link.isRelative, true);
+        try {
+          OrgFileLink.parse('https://example.com');
+          fail('OrgFileLink parser should not accept HTTPS link');
+        } on ParserException {
+          // OK
+        }
+      });
+    });
   });
 }

@@ -503,3 +503,21 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         return OrgLatexInline(leading, body, trailing);
       });
 }
+
+class OrgFileLinkParser extends GrammarParser {
+  OrgFileLinkParser() : super(OrgFileLinkParserDefinition());
+}
+
+class OrgFileLinkParserDefinition extends OrgFileLinkGrammarDefinition {
+  @override
+  Parser start() => super.start().map((values) {
+        final scheme = values[0] as String;
+        final body = values[1] as String;
+        final extra = values[2] as String?;
+        return OrgFileLink(
+          scheme.isEmpty ? null : scheme,
+          body,
+          extra,
+        );
+      });
+}

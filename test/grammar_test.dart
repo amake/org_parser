@@ -1258,4 +1258,44 @@ I am''');
       ]);
     });
   });
+  group('file link', () {
+    final parser = OrgFileLinkGrammar();
+    test('with scheme', () {
+      var result = parser.parse('file:/home/dominik/images/jupiter.jpg');
+      expect(result.value, ['file:', '/home/dominik/images/jupiter.jpg', null]);
+      result = parser.parse('file:papers/last.pdf');
+      expect(result.value, ['file:', 'papers/last.pdf', null]);
+      result = parser.parse('file:/ssh:me@some.where:papers/last.pdf');
+      expect(
+        result.value,
+        ['file:', '/ssh:me@some.where:papers/last.pdf', null],
+      );
+    });
+    test('with extra', () {
+      var result = parser.parse('file:sometextfile::123');
+      expect(result.value, ['file:', 'sometextfile', '123']);
+      result = parser.parse('file:projects.org::some words');
+      expect(result.value, ['file:', 'projects.org', 'some words']);
+      result = parser.parse('file:projects.org::*task title');
+      expect(result.value, ['file:', 'projects.org', '*task title']);
+      result = parser.parse('file:projects.org::#custom-id');
+      expect(result.value, ['file:', 'projects.org', '#custom-id']);
+    });
+    test('without scheme', () {
+      var result = parser.parse('/home/dominik/images/jupiter.jpg');
+      expect(result.value, ['', '/home/dominik/images/jupiter.jpg', null]);
+      result = parser.parse('./papers/last.pdf');
+      expect(result.value, ['', './papers/last.pdf', null]);
+      result = parser.parse('./projects.org::#custom-id');
+      expect(result.value, ['', './projects.org', '#custom-id']);
+      result = parser.parse('../projects.org::#custom-id');
+      expect(result.value, ['', '../projects.org', '#custom-id']);
+    });
+    test('non-files', () {
+      var result = parser.parse('https://example.com');
+      expect(result.isFailure, true);
+      result = parser.parse('mailto:me@example.com');
+      expect(result.isFailure, true);
+    });
+  });
 }
