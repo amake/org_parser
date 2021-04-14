@@ -6,8 +6,8 @@ Parser<T> was<T>(Parser<T> parser) => LookBehindParser(parser);
 
 /// A parser that attempts to match the given parser from one character behind
 /// the actual current position.
-class LookBehindParser<T> extends DelegateParser<T> {
-  LookBehindParser(Parser delegate) : super(delegate);
+class LookBehindParser<T> extends DelegateParser<T, T> {
+  LookBehindParser(Parser<T> delegate) : super(delegate);
 
   @override
   Result<T> parseOn(Context context) {
@@ -16,7 +16,7 @@ class LookBehindParser<T> extends DelegateParser<T> {
     if (position == 0) {
       return context.failure('Cannot look behind start of buffer');
     }
-    final result = delegate.parseOn(Context(buffer, position - 1)) as Result<T>;
+    final result = delegate.parseOn(Context(buffer, position - 1));
     if (result.isSuccess) {
       return context.success(result.value);
     } else {

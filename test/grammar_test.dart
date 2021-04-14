@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('structural grammar', () {
-    final grammar = OrgGrammar();
+    final grammar = OrgGrammarDefinition().build();
     test('parse content', () {
       final result = grammar.parse('''foo
 bar
@@ -892,7 +892,7 @@ baz bazinga
   });
 
   group('content grammar complete', () {
-    final parser = OrgContentGrammar();
+    final parser = OrgContentGrammarDefinition().build();
     test('paragraph', () {
       final result = parser.parse('''foo bar *biz*
 
@@ -1259,7 +1259,7 @@ I am''');
     });
   });
   group('file link', () {
-    final parser = OrgFileLinkGrammar();
+    final parser = OrgFileLinkGrammarDefinition().build();
     test('with scheme', () {
       var result = parser.parse('file:/home/dominik/images/jupiter.jpg');
       expect(result.value, ['file:', '/home/dominik/images/jupiter.jpg', null]);

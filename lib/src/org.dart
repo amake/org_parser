@@ -61,7 +61,7 @@ abstract class OrgTree extends OrgNode {
 
 class OrgDocument extends OrgTree {
   factory OrgDocument.parse(String text) =>
-      OrgParser().parse(text).value as OrgDocument;
+      org.parse(text).value as OrgDocument;
 
   OrgDocument(OrgContent? content, Iterable<OrgSection> sections)
       : super(content, sections);
@@ -742,7 +742,7 @@ class OrgEntity extends OrgNode {
 
 class OrgFileLink {
   factory OrgFileLink.parse(String text) =>
-      OrgFileLinkParser().parse(text).value as OrgFileLink;
+      orgFileLink.parse(text).value as OrgFileLink;
 
   OrgFileLink(this.scheme, this.body, this.extra);
   final String? scheme;

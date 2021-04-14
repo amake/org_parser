@@ -287,7 +287,7 @@ a
     });
   });
   group('parser complete', () {
-    final parser = OrgParser();
+    final parser = org;
     test('example document', () {
       const doc = '''An introduction.
 
@@ -318,7 +318,7 @@ a
       expect(document.contains(RegExp(r'\bAdd\b')), false);
     });
     test('footnotes', () {
-      final parser = OrgParser();
+      final parser = org;
       final result = parser.parse('''[fn:1] foo bar
 
 biz baz
@@ -404,7 +404,7 @@ bazoonga''');
       );
     });
     group('file link', () {
-      final parser = OrgFileLinkParser();
+      final parser = orgFileLink;
       test('with scheme', () {
         var result = parser.parse('file:/home/dominik/images/jupiter.jpg');
         var link = result.value as OrgFileLink;

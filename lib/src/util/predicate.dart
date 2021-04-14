@@ -9,9 +9,9 @@ Parser<T> resultPredicate<T>(
 
 typedef Predicate = bool Function(String buffer, int from, int to);
 
-class ResultPredicateParser<T> extends DelegateParser<T> {
+class ResultPredicateParser<T> extends DelegateParser<T, T> {
   ResultPredicateParser(
-    Parser child,
+    Parser<T> child,
     this.predicate,
     this.message,
   ) : super(child);
@@ -21,7 +21,7 @@ class ResultPredicateParser<T> extends DelegateParser<T> {
 
   @override
   Result<T> parseOn(Context context) {
-    final result = delegate.parseOn(context) as Result<T>;
+    final result = delegate.parseOn(context);
     if (result.isSuccess) {
       if (predicate(context.buffer, context.position, result.position)) {
         return result;

@@ -5,26 +5,22 @@ import 'package:petitparser/petitparser.dart';
 
 // See https://orgmode.org/worg/dev/org-syntax.html
 
-class OrgGrammar extends GrammarParser {
-  OrgGrammar() : super(OrgGrammarDefinition());
-}
-
 class OrgGrammarDefinition extends GrammarDefinition {
   @override
-  Parser start() => ref(document).end();
+  Parser start() => ref0(document).end();
 
-  Parser document() => ref(content).optional() & ref(section).star();
+  Parser document() => ref0(content).optional() & ref0(section).star();
 
-  Parser section() => ref(headline) & ref(content).optional();
+  Parser section() => ref0(headline) & ref0(content).optional();
 
-  Parser headline() => drop(ref(_headline), [-1]);
+  Parser headline() => drop(ref0(_headline), [-1]);
 
   Parser _headline() =>
-      ref(stars).trim() &
-      ref(todoKeyword).trim().optional() &
-      ref(priority).trim().optional() &
-      ref(title).optional() &
-      ref(tags).optional() &
+      ref0(stars).trim() &
+      ref0(todoKeyword).trim().optional() &
+      ref0(priority).trim().optional() &
+      ref0(title).optional() &
+      ref0(tags).optional() &
       lineEnd();
 
   Parser stars() =>
@@ -35,85 +31,81 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser priority() => string('[#') & letter() & char(']');
 
   Parser title() {
-    final limit = ref(tags) | lineEnd();
-    return OrgContentGrammar.textRun(limit).plusLazy(limit);
+    final limit = ref0(tags) | lineEnd();
+    return _textRun(limit).plusLazy(limit);
   }
 
   Parser tags() =>
       string(' :') &
-      ref(tag).separatedBy(char(':'), includeSeparators: false) &
+      ref0(tag).separatedBy(char(':'), includeSeparators: false) &
       char(':') &
       lineEnd().and();
 
   Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten('Tags expected');
 
-  Parser content() => ref(_content).flatten('Content expected');
+  Parser content() => ref0(_content).flatten('Content expected');
 
   Parser _content() =>
-      ref(stars).not() & any().plusLazy(ref(stars) | endOfInput());
+      ref0(stars).not() & any().plusLazy(ref0(stars) | endOfInput());
 }
 
-class OrgContentGrammar extends GrammarParser {
-  OrgContentGrammar() : super(OrgContentGrammarDefinition());
-
-  static Parser textRun([Parser? limit]) {
-    final definition = OrgContentGrammarDefinition();
-    final args = limit == null ? const <Object>[] : [limit];
-    return definition.build(start: definition.textRun, arguments: args);
-  }
+Parser _textRun([Parser? limit]) {
+  final definition = OrgContentGrammarDefinition();
+  final args = limit == null ? const <Object>[] : [limit];
+  return definition.build(start: definition.textRun, arguments: args);
 }
 
 class OrgContentGrammarDefinition extends GrammarDefinition {
   @override
-  Parser start() => ref(element).star().end();
+  Parser start() => ref0(element).star().end();
 
   Parser element() =>
-      ref(block) |
-      ref(greaterBlock) |
-      ref(latexBlock) |
-      ref(affiliatedKeyword) |
-      ref(fixedWidthArea) |
-      ref(table) |
-      ref(list) |
-      ref(planningLine) |
-      ref(drawer) |
-      ref(footnote) |
-      ref(paragraph);
+      ref0(block) |
+      ref0(greaterBlock) |
+      ref0(latexBlock) |
+      ref0(affiliatedKeyword) |
+      ref0(fixedWidthArea) |
+      ref0(table) |
+      ref0(list) |
+      ref0(planningLine) |
+      ref0(drawer) |
+      ref0(footnote) |
+      ref0(paragraph);
 
   Parser paragraph() =>
-      ref(indent).flatten('Paragraph indent expected') &
-      ref(textRun, ref(nonParagraphElements)).plusLazy(ref(paragraphEnd));
+      ref0(indent).flatten('Paragraph indent expected') &
+      ref1(textRun, ref0(nonParagraphElements)).plusLazy(ref0(paragraphEnd));
 
   Parser nonParagraphElements() =>
-      element()..replace(ref(paragraph), noOpFail());
+      element()..replace(ref0(paragraph), noOpFail());
 
-  Parser paragraphEnd() => endOfInput() | ref(nonParagraphElements);
+  Parser paragraphEnd() => endOfInput() | ref0(nonParagraphElements);
 
-  Parser textRun([Parser? limit]) => ref(object) | ref(plainText, limit);
+  Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 
   Parser object() =>
-      ref(link) |
-      ref(markups) |
-      ref(entity) |
-      ref(timestamp) |
-      ref(keyword) |
-      ref(macroReference) |
-      ref(footnoteReference) |
-      ref(latexInline);
+      ref0(link) |
+      ref0(markups) |
+      ref0(entity) |
+      ref0(timestamp) |
+      ref0(keyword) |
+      ref0(macroReference) |
+      ref0(footnoteReference) |
+      ref0(latexInline);
 
   Parser plainText([Parser? limit]) {
-    var fullLimit = ref(object) | endOfInput();
+    var fullLimit = ref0(object) | endOfInput();
     if (limit != null) {
       fullLimit |= limit;
     }
     return any().plusLazy(fullLimit).flatten('Plain text expected');
   }
 
-  Parser link() => ref(regularLink) | ref(plainLink);
+  Parser link() => ref0(regularLink) | ref0(plainLink);
 
-  Parser plainLink() => ref(_plainLink).flatten('Plain link expected');
+  Parser plainLink() => ref0(_plainLink).flatten('Plain link expected');
 
-  Parser _plainLink() => ref(protocol) & char(':') & ref(path2);
+  Parser _plainLink() => ref0(protocol) & char(':') & ref0(path2);
 
   // Built-in link types only
   Parser protocol() =>
@@ -163,50 +155,50 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
    */
 
   Parser regularLink() =>
-      char('[') & ref(linkPart) & ref(linkDescription).optional() & char(']');
+      char('[') & ref0(linkPart) & ref0(linkDescription).optional() & char(']');
 
-  Parser linkPart() => char('[') & ref(linkPartBody) & char(']');
+  Parser linkPart() => char('[') & ref0(linkPartBody) & char(']');
 
   Parser linkPartBody() =>
       // Join instead of flatten to drop escape chars
-      ref(linkChar).plusLazy(char(']')).map((items) => items.join());
+      ref0(linkChar).plusLazy(char(']')).map((items) => items.join());
 
-  Parser linkChar() => ref(linkEscape).castList().pick(1) | any();
+  Parser linkChar() => ref0(linkEscape).castList().pick(1) | any();
 
   Parser linkEscape() => char(r'\') & anyOf(r'[]\');
 
   Parser linkDescription() =>
       char('[') &
       // Join instead of flatten to drop escape chars
-      ref(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
+      ref0(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
       char(']');
 
-  Parser anyChar() => ref(escape).castList().pick(0) | any();
+  Parser anyChar() => ref0(escape).castList().pick(0) | any();
 
   Parser escape() => any() & char('\u200b'); // zero-width space
 
   Parser markups() =>
-      ref(bold) |
-      ref(verbatim) |
-      ref(italic) |
-      ref(strikeThrough) |
-      ref(underline) |
-      ref(code);
+      ref0(bold) |
+      ref0(verbatim) |
+      ref0(italic) |
+      ref0(strikeThrough) |
+      ref0(underline) |
+      ref0(code);
 
-  Parser bold() => ref(markup, '*');
+  Parser bold() => ref1(markup, '*');
 
-  Parser verbatim() => ref(markup, '=');
+  Parser verbatim() => ref1(markup, '=');
 
-  Parser italic() => ref(markup, '/');
+  Parser italic() => ref1(markup, '/');
 
-  Parser strikeThrough() => ref(markup, '+');
+  Parser strikeThrough() => ref1(markup, '+');
 
-  Parser underline() => ref(markup, '_');
+  Parser underline() => ref1(markup, '_');
 
-  Parser code() => ref(markup, '~');
+  Parser code() => ref1(markup, '~');
 
   Parser markup(String marker) => resultPredicate(
-        drop(ref(_markup, marker), [0, -1]),
+        drop(ref1(_markup, marker), [0, -1]),
         (result, from, to) {
           for (var count = 0, i = from; i < to; i++) {
             // Ensure at most one LF (U+000A) in markup span
@@ -219,14 +211,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       );
 
   Parser _markup(String marker) =>
-      (startOfInput() | was(ref(preMarkup))) &
+      (startOfInput() | was(ref0(preMarkup))) &
       char(marker) &
-      ref(markupContents, marker).flatten('Markup content expected') &
+      ref1(markupContents, marker).flatten('Markup content expected') &
       char(marker) &
-      (ref(postMarkup).and() | endOfInput());
+      (ref0(postMarkup).and() | endOfInput());
 
   Parser markupContents(String marker) =>
-      ref(markupBorder).and() & ref(markupBody, marker) & ref(markupBorder);
+      ref0(markupBorder).and() & ref1(markupBody, marker) & ref0(markupBorder);
 
   // The following markupBorder and pre/postMarkup definitions differ from the
   // org-syntax.org document; they have been updated based on the definition of
@@ -235,9 +227,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser markupBorder() => whitespace().neg();
 
   // TODO(aaron): Simplify this?
-  Parser markupBody(String marker) => ref(anyChar)
+  Parser markupBody(String marker) => ref0(anyChar)
       .starLazy(
-        ref(markupBorder) & char(marker) & (ref(postMarkup) | endOfInput()),
+        ref0(markupBorder) & char(marker) & (ref0(postMarkup) | endOfInput()),
       )
       // Join instead of flatten to drop escape chars
       .map((items) => items.join());
@@ -250,8 +242,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser entity() =>
       char(r'\') &
-      ref(entityBody).flatten('Entity body expected') &
-      ref(entityEnd).flatten('Entity end expected');
+      ref0(entityBody).flatten('Entity body expected') &
+      ref0(entityEnd).flatten('Entity end expected');
 
   Parser entityBody() =>
       string('there4') |
@@ -265,9 +257,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser macroReference() =>
       string('{{{') &
-      ref(macroReferenceKey).flatten('Macro reference key expected') &
+      ref0(macroReferenceKey).flatten('Macro reference key expected') &
       // TODO(aaron): Actually parse arguments
-      ref(macroReferenceArgs)
+      ref0(macroReferenceArgs)
           .optional()
           .flatten('Macro reference args expected') &
       string('}}}');
@@ -280,83 +272,83 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char('(') & any().starLazy(char(')')) & char(')');
 
   Parser affiliatedKeyword() => indented(
-        ref(affiliatedKeywordBody).flatten('Affiliated keyword body expected'),
+        ref0(affiliatedKeywordBody).flatten('Affiliated keyword body expected'),
       );
 
   // TODO(aaron): Actually parse real keywords
   Parser affiliatedKeywordBody() => string('#+') & whitespace().neg().plus();
 
-  Parser fixedWidthArea() => ref(fixedWidthLine).plus() & ref(blankLines);
+  Parser fixedWidthArea() => ref0(fixedWidthLine).plus() & ref0(blankLines);
 
   Parser fixedWidthLine() =>
-      ref(indent).flatten('Fixed-width line indent expected') &
+      ref0(indent).flatten('Fixed-width line indent expected') &
       string(': ') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   // TODO(aaron): Handle arbitrary blocks? See LatexBlockParser
   Parser block() =>
-      ref(namedBlock, 'comment') |
-      ref(namedBlock, 'example') |
-      ref(namedBlock, 'export') |
-      ref(srcBlock) |
-      ref(namedBlock, 'verse');
+      ref1(namedBlock, 'comment') |
+      ref1(namedBlock, 'example') |
+      ref1(namedBlock, 'export') |
+      ref0(srcBlock) |
+      ref1(namedBlock, 'verse');
 
   Parser srcBlock() => indented(
-        ref(srcBlockStart) &
-            ref(namedBlockContent, 'src') &
-            ref(namedBlockEnd, 'src'),
+        ref0(srcBlockStart) &
+            ref1(namedBlockContent, 'src') &
+            ref1(namedBlockEnd, 'src'),
       );
 
   Parser namedBlock(String name) => indented(
-        ref(namedBlockStart, name) &
-            ref(namedBlockContent, name) &
-            ref(namedBlockEnd, name),
+        ref1(namedBlockStart, name) &
+            ref1(namedBlockContent, name) &
+            ref1(namedBlockEnd, name),
       );
 
   Parser srcBlockStart() =>
       stringIgnoreCase('#+begin_src') &
-      ref(srcBlockLanguageToken).optional() &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref0(srcBlockLanguageToken).optional() &
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser srcBlockLanguageToken() =>
-      ref(insignificantWhitespace)
+      ref0(insignificantWhitespace)
           .plus()
           .flatten('Separating whitespace expected') &
       whitespace().neg().plus().flatten('Language token expected');
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
-  Parser namedBlockContent(String name) => ref(namedBlockEnd, name)
+  Parser namedBlockContent(String name) => ref1(namedBlockEnd, name)
       .neg()
       .star()
       .flatten('Named block content expected');
 
   Parser namedBlockEnd(String name) =>
-      ref(indent).flatten('Block end indent expected') &
+      ref0(indent).flatten('Block end indent expected') &
       stringIgnoreCase('#+end_$name');
 
   Parser greaterBlock() =>
-      ref(namedGreaterBlock, 'quote') | ref(namedGreaterBlock, 'center');
+      ref1(namedGreaterBlock, 'quote') | ref1(namedGreaterBlock, 'center');
 
   Parser namedGreaterBlock(String name) => indented(
-        ref(namedBlockStart, name) &
+        ref1(namedBlockStart, name) &
             namedGreaterBlockContent(name) &
-            ref(namedBlockEnd, name),
+            ref1(namedBlockEnd, name),
       );
 
   Parser namedGreaterBlockContent(String name) {
-    final end = ref(namedBlockEnd, name);
-    return ref(textRun, end).starLazy(end);
+    final end = ref1(namedBlockEnd, name);
+    return ref1(textRun, end).starLazy(end);
   }
 
-  Parser indent() => lineStart() & ref(insignificantWhitespace).star();
+  Parser indent() => lineStart() & ref0(insignificantWhitespace).star();
 
   Parser indented(Parser parser) =>
-      ref(indent).flatten('Indent expected') &
+      ref0(indent).flatten('Indent expected') &
       parser &
-      (ref(lineTrailing) & ref(blankLines))
+      (ref0(lineTrailing) & ref0(blankLines))
           .flatten('Trailing line content expected');
 
   Parser blankLines() =>
@@ -365,91 +357,91 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
   Parser lineTrailingWhitespace() =>
-      ref(insignificantWhitespace).starLazy(lineEnd()) & lineEnd();
+      ref0(insignificantWhitespace).starLazy(lineEnd()) & lineEnd();
 
   Parser insignificantWhitespace() => anyOf(' \t');
 
-  Parser table() => ref(tableLine).plus() & blankLines();
+  Parser table() => ref0(tableLine).plus() & blankLines();
 
-  Parser tableLine() => ref(tableRow) | ref(tableDotElDivider);
+  Parser tableLine() => ref0(tableRow) | ref0(tableDotElDivider);
 
-  Parser tableRow() => ref(tableRowRule) | ref(tableRowStandard);
+  Parser tableRow() => ref0(tableRowRule) | ref0(tableRowStandard);
 
   Parser tableRowStandard() =>
-      ref(indent).flatten('Table row indent expected') &
+      ref0(indent).flatten('Table row indent expected') &
       char('|') &
-      ref(tableCell).star() &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref0(tableCell).star() &
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser tableCell() =>
-      ref(tableCellLeading).flatten('Cell leading content expected') &
-      ref(tableCellContents) &
-      ref(tableCellTrailing).flatten('Cell trailing content expected');
+      ref0(tableCellLeading).flatten('Cell leading content expected') &
+      ref0(tableCellContents) &
+      ref0(tableCellTrailing).flatten('Cell trailing content expected');
 
   Parser tableCellLeading() => char(' ').star();
 
   Parser tableCellTrailing() => char(' ').star() & char('|');
 
   Parser tableCellContents() {
-    final end = ref(tableCellTrailing) | lineEnd();
-    return ref(textRun, end).starLazy(end);
+    final end = ref0(tableCellTrailing) | lineEnd();
+    return ref1(textRun, end).starLazy(end);
   }
 
   Parser tableRowRule() =>
-      ref(indent).flatten('Table row rule indent expected') &
-      (string('|-') & ref(lineTrailing))
+      ref0(indent).flatten('Table row rule indent expected') &
+      (string('|-') & ref0(lineTrailing))
           .flatten('Trailing line content expected');
 
   Parser tableDotElDivider() =>
-      ref(indent).flatten('Table.el divider indent expected') &
+      ref0(indent).flatten('Table.el divider indent expected') &
       (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
-      ref(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser timestamp() =>
-      ref(timestampDiary) |
-      ref(timestampRange, true) |
-      ref(timestampRange, false) |
-      ref(timestampSimple, true) |
-      ref(timestampSimple, false);
+      ref0(timestampDiary) |
+      ref1(timestampRange, true) |
+      ref1(timestampRange, false) |
+      ref1(timestampSimple, true) |
+      ref1(timestampSimple, false);
 
-  Parser timestampDiary() => string('<%%') & ref(sexp) & char('>');
+  Parser timestampDiary() => string('<%%') & ref0(sexp) & char('>');
 
   // TODO(aaron): Bother with a real Elisp parser here?
-  Parser sexp() => ref(sexpAtom) | ref(sexpList);
+  Parser sexp() => ref0(sexpAtom) | ref0(sexpList);
 
   Parser sexpAtom() =>
       (anyOf('()') | whitespace()).neg().plus().flatten('Expected atom');
 
-  Parser sexpList() => char('(') & ref(sexp).trim().star() & char(')');
+  Parser sexpList() => char('(') & ref0(sexp).trim().star() & char(')');
 
   Parser timestampSimple(bool active) =>
       (active ? char('<') : char('[')) &
-      ref(date) &
-      ref(time).trim().optional() &
-      ref(repeaterOrDelay).trim().repeat(0, 2) &
+      ref0(date) &
+      ref0(time).trim().optional() &
+      ref0(repeaterOrDelay).trim().repeat(0, 2) &
       (active ? char('>') : char(']'));
 
   Parser timestampRange(bool active) =>
-      ref(timestampTimeRange, active) | ref(timestampDateRange, active);
+      ref1(timestampTimeRange, active) | ref1(timestampDateRange, active);
 
   Parser timestampTimeRange(bool active) =>
       (active ? char('<') : char('[')) &
-      ref(date) &
-      (ref(time) & char('-') & ref(time)).trim() &
-      ref(repeaterOrDelay).trim().repeat(0, 2) &
+      ref0(date) &
+      (ref0(time) & char('-') & ref0(time)).trim() &
+      ref0(repeaterOrDelay).trim().repeat(0, 2) &
       (active ? char('>') : char(']'));
 
   Parser timestampDateRange(bool active) =>
-      ref(timestampSimple, active) &
+      ref1(timestampSimple, active) &
       char('-').repeat(1, 3).flatten('Expected timestamp separator') &
-      ref(timestampSimple, active);
+      ref1(timestampSimple, active);
 
   Parser date() =>
-      ref(year) &
+      ref0(year) &
       char('-') &
-      ref(month) &
+      ref0(month) &
       char('-') &
-      ref(day) &
+      ref0(day) &
       dayName().trim();
 
   Parser year() => digit().times(4).flatten('Expected year');
@@ -463,23 +455,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       .plus()
       .flatten('Expected day name');
 
-  Parser time() => ref(hours) & char(':') & ref(minutes);
+  Parser time() => ref0(hours) & char(':') & ref0(minutes);
 
   Parser hours() => digit().repeat(1, 2).flatten('Expected hours');
 
   Parser minutes() => digit().times(2).flatten('Expected minutes');
 
   Parser repeaterOrDelay() =>
-      ref(repeaterMark) &
+      ref0(repeaterMark) &
       digit().plus().flatten('Expected number') &
-      ref(repeaterUnit);
+      ref0(repeaterUnit);
 
   Parser repeaterMark() =>
       string('++') | string('.+') | string('--') | anyOf('+-');
 
   Parser repeaterUnit() => anyOf('hdwmy');
 
-  Parser keyword() => ref(_keyword).flatten('Expected keyword');
+  Parser keyword() => ref0(_keyword).flatten('Expected keyword');
 
   Parser _keyword() =>
       string('SCHEDULED:') |
@@ -487,25 +479,25 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('CLOCK:') |
       string('CLOSED:');
 
-  Parser planningLine() => indented(ref(_planningLine));
+  Parser planningLine() => indented(ref0(_planningLine));
 
   Parser _planningLine() {
     final limit = lineEnd() | endOfInput();
-    return ref(keyword) & ref(textRun, limit).plusLazy(limit);
+    return ref0(keyword) & ref1(textRun, limit).plusLazy(limit);
   }
 
-  Parser list() => ref(listItem).plus() & ref(blankLines);
+  Parser list() => ref0(listItem).plus() & ref0(blankLines);
 
-  Parser listItem() => ref(listItemUnordered) | ref(listItemOrdered);
+  Parser listItem() => ref0(listItemUnordered) | ref0(listItemOrdered);
 
   Parser listItemUnordered() =>
-      (ref(indent) & ref(listUnorderedBullet).and())
+      (ref0(indent) & ref0(listUnorderedBullet).and())
           .flatten('List item (unordered) indent expected') &
       indentedRegion(
-        parser: ref(listUnorderedBullet).flatten('Unordered bullet expected') &
-            ref(listCheckBox).trim(char(' ')).optional() &
-            ref(listTag).trim(char(' ')).optional() &
-            ref(listItemContents),
+        parser: ref0(listUnorderedBullet).flatten('Unordered bullet expected') &
+            ref0(listCheckBox).trim(char(' ')).optional() &
+            ref0(listTag).trim(char(' ')).optional() &
+            ref0(listItemContents),
         indentAdjust: 1,
         maxSeparatingLineBreaks: 2,
       );
@@ -515,18 +507,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listTag() {
     final end = string(' ::') & (lineEnd() | char(' '));
     final limit = end | lineEnd();
-    return ref(textRun, limit).plusLazy(limit) &
+    return ref1(textRun, limit).plusLazy(limit) &
         end.flatten('List tag end expected');
   }
 
   Parser listItemOrdered() =>
-      (ref(indent) & ref(listOrderedBullet).and())
+      (ref0(indent) & ref0(listOrderedBullet).and())
           .flatten('List item (ordered) indent expected') &
       indentedRegion(
-        parser: ref(listOrderedBullet) &
-            ref(listCounterSet).trim(char(' ')).optional() &
-            ref(listCheckBox).trim(char(' ')).optional() &
-            ref(listItemContents),
+        parser: ref0(listOrderedBullet) &
+            ref0(listCounterSet).trim(char(' ')).optional() &
+            ref0(listCheckBox).trim(char(' ')).optional() &
+            ref0(listItemContents),
         indentAdjust: 1,
         maxSeparatingLineBreaks: 2,
       );
@@ -545,15 +537,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemContents() {
     final end =
-        ref(listItemAnyStart) | ref(nonParagraphElements) | endOfInput();
-    return (ref(element) | ref(textRun, end)).star();
+        ref0(listItemAnyStart) | ref0(nonParagraphElements) | endOfInput();
+    return (ref0(element) | ref1(textRun, end)).star();
   }
 
   Parser listItemAnyStart() =>
-      ref(indent) & (ref(listUnorderedBullet) | ref(listOrderedBullet));
+      ref0(indent) & (ref0(listUnorderedBullet) | ref0(listOrderedBullet));
 
   Parser drawer() => indented(
-        ref(drawerStart) & ref(drawerContent) & ref(drawerEnd),
+        ref0(drawerStart) & ref0(drawerContent) & ref0(drawerEnd),
       );
 
   Parser drawerStart() =>
@@ -565,30 +557,30 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       lineTrailingWhitespace().flatten('Trailing whitespace expected');
 
   Parser drawerContent() {
-    final end = ref(drawerEnd);
-    return (ref(property) | ref(nonDrawerElements) | ref(textRun, end))
+    final end = ref0(drawerEnd);
+    return (ref0(property) | ref0(nonDrawerElements) | ref1(textRun, end))
         .starLazy(end);
   }
 
   Parser nonDrawerElements() =>
-      nonParagraphElements()..replace(ref(drawer), noOpFail());
+      nonParagraphElements()..replace(ref0(drawer), noOpFail());
 
   Parser drawerEnd() =>
-      ref(indent).flatten('Drawer end indent expected') &
-      (stringIgnoreCase(':END:') & ref(insignificantWhitespace).star())
+      ref0(indent).flatten('Drawer end indent expected') &
+      (stringIgnoreCase(':END:') & ref0(insignificantWhitespace).star())
           .flatten('Drawer end expected');
 
   Parser property() =>
-      ref(indent).flatten('Property indent expected') &
-      ref(propertyKey) &
-      ref(propertyValue) &
-      (lineEnd() & ref(blankLines)).flatten('Trailing whitespace expected');
+      ref0(indent).flatten('Property indent expected') &
+      ref0(propertyKey) &
+      ref0(propertyValue) &
+      (lineEnd() & ref0(blankLines)).flatten('Trailing whitespace expected');
 
   Parser propertyKey() =>
       char(':') &
       any()
           .plusLazy(
-            char(':') & ref(insignificantWhitespace).plus() & lineEnd().not(),
+            char(':') & ref0(insignificantWhitespace).plus() & lineEnd().not(),
           )
           .flatten('Property name expected') &
       char(':');
@@ -597,16 +589,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       any().plusLazy(lineEnd()).flatten('Property value expected');
 
   Parser footnoteReference() =>
-      ref(footnoteReferenceNamed) | ref(footnoteReferenceInline);
+      ref0(footnoteReferenceNamed) | ref0(footnoteReferenceInline);
 
   Parser footnoteReferenceNamed() =>
-      string('[fn:') & ref(footnoteName) & char(']');
+      string('[fn:') & ref0(footnoteName) & char(']');
 
   Parser footnoteReferenceInline() =>
       string('[fn:') &
-      ref(footnoteName).optional() &
+      ref0(footnoteName).optional() &
       char(':') &
-      ref(footnoteDefinition) &
+      ref0(footnoteDefinition) &
       char(']');
 
   Parser footnoteName() =>
@@ -614,29 +606,29 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser footnoteDefinition() => textRun(char(']')).plusLazy(char(']'));
 
-  Parser footnote() => drop(ref(_footnote), [0]);
+  Parser footnote() => drop(ref0(_footnote), [0]);
 
   Parser _footnote() =>
       lineStart() &
-      ref(footnoteReferenceNamed) &
-      ref(footnoteBody) &
+      ref0(footnoteReferenceNamed) &
+      ref0(footnoteBody) &
       Token.newlineParser()
           .repeat(0, 3)
           .flatten('Footnote trailing content expected');
 
   Parser footnoteBody() {
     final end = endOfInput() |
-        lineStart() & ref(footnoteReferenceNamed) |
+        lineStart() & ref0(footnoteReferenceNamed) |
         Token.newlineParser().repeat(3);
-    return ref(textRun, end).plusLazy(end);
+    return ref1(textRun, end).plusLazy(end);
   }
 
   Parser latexBlock() => indented(LatexBlockParser());
 
   Parser latexInline() =>
-      ref(_latexInline, r'$$', r'$$') |
-      ref(_latexInline, r'\(', r'\)') |
-      ref(_latexInline, r'\[', r'\]') |
+      ref2(_latexInline, r'$$', r'$$') |
+      ref2(_latexInline, r'\(', r'\)') |
+      ref2(_latexInline, r'\[', r'\]') |
       drop(_markup(r'$'), [0, -1]);
 
   Parser _latexInline(String start, String end) =>
@@ -645,14 +637,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(end);
 }
 
-class OrgFileLinkGrammar extends GrammarParser {
-  OrgFileLinkGrammar() : super(OrgFileLinkGrammarDefinition());
-}
-
 class OrgFileLinkGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() =>
-      ref(scheme) & ref(body) & (string('::') & ref(extra)).pick(1).optional();
+      ref0(scheme) &
+      ref0(body) &
+      (string('::') & ref0(extra)).pick(1).optional();
 
   Parser scheme() =>
       (string('file:') | anyOf('/.').and()).flatten('Expected link scheme');

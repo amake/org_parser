@@ -157,8 +157,8 @@ class Tracer {
 
 // Adapted from PetitParser's trace.dart
 Parser trace(Parser parser, Tracer tracer) {
-  return transformParser(parser, (each) {
-    return ContinuationParser(each, (continuation, context) {
+  return transformParser(parser, <T>(each) {
+    return each.callCC((continuation, context) {
       tracer.push(each);
       final result = continuation(context);
       tracer.pop(result);
@@ -181,7 +181,7 @@ void main() {
 ** Sub-Topic 2
 
 *** Additional entry''';
-      final html = flameGraph(OrgParser(), doc);
+      final html = flameGraph(org, doc);
       File('tmp/profile.html')
         ..parent.createSync()
         ..writeAsStringSync(html);
@@ -189,8 +189,8 @@ void main() {
     test(
       'org-manual',
       () {
-        final html = flameGraph(
-            OrgGrammar(), File('test/org-manual.org').readAsStringSync());
+        final html = flameGraph(OrgGrammarDefinition().build(),
+            File('test/org-manual.org').readAsStringSync());
         File('tmp/org-manual-profile.html')
           ..parent.createSync()
           ..writeAsStringSync(html);

@@ -3,9 +3,7 @@ import 'package:org_parser/src/org.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
-class OrgParser extends GrammarParser {
-  OrgParser() : super(OrgParserDefinition());
-}
+final org = OrgParserDefinition().build();
 
 class OrgParserDefinition extends OrgGrammarDefinition {
   @override
@@ -70,8 +68,8 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 
   @override
   Parser title() {
-    final limit = ref(tags) | lineEnd();
-    return OrgContentParser.textRun(limit)
+    final limit = ref0(tags) | lineEnd();
+    return _textRun(limit)
         .plusLazy(limit)
         .castList<OrgNode>()
         .map((items) => OrgContent(items))
@@ -90,16 +88,12 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       .map((content) => _orgContentParser.parse(content as String).value);
 }
 
-final _orgContentParser = OrgContentParser();
+final _orgContentParser = OrgContentParserDefinition().build();
 
-class OrgContentParser extends GrammarParser {
-  OrgContentParser() : super(OrgContentParserDefinition());
-
-  static Parser textRun([Parser? limit]) {
-    final definition = OrgContentParserDefinition();
-    final args = limit == null ? const <Object>[] : [limit];
-    return definition.build(start: definition.textRun, arguments: args);
-  }
+Parser _textRun([Parser? limit]) {
+  final definition = OrgContentParserDefinition();
+  final args = limit == null ? const <Object>[] : [limit];
+  return definition.build(start: definition.textRun, arguments: args);
 }
 
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
@@ -504,9 +498,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 }
 
-class OrgFileLinkParser extends GrammarParser {
-  OrgFileLinkParser() : super(OrgFileLinkParserDefinition());
-}
+final orgFileLink = OrgFileLinkParserDefinition().build();
 
 class OrgFileLinkParserDefinition extends OrgFileLinkGrammarDefinition {
   @override
