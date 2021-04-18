@@ -1,3 +1,6 @@
+## [2.1.1]
+* Require petitparser 4.1.0 or higher
+
 ## [2.1.0]
 * Relicense under the MIT License
 * "Plain" links of all built-in types are now recognized (not just http(s): and
