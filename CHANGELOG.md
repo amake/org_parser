@@ -1,3 +1,15 @@
+## [2.1.0]
+* Relicense under the MIT License
+* "Plain" links of all built-in types are now recognized (not just http(s): and
+  mailto:)
+* Added parser, AST for file links; see `OrgFileLink` class, `orgFileLink`
+  variable
+* Removed the following classes; use noted replacements
+  * `OrgGrammar` → `OrgGrammarDefinition().build()`
+  * `OrgContentGrammar` → `OrgContentGrammarDefinition().build()`
+  * `OrgParser` → `org` variable
+  * `OrgContentParser` → `OrgContentParserDefinition().build()`
+
 ## [2.0.0]
 
 * Change class hierarchy of AST classes
