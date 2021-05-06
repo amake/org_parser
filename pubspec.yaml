@@ -1,5 +1,5 @@
 name: org_parser
-description: A pure-Dart parser for Emacs org-mode (https://orgmode.org) markup
+description: A pure-Dart parser for Emacs Org Mode (https://orgmode.org) markup
 version: 2.1.1
 homepage: https://github.com/amake/org_parser
 

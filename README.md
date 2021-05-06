@@ -1,15 +1,15 @@
 # org_parser
 
-An [Org-mode](https://orgmode.org/) parser for Dart.
+An [Org Mode](https://orgmode.org/) parser for Dart.
 
 # Usage
 
-For displaying Org-mode documents in Flutter applications, see
+For displaying Org Mode documents in Flutter applications, see
 [org_flutter](https://github.com/amake/org_flutter). For an example application
-that displays Org-mode documents with org_parser and org_flutter, see
+that displays Org Mode documents with org_parser and org_flutter, see
 [orgro](https://github.com/amake/orgro).
 
-This package allows you to parse raw Org-mode documents into a structured
+This package allows you to parse raw Org Mode documents into a structured
 in-memory representation.
 
 ```dart
