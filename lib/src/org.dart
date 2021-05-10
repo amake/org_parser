@@ -142,6 +142,36 @@ class OrgSection extends OrgTree {
   @override
   int get level => headline.level;
 
+  /// Get the ID properties from this section's PROPERTIES drawer, if any.
+  List<String> get ids => _getProperties(':ID:');
+
+  /// Get the CUSTOM_ID properties from this section's PROPERTIES drawer, if
+  /// any.
+  List<String> get customIds => _getProperties(':CUSTOM_ID:');
+
+  List<String> _getProperties(String key) =>
+      _propertiesDrawer
+          ?.properties(key: key)
+          .map<String>((prop) => prop.value.trim())
+          .toList(growable: false) ??
+      const [];
+
+  /// Retrieve this section's PROPERTIES drawer, if it exists.
+  OrgDrawer? get _propertiesDrawer {
+    OrgDrawer? result;
+    // Visit [content], not [this], because we don't want to find a drawer in a
+    // child section
+    content?.visit<OrgDrawer>((drawer) {
+      if (drawer.header.trim().toUpperCase() == ':PROPERTIES:') {
+        result = drawer;
+        // Only first drawer is recognized
+        return false;
+      }
+      return true;
+    });
+    return result;
+  }
+
   bool get isEmpty => content == null && sections.isEmpty;
 
   OrgSection copyWith({

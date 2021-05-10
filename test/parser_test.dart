@@ -408,6 +408,33 @@ bazoonga''');
         ['OrgDocument', 'OrgContent', 'OrgParagraph'],
       );
     });
+    test('section ids', () {
+      var result = parser.parse('''* Foobar
+   :properties:
+   :bizz: bazz
+   :ID:   abcd1234
+   :ID: efgh5678
+   :CUSTOM_ID: some-id
+   :custom_ID: other-id
+   :END:
+
+content''');
+      var doc = result.value as OrgDocument;
+      var section = doc.sections[0];
+      expect(section.customIds, const ['some-id', 'other-id']);
+      expect(section.ids, const ['abcd1234', 'efgh5678']);
+      result = parser.parse('''* Foobar
+** Bizbaz
+   :PROPERTIES:
+   :ID: abcd1234
+   :END:
+
+content''');
+      doc = result.value as OrgDocument;
+      section = doc.sections[0];
+      expect(section.customIds.isEmpty, true);
+      expect(section.ids.isEmpty, true);
+    });
     group('file link', () {
       final parser = orgFileLink;
       test('with scheme', () {
