@@ -612,6 +612,21 @@ class OrgDrawer extends OrgNode with IndentedElement {
   @override
   List<OrgNode> get children => [body];
 
+  /// Get a list of [OrgProperty] nodes contained within this block. Optionally
+  /// filter the result to include only properties with the specified [key].
+  /// Keys are matched case-insensitively.
+  List<OrgProperty> properties({String? key}) {
+    final upperKey = key?.toUpperCase();
+    final result = <OrgProperty>[];
+    visit<OrgProperty>((prop) {
+      if (upperKey == null || prop.key.toUpperCase() == upperKey) {
+        result.add(prop);
+      }
+      return true;
+    });
+    return result;
+  }
+
   @override
   bool contains(Pattern pattern) =>
       header.contains(pattern) ||

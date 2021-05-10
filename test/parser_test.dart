@@ -154,28 +154,33 @@ bar/''');
       final parser = buildSpecific(parserDefinition.drawer);
       var result = parser.parse('''  :foo:
   :bar: baz
+  :bizz: buzz
   :end:
 
 ''');
       var drawer = result.value as OrgDrawer;
       expect(drawer.header, ':foo:\n');
+      expect(drawer.properties().length, 2);
       var body = drawer.body as OrgContent;
       final property = body.children[0] as OrgProperty;
       expect(property.key, ':bar:');
       expect(property.value, ' baz');
       expect(drawer.footer, '  :end:');
+      expect(drawer.properties().first, property);
       result = parser.parse(''':LOGBOOK:
 a
 :END:
 ''');
       drawer = result.value as OrgDrawer;
       expect(drawer.header, ':LOGBOOK:\n');
+      expect(drawer.properties().isEmpty, true);
       body = drawer.body as OrgContent;
       final text = body.children[0] as OrgPlainText;
       expect(text.content, 'a\n');
       result = parser.parse(''':FOOBAR:
 :END:''');
       drawer = result.value as OrgDrawer;
+      expect(drawer.properties().isEmpty, true);
       body = drawer.body as OrgContent;
       expect(body.children.isEmpty, true);
     });
