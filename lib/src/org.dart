@@ -11,6 +11,24 @@ String parseOrgLocalSectionUrl(String url) {
   return url.substring(1).replaceAll(RegExp('[ \t]*\r?\n[ \t]*'), ' ');
 }
 
+bool isOrgCustomIdUrl(String url) => url.startsWith('#');
+
+/// Return the CUSTOM_ID of the section pointed to by the URL. The URL must be
+/// one for which [isOrgCustomIdUrl] returns true.
+String parseOrgCustomIdUrl(String url) {
+  assert(isOrgCustomIdUrl(url));
+  return url.substring(1);
+}
+
+bool isOrgIdUrl(String url) => url.startsWith('id:');
+
+/// Return the ID of the section pointed to by the URL. The URL must be one
+/// for which [isOrgCustomIdUrl] returns true.
+String parseOrgIdUrl(String url) {
+  assert(isOrgIdUrl(url));
+  return url.substring(3);
+}
+
 abstract class OrgNode {
   List<OrgNode> get children => const [];
 
