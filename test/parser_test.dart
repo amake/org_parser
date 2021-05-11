@@ -408,6 +408,25 @@ bazoonga''');
         ['OrgDocument', 'OrgContent', 'OrgParagraph'],
       );
     });
+    test('walk sections', () {
+      final result = parser.parse('''* Foobar
+** Bizzbazz
+*** Bingbang
+content''');
+      final doc = result.value as OrgDocument;
+      var sections = <String?>[];
+      doc.visitSections((section) {
+        sections.add(section.headline.rawTitle);
+        return true;
+      });
+      expect(sections, ['Foobar', 'Bizzbazz', 'Bingbang']);
+      sections = <String?>[];
+      doc.visitSections((section) {
+        sections.add(section.headline.rawTitle);
+        return sections.length < 2;
+      });
+      expect(sections, ['Foobar', 'Bizzbazz']);
+    });
     test('section ids', () {
       var result = parser.parse('''* Foobar
    :properties:

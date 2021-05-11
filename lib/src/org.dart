@@ -64,6 +64,22 @@ abstract class OrgTree extends OrgNode {
 
   int get level;
 
+  /// Walk only section nodes of the AST with [visitor]. More efficient than
+  /// calling [visit]. The visitor function must return `true` to continue
+  /// iterating, or `false` to stop.
+  bool visitSections(bool Function(OrgSection) visitor) {
+    final self = this;
+    if (self is OrgSection && !visitor(self)) {
+      return false;
+    }
+    for (final section in sections) {
+      if (!section.visitSections(visitor)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @override
   bool contains(Pattern pattern, {bool includeChildren = true}) {
     final content = this.content;
