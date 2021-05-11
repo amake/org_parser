@@ -812,6 +812,13 @@ class OrgFileLink {
   final String body;
   final String? extra;
 
+  /// Whether the file linked to is indicated by a relative path (as opposed to
+  /// an absolute path). Also true for local links.
   bool get isRelative =>
-      body.startsWith('.') || scheme != null && !body.startsWith('/');
+      isLocal ||
+      body.startsWith('.') ||
+      scheme != null && !body.startsWith('/');
+
+  /// Whether this link points to a section within the current document.
+  bool get isLocal => body.isEmpty && extra != null;
 }

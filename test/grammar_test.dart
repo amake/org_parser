@@ -1280,6 +1280,8 @@ I am''');
       expect(result.value, ['file:', 'projects.org', '*task title']);
       result = parser.parse('file:projects.org::#custom-id');
       expect(result.value, ['file:', 'projects.org', '#custom-id']);
+      result = parser.parse('file:::*task title');
+      expect(result.value, ['file:', '', '*task title']);
     });
     test('without scheme', () {
       var result = parser.parse('/home/dominik/images/jupiter.jpg');

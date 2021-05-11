@@ -648,7 +648,7 @@ class OrgFileLinkGrammarDefinition extends GrammarDefinition {
       (string('file:') | anyOf('/.').and()).flatten('Expected link scheme');
 
   Parser body() =>
-      any().plusLazy(string('::') | endOfInput()).flatten('Expected link body');
+      any().starLazy(string('::') | endOfInput()).flatten('Expected link body');
 
   Parser extra() => any().star().flatten('Expected link extra');
 }
