@@ -1,3 +1,17 @@
+## [2.2.0]
+
+* Add utilities for recognizing, parsing `id:` and `#custom-id` URLs
+  * `isOrgIdUrl` & `parseOrgIdUrl`
+  * `isOrgCustomIdUrl` & `parseOrgCustomIdUrl`
+* Add `OrgDrawer.properties` for obtaining drawer properties
+* Add methods for getting the `ID` and `CUSTOM_ID` properties of a section
+  * `OrgSection.ids`
+  * `OrgSection.customIds`
+* Add `OrgTree.visitSections` for efficiently walking just sections
+* `OrgFileLink` now correctly recognizes links with empty file parts like
+  `file:::*Section name`, which point to local sections; see
+  `OrgFileLink.isLocal`.
+
 ## [2.1.1]
 * Require petitparser 4.1.0 or higher
 
