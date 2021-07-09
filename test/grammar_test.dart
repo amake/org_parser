@@ -1,5 +1,6 @@
 import 'package:org_parser/org_parser.dart';
 import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/reflection.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -1257,6 +1258,15 @@ I am''');
         ]
       ]);
     });
+    test('detect common problems', () {
+      expect(
+        linter(parser).where((issue) => issue.type != LinterType.info),
+        isEmpty,
+        // TODO(aaron): There are two warnings about repeated choice, but
+        // there's no hint as to where in the grammar they are.
+        skip: true,
+      );
+    });
   });
   group('file link', () {
     final parser = OrgFileLinkGrammarDefinition().build();
@@ -1298,6 +1308,9 @@ I am''');
       expect(result.isFailure, true);
       result = parser.parse('mailto:me@example.com');
       expect(result.isFailure, true);
+    });
+    test('detect common problems', () {
+      expect(linter(parser), isEmpty);
     });
   });
 }
