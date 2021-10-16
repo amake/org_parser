@@ -403,7 +403,7 @@ bazoonga''');
       expect(
         walkTree(
           doc,
-          kontinue: (node) => !(node is OrgParagraph),
+          kontinue: (node) => node is! OrgParagraph,
         ),
         ['OrgDocument', 'OrgContent', 'OrgParagraph'],
       );
