@@ -1260,7 +1260,7 @@ I am''');
     });
     test('detect common problems', () {
       expect(
-        linter(parser).where((issue) => issue.type != LinterType.info),
+        linter(parser, excludedTypes: {LinterType.info}),
         isEmpty,
         // TODO(aaron): There are two warnings about repeated choice, but
         // there's no hint as to where in the grammar they are.
