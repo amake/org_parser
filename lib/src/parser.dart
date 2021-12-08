@@ -1,5 +1,4 @@
 import 'package:org_parser/org_parser.dart';
-import 'package:org_parser/src/org.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
@@ -29,7 +28,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       final parent = sections[i];
       final children = sections
           .sublist(i + 1)
-          .takeWhile((item) => item is OrgSection && item.level > parent.level)
+          .takeWhile((item) => item.level > parent.level)
           .cast<OrgSection>()
           .toList();
       if (children.isNotEmpty) {

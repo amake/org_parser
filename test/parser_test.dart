@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:org_parser/org_parser.dart';
-import 'package:org_parser/src/parser.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
