@@ -5,6 +5,18 @@ import 'package:petitparser/petitparser.dart';
 
 // See https://orgmode.org/worg/dev/org-syntax.html
 
+/// Top-level grammar definition
+///
+/// This describes the overall structure of an Org document:
+/// - Leading content
+/// - One or more sections
+///   - Headline
+///   - Content
+///   - One or more sections
+///     - etc.
+///
+/// The structure and the content turned out to be hard to define together, so
+/// the content rules are defined separately in [OrgContentGrammarDefinition].
 class OrgGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() => ref0(document).end();
@@ -59,6 +71,10 @@ Parser _textRun([Parser? limit]) {
   return definition.build(start: definition.textRun, arguments: args);
 }
 
+/// Content grammar definition
+///
+/// These rules cover all "content", as opposed to "structure". See
+/// [OrgGrammarDefinition].
 class OrgContentGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() => ref0(element).star().end();
@@ -641,6 +657,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(end);
 }
 
+/// Grammar rules for file links, which are basically a mini-format of their own
 class OrgFileLinkGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() =>

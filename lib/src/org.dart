@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:org_parser/org_parser.dart';
 
+/// Identify URLs that point to a section within the current document (starting
+/// with '*')
 bool isOrgLocalSectionUrl(String url) => url.startsWith('*');
 
 /// Return the title of the section pointed to by the URL. The URL must be one
@@ -11,6 +13,9 @@ String parseOrgLocalSectionUrl(String url) {
   return url.substring(1).replaceAll(RegExp('[ \t]*\r?\n[ \t]*'), ' ');
 }
 
+/// Identify URLs that point to a custom ID (starting with '#').
+///
+/// Note that "custom IDs" are distinct from "IDs"; see [isOrgIdUrl].
 bool isOrgCustomIdUrl(String url) => url.startsWith('#');
 
 /// Return the CUSTOM_ID of the section pointed to by the URL. The URL must be
@@ -20,6 +25,9 @@ String parseOrgCustomIdUrl(String url) {
   return url.substring(1);
 }
 
+/// Identify URLs that point to IDs (starting with 'id:').
+///
+/// Note that "IDs" are distinct from "custom IDs"; see [isOrgCustomIdUrl].
 bool isOrgIdUrl(String url) => url.startsWith('id:');
 
 /// Return the ID of the section pointed to by the URL. The URL must be one
@@ -29,9 +37,13 @@ String parseOrgIdUrl(String url) {
   return url.substring(3);
 }
 
+/// The base type of all Org AST objects
 abstract class OrgNode {
+  /// The children of this node. May be empty.
   List<OrgNode> get children => const [];
 
+  /// Return true if this node or any of its children recursively match the
+  /// supplied [pattern]
   bool contains(Pattern pattern);
 
   /// Walk AST with [visitor]. Specify a type [T] to only visit nodes of that
@@ -53,15 +65,23 @@ abstract class OrgNode {
   }
 }
 
+/// A node potentially containing [OrgSection]s
 abstract class OrgTree extends OrgNode {
   OrgTree(this.content, [Iterable<OrgSection>? sections])
       : sections = List.unmodifiable(sections ?? const <OrgSection>[]);
+
+  /// Leading content
   final OrgContent? content;
+
+  /// Sections contained within this tree. These are also iterated by [children].
   final List<OrgSection> sections;
 
+  /// Leading content, if present, followed by [sections]
   @override
   List<OrgNode> get children => [if (content != null) content!, ...sections];
 
+  /// The "level" (depth) of this node in the tree; corresponds to the number of
+  /// '*' characters in the section heading
   int get level;
 
   /// Walk only section nodes of the AST with [visitor]. More efficient than
@@ -93,7 +113,9 @@ abstract class OrgTree extends OrgNode {
   String toString() => runtimeType.toString();
 }
 
+/// The top-level node representing a full Org document
 class OrgDocument extends OrgTree {
+  /// Parse an Org document in string form into an AST
   factory OrgDocument.parse(String text) =>
       org.parse(text).value as OrgDocument;
 
@@ -107,6 +129,11 @@ class OrgDocument extends OrgTree {
   String toString() => 'OrgDocument';
 }
 
+/// An Org headline, like
+///
+/// ```
+/// **** TODO [#A] COMMENT Title :tag1:tag2:
+/// ```
 class OrgHeadline extends OrgNode {
   OrgHeadline(
     this.stars,
@@ -116,13 +143,25 @@ class OrgHeadline extends OrgNode {
     this.rawTitle, [
     Iterable<String>? tags,
   ]) : tags = List.unmodifiable(tags ?? const <String>[]);
+
+  /// Headline stars, like `*** `. Includes trailing space.
   final String stars;
+
+  /// Headline keyword, like `TODO`
   final String? keyword;
+
+  /// Headline priority, like `A`
   final String? priority;
+
+  /// Headline title
   final OrgContent? title;
 
-  // For resolving links
+  /// A raw representation of the headline title. This is useful for resolving
+  /// section links (see [isOrgLocalSectionUrl]), which will reference the raw
+  /// title rather than the parsed title.
   final String? rawTitle;
+
+  /// Headline tags, like `:tag1:tag2:`, stored without the `:` delimiters
   final List<String> tags;
 
   // -1 for trailing space
@@ -144,6 +183,14 @@ class OrgHeadline extends OrgNode {
   String toString() => 'OrgHeadline';
 }
 
+/// An Org section. May have nested sections, like
+///
+/// ```
+/// * TODO [#A] COMMENT Title :tag1:tag2:
+/// content
+/// ** Sub section
+/// more content
+/// ```
 class OrgSection extends OrgTree {
   OrgSection(
     this.headline,
@@ -188,6 +235,7 @@ class OrgSection extends OrgTree {
     return result;
   }
 
+  /// A section may be empty if it has no content or sub-sections
   bool get isEmpty => content == null && sections.isEmpty;
 
   OrgSection copyWith({
@@ -217,11 +265,14 @@ mixin SingleContentElement {
 }
 
 mixin IndentedElement {
+  /// Indenting whitespace
   String get indent;
 
+  /// Trailing whitespace
   String get trailing;
 }
 
+/// A generic node that contains children
 class OrgContent extends OrgNode {
   OrgContent(Iterable<OrgNode> children)
       : children = List.unmodifiable(children);
@@ -237,6 +288,7 @@ class OrgContent extends OrgNode {
   String toString() => 'OrgContent';
 }
 
+/// Plain text that has no markup
 class OrgPlainText extends OrgNode with SingleContentElement {
   OrgPlainText(this.content);
 
@@ -247,9 +299,25 @@ class OrgPlainText extends OrgNode with SingleContentElement {
   String toString() => 'OrgPlainText';
 }
 
+/// A link, like
+/// ```
+/// [[https://example.com][An example]]
+/// ```
+/// or
+/// ```
+/// [[https://example.com]]
+/// ```
+/// or
+/// ```
+/// https://example.com
+/// ```
 class OrgLink extends OrgNode {
   OrgLink(this.location, this.description);
+
+  /// Where the link points
   final String location;
+
+  /// The user-visible text
   final String? description;
 
   @override
@@ -263,6 +331,16 @@ class OrgLink extends OrgNode {
   String toString() => 'OrgLink';
 }
 
+/// Emphasis markup, like
+/// ```
+/// *bold*
+/// /italic/
+/// +strikethrough+
+/// ~code~
+/// =verbatim=
+/// ```
+///
+/// See [OrgStyle] for supported emphasis types
 class OrgMarkup extends OrgNode {
   // TODO(aaron): Get rid of this hack
   OrgMarkup.just(String content, OrgStyle style) : this('', content, '', style);
@@ -289,6 +367,7 @@ class OrgMarkup extends OrgNode {
       trailingDecoration.contains(pattern);
 }
 
+/// Supported styles for [OrgMarkup] nodes
 enum OrgStyle {
   bold,
   verbatim,
@@ -298,6 +377,10 @@ enum OrgStyle {
   code,
 }
 
+/// A macro reference, like
+/// ```
+/// {{{my_macro}}}
+/// ```
 class OrgMacroReference extends OrgNode with SingleContentElement {
   OrgMacroReference(this.content);
 
@@ -308,6 +391,12 @@ class OrgMacroReference extends OrgNode with SingleContentElement {
   String toString() => 'OrgMacroReference';
 }
 
+/// A "meta" line, like
+/// ```
+/// #+KEYWORD: some-named-thing
+/// ```
+///
+/// TODO(aaron): Should this be renamed to `OrgKeyword`?
 class OrgMeta extends OrgNode with IndentedElement {
   OrgMeta(this.indent, this.keyword, this.trailing);
 
@@ -328,6 +417,14 @@ class OrgMeta extends OrgNode with IndentedElement {
   String toString() => 'OrgMeta';
 }
 
+/// A block, like
+/// ```
+/// #+begin_quote
+/// foo
+/// #+end_quote
+/// ```
+///
+/// See also [OrgSrcBlock]
 class OrgBlock extends OrgNode with IndentedElement {
   OrgBlock(this.indent, this.header, this.body, this.footer, this.trailing);
 
@@ -352,6 +449,12 @@ class OrgBlock extends OrgNode with IndentedElement {
   String toString() => 'OrgBlock';
 }
 
+/// A source block, like
+/// ```
+/// #+begin_src sh
+///   echo "hello world"
+/// #+end_src
+/// ```
 class OrgSrcBlock extends OrgBlock {
   OrgSrcBlock(
     this.language,
@@ -362,9 +465,17 @@ class OrgSrcBlock extends OrgBlock {
     String trailing,
   ) : super(indent, header, body, footer, trailing);
 
+  /// The language of the block, like `sh`
   final String? language;
 }
 
+/// A table, like
+/// ```
+/// | Foo         |    Bar |  Baz |
+/// |-------------+--------+------|
+/// | Lorem ipsum | 30.000 |    1 |
+/// | 123         |        |      |
+/// ```
 class OrgTable extends OrgNode with IndentedElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing)
       : rows = List.unmodifiable(rows);
@@ -379,6 +490,7 @@ class OrgTable extends OrgNode with IndentedElement {
   @override
   final String trailing;
 
+  /// The table is rectangular if all rows contain the same number of cells
   bool get rectangular =>
       rows
           .whereType<OrgTableCellRow>()
@@ -387,9 +499,12 @@ class OrgTable extends OrgNode with IndentedElement {
           .length <
       2;
 
+  /// The maximum number of columns in any row of the table
   int get columnCount =>
       rows.whereType<OrgTableCellRow>().map((row) => row.cellCount).reduce(max);
 
+  /// Determine whether the column number [colIdx] should be treated as a
+  /// numeric column. A certain percentage of non-numeric cells are tolerated.
   bool columnIsNumeric(int colIdx) {
     final cells = rows
         .whereType<OrgTableCellRow>()
@@ -468,6 +583,7 @@ final _orgTableNumberRegexp = RegExp(
 // right-aligned. From org-mode 20200504.
 const _orgTableNumberFraction = 0.5;
 
+/// A timestamp, like `[2020-05-05 Tue]`
 class OrgTimestamp extends OrgNode with SingleContentElement {
   OrgTimestamp(this.content);
 
@@ -479,6 +595,9 @@ class OrgTimestamp extends OrgNode with SingleContentElement {
   String toString() => 'OrgTimestamp';
 }
 
+/// A planning keyword, like `SCHEDULED:` or `DEADLINE:`
+///
+/// TODO(aaron): Rename this to "OrgPlanningKeyword"?
 class OrgKeyword extends OrgNode with SingleContentElement {
   OrgKeyword(this.content);
 
@@ -489,6 +608,14 @@ class OrgKeyword extends OrgNode with SingleContentElement {
   String toString() => 'OrgKeyword';
 }
 
+/// A planning line, like
+/// ```
+/// SCHEDULED: <2021-12-09 Thu>
+/// ```
+/// or
+/// ```
+/// CLOSED: [2021-12-09 Thu 12:02]
+/// ```
 class OrgPlanningLine extends OrgNode with IndentedElement {
   OrgPlanningLine(this.indent, this.keyword, this.body, this.trailing);
 
@@ -513,6 +640,10 @@ class OrgPlanningLine extends OrgNode with IndentedElement {
   String toString() => 'OrgPlanningLine';
 }
 
+/// A fixed-width area, like
+/// ```
+/// : result of source block, or whatever
+/// ```
 class OrgFixedWidthArea extends OrgNode with IndentedElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing);
 
@@ -532,6 +663,12 @@ class OrgFixedWidthArea extends OrgNode with IndentedElement {
   String toString() => 'OrgFixedWidthArea';
 }
 
+/// A list, like
+/// ```
+/// - foo
+/// - bar
+///   - baz
+/// ```
 class OrgList extends OrgNode with IndentedElement {
   OrgList(Iterable<OrgListItem> items, this.trailing)
       : items = List.unmodifiable(items);
@@ -574,6 +711,10 @@ abstract class OrgListItem extends OrgNode {
   String toString() => runtimeType.toString();
 }
 
+/// An unordered list item, like
+/// ```
+/// - foo
+/// ```
 class OrgListUnorderedItem extends OrgListItem {
   OrgListUnorderedItem(
     String indent,
@@ -605,6 +746,10 @@ class OrgListUnorderedItem extends OrgListItem {
   String toString() => 'OrgListUnorderedItem';
 }
 
+/// An ordered list item, like
+/// ```
+/// 1. foo
+/// ```
 class OrgListOrderedItem extends OrgListItem {
   OrgListOrderedItem(
     String indent,
@@ -644,6 +789,12 @@ class OrgParagraph extends OrgNode {
   String toString() => 'OrgParagraph';
 }
 
+/// A drawer, like
+/// ```
+/// :PROPERTIES:
+/// :CUSTOM_ID: foobar
+/// :END:
+/// ```
 class OrgDrawer extends OrgNode with IndentedElement {
   OrgDrawer(this.indent, this.header, this.body, this.footer, this.trailing);
 
@@ -683,6 +834,10 @@ class OrgDrawer extends OrgNode with IndentedElement {
   String toString() => 'OrgDrawer';
 }
 
+/// A property in a drawer, like
+/// ```
+/// :CUSTOM_ID: foobar
+/// ```
 class OrgProperty extends OrgNode with IndentedElement {
   OrgProperty(this.indent, this.key, this.value, this.trailing);
 
@@ -701,6 +856,10 @@ class OrgProperty extends OrgNode with IndentedElement {
   String toString() => 'OrgProperty';
 }
 
+/// A footnote, like
+/// ```
+/// [fn:1] this is a footnote
+/// ```
 class OrgFootnote extends OrgNode {
   OrgFootnote(this.marker, this.content);
 
@@ -718,6 +877,7 @@ class OrgFootnote extends OrgNode {
   String toString() => 'OrgFootnote';
 }
 
+/// A footnote reference, like `[fn:1]`
 class OrgFootnoteReference extends OrgNode {
   OrgFootnoteReference.named(String leading, String name, String trailing)
       : this(leading, name, null, null, trailing);
@@ -755,6 +915,12 @@ class OrgFootnoteReference extends OrgNode {
   String toString() => 'OrgFootnoteReference';
 }
 
+/// A LaTeX block, like
+/// ```
+/// \begin{equation}
+/// \nabla \cdot \mathbf{B} = 0
+/// \end{equation}
+/// ```
 class OrgLatexBlock extends OrgNode {
   OrgLatexBlock(
     this.environment,
@@ -765,6 +931,7 @@ class OrgLatexBlock extends OrgNode {
     this.trailing,
   );
 
+  /// The LaTeX environment, like `equation`
   final String environment;
   final String leading;
   final String begin;
@@ -784,6 +951,7 @@ class OrgLatexBlock extends OrgNode {
   String toString() => 'OrgLatexBlock';
 }
 
+/// An inline LaTeX snippet, like `$E=mc^2$`
 class OrgLatexInline extends OrgNode {
   OrgLatexInline(
     this.leadingDecoration,
@@ -805,6 +973,7 @@ class OrgLatexInline extends OrgNode {
       trailingDecoration.contains(pattern);
 }
 
+/// An entity, like `\Omega`
 class OrgEntity extends OrgNode {
   OrgEntity(this.leading, this.name, this.trailing);
 
@@ -819,6 +988,10 @@ class OrgEntity extends OrgNode {
       trailing.contains(pattern);
 }
 
+/// A link to a file, like
+/// ```
+/// file:/foo/bar.org::#custom-id
+/// ```
 class OrgFileLink {
   factory OrgFileLink.parse(String text) =>
       orgFileLink.parse(text).value as OrgFileLink;

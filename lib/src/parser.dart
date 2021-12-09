@@ -2,8 +2,10 @@ import 'package:org_parser/org_parser.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
+/// The top-level Org parser
 final org = OrgParserDefinition().build();
 
+/// Top-level parser definitions
 class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser start() => super.start().map((items) {
@@ -87,6 +89,8 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       .map((content) => _orgContentParser.parse(content as String).value);
 }
 
+/// The content parser. This is not really intended to be used separately; it is
+/// used by [org] to parse "content" inside sections.
 final _orgContentParser = OrgContentParserDefinition().build();
 
 Parser _textRun([Parser? limit]) {
@@ -95,6 +99,7 @@ Parser _textRun([Parser? limit]) {
   return definition.build(start: definition.textRun, arguments: args);
 }
 
+/// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser start() =>
@@ -497,8 +502,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 }
 
+/// File link parser
 final orgFileLink = OrgFileLinkParserDefinition().build();
 
+/// File link parser definition
 class OrgFileLinkParserDefinition extends OrgFileLinkGrammarDefinition {
   @override
   Parser start() => super.start().map((values) {
