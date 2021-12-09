@@ -4,6 +4,62 @@ import 'package:petitparser/reflection.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('headline', () {
+    final grammarDefinion = OrgGrammarDefinition();
+    final parser = grammarDefinion.build(start: grammarDefinion.headline);
+    test('parse a headline', () {
+      final result = parser.parse('* Title');
+      expect(
+        result.value,
+        [
+          '* ',
+          null,
+          null,
+          ['Title'],
+          null
+        ],
+      );
+    });
+    test('parse almost-a-header', () {
+      final result = parser.parse('**');
+      expect(result.isFailure, true);
+    });
+    test('parse just an empty header', () {
+      final result = parser.parse('* ');
+      expect(
+        result.value,
+        ['* ', null, null, null, null],
+      );
+    });
+    test('parse a todo header', () {
+      final result = parser.parse('* TODO Title');
+      expect(
+        result.value,
+        [
+          '* ',
+          'TODO',
+          null,
+          ['Title'],
+          null
+        ],
+      );
+    });
+    test('parse a complex header', () {
+      final result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
+      expect(result.value, [
+        '** ',
+        'TODO',
+        ['[#', 'A', ']'],
+        ['Title foo bar'],
+        [
+          ' :',
+          ['biz', 'baz'],
+          ':',
+          null
+        ]
+      ]);
+    });
+  });
   group('structural grammar', () {
     final grammar = OrgGrammarDefinition().build();
     test('parse content', () {
@@ -11,65 +67,6 @@ void main() {
 bar
 ''');
       expect(result.value, ['foo\nbar\n', []]);
-    });
-    test('parse a header', () {
-      final result = grammar.parse('* Title');
-      expect(result.value, [
-        null,
-        [
-          [
-            [
-              '* ',
-              null,
-              null,
-              ['Title'],
-              null
-            ],
-            null
-          ]
-        ]
-      ]);
-    });
-    test('parse a todo header', () {
-      final result = grammar.parse('* TODO Title');
-      expect(result.value, [
-        null,
-        [
-          [
-            [
-              '* ',
-              'TODO',
-              null,
-              ['Title'],
-              null
-            ],
-            null
-          ]
-        ]
-      ]);
-    });
-    test('parse a complex header', () {
-      final result = grammar.parse('** TODO [#A] Title foo bar :biz:baz:');
-      expect(result.value, [
-        null,
-        [
-          [
-            [
-              '** ',
-              'TODO',
-              ['[#', 'A', ']'],
-              ['Title foo bar'],
-              [
-                ' :',
-                ['biz', 'baz'],
-                ':',
-                null
-              ]
-            ],
-            null
-          ]
-        ]
-      ]);
     });
     test('parse a section', () {
       final result = grammar.parse('''* Title
