@@ -68,6 +68,34 @@ bar
 ''');
       expect(result.value, ['foo\nbar\n', []]);
     });
+    test('parse an empty header before a regular header', () {
+      final result = grammar.parse('''**${' '}
+* foo''');
+      expect(result.value, [
+        null,
+        [
+          [
+            ['** ', null, null, null, null],
+            null
+          ],
+          [
+            [
+              '* ',
+              null,
+              null,
+              ['foo'],
+              null
+            ],
+            null
+          ]
+        ]
+      ]);
+    });
+    test('parse an almost-header before content', () {
+      final result = grammar.parse('''*
+foo''');
+      expect(result.value, ['*\nfoo', []]);
+    });
     test('parse a section', () {
       final result = grammar.parse('''* Title
   Content1

@@ -16,7 +16,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser headline() => drop(ref0(_headline), [-1]);
 
   Parser _headline() =>
-      ref0(stars).trim() &
+      ref0(stars) &
       ref0(todoKeyword).trim().optional() &
       ref0(priority).trim().optional() &
       ref0(title).optional() &
@@ -32,7 +32,11 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser title() {
     final limit = ref0(tags) | lineEnd();
-    return _textRun(limit).plusLazy(limit);
+    return (
+            // Reject line break here as a bit of a hack to prevent textRun from
+            // swallowing an immediate line break
+            Token.newlineParser().not() & _textRun(limit).plusLazy(limit))
+        .pick(1);
   }
 
   Parser tags() =>
