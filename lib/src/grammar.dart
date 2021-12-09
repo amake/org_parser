@@ -47,8 +47,14 @@ class OrgGrammarDefinition extends GrammarDefinition {
     return (
             // Reject line break here as a bit of a hack to prevent textRun from
             // swallowing an immediate line break
-            Token.newlineParser().not() & _textRun(limit).plusLazy(limit))
+            Token.newlineParser().not() & textRun(limit).plusLazy(limit))
         .pick(1);
+  }
+
+  Parser textRun([Parser? limit]) {
+    final definition = OrgContentGrammarDefinition();
+    final args = limit == null ? const <Object>[] : [limit];
+    return definition.build(start: definition.textRun, arguments: args);
   }
 
   Parser tags() =>
@@ -63,12 +69,6 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser _content() =>
       ref0(stars).not() & any().plusLazy(ref0(stars) | endOfInput());
-}
-
-Parser _textRun([Parser? limit]) {
-  final definition = OrgContentGrammarDefinition();
-  final args = limit == null ? const <Object>[] : [limit];
-  return definition.build(start: definition.textRun, arguments: args);
 }
 
 /// Content grammar definition

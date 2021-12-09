@@ -1,5 +1,4 @@
 import 'package:org_parser/org_parser.dart';
-import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 /// The top-level Org parser
@@ -68,13 +67,17 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       });
 
   @override
-  Parser title() {
-    final limit = ref0(tags) | lineEnd();
-    return _textRun(limit)
-        .plusLazy(limit)
-        .castList<OrgNode>()
-        .map((items) => OrgContent(items))
-        .token();
+  Parser title() => super
+      .title()
+      .castList<OrgNode>()
+      .map((items) => OrgContent(items))
+      .token();
+
+  @override
+  Parser textRun([Parser? limit]) {
+    final definition = OrgContentParserDefinition();
+    final args = limit == null ? const <Object>[] : [limit];
+    return definition.build(start: definition.textRun, arguments: args);
   }
 
   @override
@@ -92,12 +95,6 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 /// The content parser. This is not really intended to be used separately; it is
 /// used by [org] to parse "content" inside sections.
 final _orgContentParser = OrgContentParserDefinition().build();
-
-Parser _textRun([Parser? limit]) {
-  final definition = OrgContentParserDefinition();
-  final args = limit == null ? const <Object>[] : [limit];
-  return definition.build(start: definition.textRun, arguments: args);
-}
 
 /// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
