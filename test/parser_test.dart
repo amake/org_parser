@@ -360,6 +360,14 @@ bazoonga''');
       section = document.sections[0];
       expect(section.headline.rawTitle, 'foo:AB:CD:');
     });
+    test('https://github.com/amake/orgro/issues/51', () {
+      var result = parser.parse('''**${' '}
+* foo''');
+      var document = result.value as OrgDocument;
+      expect(document.sections.length, 2);
+      expect(document.sections[0].headline.rawTitle, isNull);
+      expect(document.sections[1].headline.rawTitle, 'foo');
+    });
     test('complex document', () {
       final result =
           parser.parse(File('test/org-syntax.org').readAsStringSync());
