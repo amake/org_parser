@@ -1,3 +1,9 @@
+## [2.2.1]
+
+* Add dartdoc comments to AST, grammar, and parser objects
+* Fix incorrect parsing of star-only headlines
+  ([#5](https://github.com/amake/org_parser/issues/5))
+
 ## [2.2.0]
 
 * Add utilities for recognizing, parsing `id:` and `#custom-id` URLs
