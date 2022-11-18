@@ -59,7 +59,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser tags() =>
       string(' :') &
-      ref0(tag).separatedBy(char(':'), includeSeparators: false) &
+      ref0(tag).plusSeparated(char(':')) &
       char(':') &
       lineEnd().and();
 

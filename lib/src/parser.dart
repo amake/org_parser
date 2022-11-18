@@ -55,14 +55,14 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final keyword = items[1] as String?;
         final priority = items[2] as String?;
         final title = items[3] as Token?;
-        final tags = items[4] as List?;
+        final tags = items[4] as SeparatedList?;
         return OrgHeadline(
           stars,
           keyword,
           priority,
           title?.value as OrgContent?,
           title?.input,
-          tags?.cast<String>(),
+          tags?.elements.cast<String>(),
         );
       });
 

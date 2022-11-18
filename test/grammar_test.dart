@@ -3,6 +3,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:test/test.dart';
 
+import 'matchers.dart';
+
 void main() {
   group('headline', () {
     final grammarDefinion = OrgGrammarDefinition();
@@ -53,7 +55,12 @@ void main() {
         ['Title foo bar'],
         [
           ' :',
-          ['biz', 'baz'],
+          isSeparatedList(elements: [
+            'biz',
+            'baz',
+          ], separators: [
+            ':'
+          ]),
           ':',
           null
         ]
