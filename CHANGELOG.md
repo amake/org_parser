@@ -1,3 +1,8 @@
+## [3.0.0]
+
+* Require petitparser 5.1.0 or higher
+* Require Dart 2.18 or higher
+
 ## [2.2.1]
 
 * Add dartdoc comments to AST, grammar, and parser objects
