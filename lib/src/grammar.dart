@@ -53,8 +53,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser textRun([Parser? limit]) {
     final definition = OrgContentGrammarDefinition();
-    final args = limit == null ? const <Object>[] : [limit];
-    return definition.build(start: definition.textRun, arguments: args);
+    return definition.buildFrom(definition.textRun(limit));
   }
 
   Parser tags() =>

@@ -8,7 +8,7 @@ import 'matchers.dart';
 void main() {
   group('headline', () {
     final grammarDefinion = OrgGrammarDefinition();
-    final parser = grammarDefinion.build(start: grammarDefinion.headline);
+    final parser = grammarDefinion.buildFrom(grammarDefinion.headline());
     test('parse a headline', () {
       final result = parser.parse('* Title');
       expect(
@@ -138,7 +138,7 @@ foo''');
   group('content grammar parts', () {
     final grammarDefinition = OrgContentGrammarDefinition();
     Parser buildSpecific(Parser Function() start) {
-      return grammarDefinition.build(start: start).end();
+      return grammarDefinition.buildFrom(start()).end();
     }
 
     test('paragraph', () {

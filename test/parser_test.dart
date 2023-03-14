@@ -8,7 +8,7 @@ void main() {
   group('content parser parts', () {
     final parserDefinition = OrgContentParserDefinition();
     Parser buildSpecific(Parser Function() start) {
-      return parserDefinition.build(start: start).end();
+      return parserDefinition.buildFrom(start()).end();
     }
 
     test('link', () {
@@ -275,7 +275,7 @@ a
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();
     Parser buildSpecific(Parser Function() start) {
-      return parserDefinition.build(start: start).end();
+      return parserDefinition.buildFrom(start()).end();
     }
 
     test('header', () {

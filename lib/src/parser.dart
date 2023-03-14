@@ -76,8 +76,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser textRun([Parser? limit]) {
     final definition = OrgContentParserDefinition();
-    final args = limit == null ? const <Object>[] : [limit];
-    return definition.build(start: definition.textRun, arguments: args);
+    return definition.buildFrom(definition.textRun(limit));
   }
 
   @override
