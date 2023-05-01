@@ -49,7 +49,7 @@ void main() {
   });
   test('recursive list parser', () {
     final listStart =
-        (lineStart() & whitespace().star() & string('- ')).flatten();
+        (lineStart() & whitespace().starString() & string('- ')).flatten();
     final list = undefined();
     list.set(listStart &
         indentedRegion(

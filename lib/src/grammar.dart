@@ -35,8 +35,8 @@ class OrgGrammarDefinition extends GrammarDefinition {
       ref0(tags).optional() &
       lineEnd();
 
-  Parser stars() =>
-      (lineStart() & char('*').plus() & char(' ')).flatten('Stars expected');
+  Parser stars() => (lineStart() & char('*').plusString() & char(' '))
+      .flatten('Stars expected');
 
   Parser todoKeyword() => string('TODO') | string('DONE');
 
@@ -62,7 +62,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
       char(':') &
       lineEnd().and();
 
-  Parser tag() => pattern('a-zA-Z0-9_@#%').plus().flatten('Tags expected');
+  Parser tag() => pattern('a-zA-Z0-9_@#%').plusString('Tags expected');
 
   Parser content() => ref0(_content).flatten('Content expected');
 
@@ -333,7 +333,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(insignificantWhitespace)
           .plus()
           .flatten('Separating whitespace expected') &
-      whitespace().neg().plus().flatten('Language token expected');
+      whitespace().neg().plusString('Language token expected');
 
   Parser namedBlockStart(String name) =>
       stringIgnoreCase('#+begin_$name') &
@@ -341,8 +341,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlockContent(String name) => ref1(namedBlockEnd, name)
       .neg()
-      .star()
-      .flatten('Named block content expected');
+      .starString('Named block content expected');
 
   Parser namedBlockEnd(String name) =>
       ref0(indent).flatten('Block end indent expected') &
@@ -371,7 +370,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
           .flatten('Trailing line content expected');
 
   Parser blankLines() =>
-      Token.newlineParser().star().flatten('Blank lines expected');
+      Token.newlineParser().starString('Blank lines expected');
 
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
@@ -413,7 +412,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableDotElDivider() =>
       ref0(indent).flatten('Table.el divider indent expected') &
-      (string('+-') & anyOf('+-').star()).flatten('Table divider expected') &
+      (string('+-') & anyOf('+-').starString())
+          .flatten('Table divider expected') &
       ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser timestamp() =>
@@ -429,7 +429,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser sexp() => ref0(sexpAtom) | ref0(sexpList);
 
   Parser sexpAtom() =>
-      (anyOf('()') | whitespace()).neg().plus().flatten('Expected atom');
+      (anyOf('()') | whitespace()).neg().plusString('Expected atom');
 
   Parser sexpList() => char('(') & ref0(sexp).trim().star() & char(')');
 
@@ -452,7 +452,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser timestampDateRange(bool active) =>
       ref1(timestampSimple, active) &
-      char('-').repeat(1, 3).flatten('Expected timestamp separator') &
+      char('-').repeatString(1, 3, 'Expected timestamp separator') &
       ref1(timestampSimple, active);
 
   Parser date() =>
@@ -463,11 +463,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(day) &
       dayName().trim();
 
-  Parser year() => digit().times(4).flatten('Expected year');
+  Parser year() => digit().timesString(4, 'Expected year');
 
-  Parser month() => digit().times(2).flatten('Expected month');
+  Parser month() => digit().timesString(2, 'Expected month');
 
-  Parser day() => digit().times(2).flatten('Expected day');
+  Parser day() => digit().timesString(2, 'Expected day');
 
   Parser dayName() => (whitespace() | anyOf('+-]>\n') | digit())
       .neg()
@@ -476,13 +476,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser time() => ref0(hours) & char(':') & ref0(minutes);
 
-  Parser hours() => digit().repeat(1, 2).flatten('Expected hours');
+  Parser hours() => digit().repeatString(1, 2, 'Expected hours');
 
-  Parser minutes() => digit().times(2).flatten('Expected minutes');
+  Parser minutes() => digit().timesString(2, 'Expected minutes');
 
   Parser repeaterOrDelay() =>
       ref0(repeaterMark) &
-      digit().plus().flatten('Expected number') &
+      digit().plusString('Expected number') &
       ref0(repeaterUnit);
 
   Parser repeaterMark() =>
@@ -543,13 +543,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       );
 
   Parser listOrderedBullet() =>
-      (digit().plus().flatten('Bullet number expected') | letter()) &
+      (digit().plusString('Bullet number expected') | letter()) &
       anyOf('.)') &
       char(' ');
 
   Parser listCounterSet() =>
       string('[@') &
-      digit().plus().flatten('Counter set number expected') &
+      digit().plusString('Counter set number expected') &
       char(']');
 
   Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
@@ -621,7 +621,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(']');
 
   Parser footnoteName() =>
-      pattern('-_A-Za-z0-9').plus().flatten('Footnote name expected');
+      pattern('-_A-Za-z0-9').plusString('Footnote name expected');
 
   Parser footnoteDefinition() => textRun(char(']')).plusLazy(char(']'));
 
@@ -632,8 +632,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(footnoteReferenceNamed) &
       ref0(footnoteBody) &
       Token.newlineParser()
-          .repeat(0, 3)
-          .flatten('Footnote trailing content expected');
+          .repeatString(0, 3, 'Footnote trailing content expected');
 
   Parser footnoteBody() {
     final end = endOfInput() |
@@ -670,5 +669,5 @@ class OrgFileLinkGrammarDefinition extends GrammarDefinition {
   Parser body() =>
       any().starLazy(string('::') | endOfInput()).flatten('Expected link body');
 
-  Parser extra() => any().star().flatten('Expected link extra');
+  Parser extra() => any().starString('Expected link extra');
 }

@@ -33,7 +33,7 @@ class IndentedRegionParser extends DelegateParser {
       Parser? delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
       : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
             maxSeparatingLineBreaks > 0),
-        super(delegate ?? any().star().flatten('Region content expected'));
+        super(delegate ?? any().starString('Region content expected'));
 
   final int indentAdjust;
   final int maxSeparatingLineBreaks;
