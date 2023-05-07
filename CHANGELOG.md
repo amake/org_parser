@@ -1,3 +1,7 @@
+## [3.1.0]
+
+* Update to petitparser 5.4.0
+
 ## [3.0.0]
 
 * Require petitparser 5.1.0 or higher
