@@ -1,3 +1,8 @@
+## [3.1.1]
+
+* Fix parsing of section title text in some cases
+  ([#13](https://github.com/amake/org_parser/issues/13))
+
 ## [3.1.0]
 
 * Update to petitparser 5.4.0
