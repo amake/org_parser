@@ -13,13 +13,7 @@ void main() {
       final result = parser.parse('* Title');
       expect(
         result.value,
-        [
-          '* ',
-          null,
-          null,
-          ['Title'],
-          null
-        ],
+        ['* ', null, null, 'Title', null],
       );
     });
     test('parse almost-a-header', () {
@@ -37,13 +31,7 @@ void main() {
       final result = parser.parse('* TODO Title');
       expect(
         result.value,
-        [
-          '* ',
-          'TODO',
-          null,
-          ['Title'],
-          null
-        ],
+        ['* ', 'TODO', null, 'Title', null],
       );
     });
     test('parse a complex header', () {
@@ -52,7 +40,7 @@ void main() {
         '** ',
         'TODO',
         ['[#', 'A', ']'],
-        ['Title foo bar'],
+        'Title foo bar',
         [
           ' :',
           isSeparatedList(elements: [
@@ -86,13 +74,7 @@ bar
             null
           ],
           [
-            [
-              '* ',
-              null,
-              null,
-              ['foo'],
-              null
-            ],
+            ['* ', null, null, 'foo', null],
             null
           ]
         ]
@@ -111,13 +93,7 @@ foo''');
         null,
         [
           [
-            [
-              '* ',
-              null,
-              null,
-              ['Title'],
-              null
-            ],
+            ['* ', null, null, 'Title', null],
             '  Content1\n  Content2'
           ]
         ]

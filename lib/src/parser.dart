@@ -54,30 +54,24 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final stars = items[0] as String;
         final keyword = items[1] as String?;
         final priority = items[2] as String?;
-        final title = items[3] as Token?;
+        final title = items[3] as List?;
         final tags = items[4] as SeparatedList?;
         return OrgHeadline(
           stars,
           keyword,
           priority,
-          title?.value as OrgContent?,
-          title?.input,
+          title?[0] as OrgContent?,
+          title?[1] as String?,
           tags?.elements.cast<String>(),
         );
       });
 
   @override
-  Parser title() => super
-      .title()
-      .castList<OrgNode>()
-      .map((items) => OrgContent(items))
-      .token();
-
-  @override
-  Parser textRun([Parser? limit]) {
-    final definition = OrgContentParserDefinition();
-    return definition.buildFrom(definition.textRun(limit));
-  }
+  Parser title() => super.title().map((title) {
+        final node = _textRunParser.parse(title as String).value as OrgNode;
+        final value = OrgContent([node]);
+        return [value, title];
+      });
 
   @override
   Parser priority() => super.priority().flatten('Priority expected');
@@ -94,6 +88,13 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 /// The content parser. This is not really intended to be used separately; it is
 /// used by [org] to parse "content" inside sections.
 final _orgContentParser = OrgContentParserDefinition().build();
+
+/// Text run parser. This is not really intended to be used separately; it is
+/// used by [org] to parse text content in section headers.
+final _textRunParser = (() {
+  final definition = OrgContentParserDefinition();
+  return definition.buildFrom(definition.textRun());
+})();
 
 /// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {

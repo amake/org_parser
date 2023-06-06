@@ -44,16 +44,10 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser title() {
     final limit = ref0(tags) | lineEnd();
-    return (
-            // Reject line break here as a bit of a hack to prevent textRun from
-            // swallowing an immediate line break
-            Token.newlineParser().not() & textRun(limit).plusLazy(limit))
-        .pick(1);
-  }
-
-  Parser textRun([Parser? limit]) {
-    final definition = OrgContentGrammarDefinition();
-    return definition.buildFrom(definition.textRun(limit));
+    return Token.newlineParser()
+        .neg()
+        .plusLazy(limit)
+        .flatten('Title expected');
   }
 
   Parser tags() =>
