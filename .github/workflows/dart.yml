@@ -21,6 +21,4 @@ jobs:
     - name: Analyze
       run: dart analyze
     - name: Run tests
-      run: dart test
-    - name: Check example
-      run: dart example/example.dart
+      run: make test
