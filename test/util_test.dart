@@ -78,10 +78,10 @@ void main() {
   test('no-op parser', () {
     var parser = noOpFail();
     var result = parser.parse('');
-    expect(result.isFailure, true);
+    expect(result is Failure, true);
     parser = NoOpParser(true);
     result = parser.parse('');
-    expect(result.isSuccess, true);
+    expect(result is Success, true);
     expect(result.value, '');
   });
   test('local section url parser', () {

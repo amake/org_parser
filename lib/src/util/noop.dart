@@ -17,6 +17,11 @@ class NoOpParser extends Parser {
   Parser copy() => NoOpParser(succeed);
 
   @override
-  Result parseOn(Context context) =>
-      succeed ? context.success('') : context.failure('No-op');
+  Result parseOn(Context context) {
+    if (succeed) {
+      return context.success('');
+    } else {
+      return context.failure('No-op');
+    }
+  }
 }

@@ -18,7 +18,7 @@ void main() {
     });
     test('parse almost-a-header', () {
       final result = parser.parse('**');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
     });
     test('parse just an empty header', () {
       final result = parser.parse('* ');
@@ -106,7 +106,7 @@ foo''');
         '*** Some e-mail',
         '**** TODO [#A] COMMENT Title :tag:a2%:',
       ]) {
-        expect(grammar.parse(valid).isSuccess, true);
+        expect(grammar.parse(valid) is Success, true);
       }
     });
   });
@@ -166,19 +166,19 @@ maybe''');
       result = parser.parse('file:example.txt');
       expect(result.value, 'file:example.txt');
       result = parser.parse('foobar://example.com');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
     });
     test('markup', () {
       final parser = buildSpecific(grammarDefinition.markups);
       var result = parser.parse('''a/b
 c/d''');
-      expect(result.isFailure, true, reason: 'bad pre/post chars');
+      expect(result is Failure, true, reason: 'bad pre/post chars');
       result = parser.parse('''a /b
 c/d''');
-      expect(result.isFailure, true, reason: 'bad post char');
+      expect(result is Failure, true, reason: 'bad post char');
       result = parser.parse('''a/b
 c/ d''');
-      expect(result.isFailure, true, reason: 'bad pre char');
+      expect(result is Failure, true, reason: 'bad pre char');
       result = parser.parse('/a/');
       expect(result.value, ['/', 'a', '/']);
       result = parser.parse('/abc/');
@@ -186,7 +186,7 @@ c/ d''');
       result = parser.parse('/a b/');
       expect(result.value, ['/', 'a b', '/']);
       result = parser.parse('//');
-      expect(result.isFailure, true, reason: 'body is required');
+      expect(result is Failure, true, reason: 'body is required');
       result = parser.parse('~,~');
       expect(result.value, ['~', ',', '~']);
       result = parser.parse("~'~");
@@ -199,7 +199,7 @@ bar+''');
       result = parser.parse('''+foo
 
 bar+''');
-      expect(true, result.isFailure);
+      expect(true, result is Failure);
     });
     test('macro reference', () {
       final parser = buildSpecific(grammarDefinition.macroReference);
@@ -208,16 +208,16 @@ bar+''');
       result = parser.parse('{{{foobar}}}');
       expect(result.value, ['{{{', 'foobar', '', '}}}']);
       result = parser.parse('{{{}}}');
-      expect(result.isFailure, true, reason: 'Body missing');
+      expect(result is Failure, true, reason: 'Body missing');
       result = parser.parse('{{{0abc}}}');
-      expect(result.isFailure, true, reason: 'Invalid key');
+      expect(result is Failure, true, reason: 'Invalid key');
     });
     test('affiliated keyword', () {
       final parser = buildSpecific(grammarDefinition.affiliatedKeyword);
       var result = parser.parse('  #+blah');
       expect(result.value, ['  ', '#+blah', '']);
       result = parser.parse('''a   #+blah''');
-      expect(result.isFailure, true, reason: 'only leading space is allowed');
+      expect(result is Failure, true, reason: 'only leading space is allowed');
     });
     test('block', () {
       final parser = buildSpecific(grammarDefinition.block);
@@ -479,9 +479,9 @@ bar+''');
         '>'
       ]);
       result = parser.parse('''<%%(what (the (f))>''');
-      expect(result.isFailure, true, reason: 'Invalid sexp');
+      expect(result is Failure, true, reason: 'Invalid sexp');
       result = parser.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
-      expect(result.isFailure, true, reason: 'Seconds not supported');
+      expect(result is Failure, true, reason: 'Seconds not supported');
     });
     test('fixed-width area', () {
       final parser = buildSpecific(grammarDefinition.fixedWidthArea);
@@ -802,7 +802,7 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
 :bar:
 :end:
 :end:''');
-      expect(result.isFailure, true,
+      expect(result is Failure, true,
           reason: 'Nested drawer disallowed; the trailing ":end:" is '
               'a separate paragraph, which fails the drawer-specific parser');
     });
@@ -816,12 +816,12 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
         ''
       ]);
       result = parser.parse(':foo:');
-      expect(result.isFailure, true, reason: 'Value required');
+      expect(result is Failure, true, reason: 'Value required');
       result = parser.parse(':foo:blah');
-      expect(result.isFailure, true, reason: 'Delimiting space required');
+      expect(result is Failure, true, reason: 'Delimiting space required');
       result = parser.parse(''':foo:
 bar''');
-      expect(result.isFailure, true, reason: 'Value must be on same line');
+      expect(result is Failure, true, reason: 'Value must be on same line');
     });
     test('footnote', () {
       final parser = buildSpecific(grammarDefinition.footnote);
@@ -848,9 +848,9 @@ baz bazinga
         ''
       ]);
       result = parser.parse(' [fn:1] foo *bar*');
-      expect(result.isFailure, true, reason: 'Indent not allowed');
+      expect(result is Failure, true, reason: 'Indent not allowed');
       result = parser.parse('[fn:1: blah] foo *bar*');
-      expect(result.isFailure, true, reason: 'Only simple references allowed');
+      expect(result is Failure, true, reason: 'Only simple references allowed');
     });
     test('footnote reference', () {
       final parser = buildSpecific(grammarDefinition.footnoteReference);
@@ -886,15 +886,15 @@ baz bazinga
       result = parser.parse(r'\sup1');
       expect(result.value, [r'\', 'sup1', '']);
       result = parser.parse(r'\sup5');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
       result = parser.parse(r'\frac12');
       expect(result.value, [r'\', 'frac12', '']);
       result = parser.parse(r'\frac15');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
       result = parser.parse(r'\foobar');
       expect(result.value, [r'\', 'foobar', '']);
       result = parser.parse(r'\foobar2');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
       result = parser.parse(r'\foobar{}');
       expect(result.value, [r'\', 'foobar', '{}']);
     });
@@ -1313,9 +1313,9 @@ I am''');
     });
     test('non-files', () {
       var result = parser.parse('https://example.com');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
       result = parser.parse('mailto:me@example.com');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
     });
     test('detect common problems', () {
       expect(linter(parser), isEmpty);

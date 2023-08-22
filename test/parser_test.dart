@@ -39,7 +39,7 @@ bar/''');
       result = parser.parse('''/foo
 
 bar/''');
-      expect(result.isFailure, true);
+      expect(result is Failure, true);
     });
     test('macro reference', () {
       final parser = buildSpecific(parserDefinition.macroReference);
@@ -50,9 +50,9 @@ bar/''');
       ref = result.value as OrgMacroReference;
       expect(ref.content, '{{{foobar}}}');
       result = parser.parse('{{{}}}');
-      expect(result.isFailure, true, reason: 'Body missing');
+      expect(result is Failure, true, reason: 'Body missing');
       result = parser.parse('{{{0abc}}}');
-      expect(result.isFailure, true, reason: 'Invalid key');
+      expect(result is Failure, true, reason: 'Invalid key');
     });
     test('fixed-width area', () {
       final parser = buildSpecific(parserDefinition.fixedWidthArea);
@@ -191,7 +191,7 @@ a
       final firstText = footnote.content.children[0] as OrgPlainText;
       expect(firstText.content, ' foo ');
       result = parser.parse(' [fn:2] bazinga');
-      expect(result.isFailure, true, reason: 'Indent not allowed');
+      expect(result is Failure, true, reason: 'Indent not allowed');
     });
     test('footnote reference', () {
       final parser = buildSpecific(parserDefinition.footnoteReference);
@@ -304,9 +304,9 @@ a
 ** Sub-Topic 2
 
 *** Additional entry''';
-      expect(parser.parse(doc).isSuccess, true);
+      expect(parser.parse(doc) is Success, true);
       final parsed = parser.parse(doc);
-      expect(parsed.isSuccess, true);
+      expect(parsed is Success, true);
       final document = parsed.value as OrgDocument;
       final paragraph = document.content!.children[0] as OrgParagraph;
       final text = paragraph.body.children[0] as OrgPlainText;
@@ -331,7 +331,7 @@ biz baz
 
 
 bazoonga''');
-      expect(result.isSuccess, true);
+      expect(result is Success, true);
       final document = result.value as OrgDocument;
       final footnote0 = document.content!.children[0] as OrgFootnote;
       expect(footnote0.marker.name, '1');
@@ -379,12 +379,12 @@ bazoonga''');
     test('complex document', () {
       final result =
           parser.parse(File('test/org-syntax.org').readAsStringSync());
-      expect(result.isSuccess, true);
+      expect(result is Success, true);
     });
     test('complex document 2', () {
       final result =
           parser.parse(File('test/org-manual.org').readAsStringSync());
-      expect(result.isSuccess, true);
+      expect(result is Success, true);
     });
     test('readme example', () {
       final doc = OrgDocument.parse('''* TODO [#A] foo bar
@@ -521,9 +521,9 @@ content''');
       });
       test('non-files', () {
         var result = parser.parse('https://example.com');
-        expect(result.isFailure, true);
+        expect(result is Failure, true);
         result = parser.parse('mailto:me@example.com');
-        expect(result.isFailure, true);
+        expect(result is Failure, true);
       });
       test('factory', () {
         final link = OrgFileLink.parse('file:papers/last.pdf');

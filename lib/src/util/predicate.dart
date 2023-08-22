@@ -22,7 +22,7 @@ class ResultPredicateParser<T> extends DelegateParser<T, T> {
   @override
   Result<T> parseOn(Context context) {
     final result = delegate.parseOn(context);
-    if (result.isSuccess) {
+    if (result is Success) {
       if (predicate(context.buffer, context.position, result.position)) {
         return result;
       } else {

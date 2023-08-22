@@ -46,7 +46,7 @@ class IndentedRegionParser extends DelegateParser {
   Result parseOn(Context context) {
     final end = _endOfRegion(context.buffer, context.position);
     final delegateResult = delegate.parseOn(_regionContext(context, end));
-    if (delegateResult.isFailure) {
+    if (delegateResult is Failure) {
       return context.failure('Indented region delegate parser failed');
     } else {
       return context.success(delegateResult.value, end);

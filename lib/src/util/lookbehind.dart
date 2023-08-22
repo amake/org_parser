@@ -17,7 +17,7 @@ class LookBehindParser<T> extends DelegateParser<T, T> {
       return context.failure('Cannot look behind start of buffer');
     }
     final result = delegate.parseOn(Context(buffer, position - 1));
-    if (result.isSuccess) {
+    if (result is Success) {
       return context.success(result.value);
     } else {
       return result;

@@ -12,7 +12,7 @@ class LatexBlockParser extends DelegateParser {
   @override
   Result parseOn(Context context) {
     final result = delegate.parseOn(context);
-    if (result.isSuccess) {
+    if (result is Success) {
       final environment = result.value[1] as String;
       final end = '\\end{$environment}';
       final index = result.buffer.indexOf(end, result.position);
