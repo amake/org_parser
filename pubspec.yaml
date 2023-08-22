@@ -4,7 +4,7 @@ version: 3.1.1
 homepage: https://github.com/amake/org_parser
 
 environment:
-  sdk: ">=2.18.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   petitparser: ^6.0.1
