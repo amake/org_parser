@@ -1,3 +1,8 @@
+## [4.0.0]
+
+* Update to petitparser 6.0.1
+* Require Dart 3.0 or higher
+
 ## [3.1.1]
 
 * Fix parsing of section title text in some cases
