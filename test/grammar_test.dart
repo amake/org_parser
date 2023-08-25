@@ -1117,6 +1117,60 @@ foo''');
         skip: true,
       );
     });
+    group('arbitrary block', () {
+      test('rich text content', () {
+        final result = parser.parse('''#+begin_fofo
+   bar ~baz~
+#+end_fofo''');
+        expect(result.value, [
+          [
+            '',
+            [
+              ['#+begin_', 'fofo', '\n'],
+              [
+                '   bar ',
+                ['~', 'baz', '~'],
+                '\n'
+              ],
+              ['', '#+end_fofo']
+            ],
+            ''
+          ]
+        ]);
+      });
+      test('https://github.com/amake/orgro/issues/79', () {
+        final result = parser.parse('''#+BEGIN_RESULTS
+Text
+#+END_RESULTS''');
+        expect(result.value, [
+          [
+            '',
+            [
+              ['#+BEGIN_', 'RESULTS', '\n'],
+              ['Text\n'],
+              ['', '#+END_RESULTS']
+            ],
+            ''
+          ]
+        ]);
+      });
+      test('mismatched capitalization', () {
+        final result = parser.parse('''#+Begin_description
+Text
+#+end_DESCRIPTION''');
+        expect(result.value, [
+          [
+            '',
+            [
+              ['#+Begin_', 'description', '\n'],
+              ['Text\n'],
+              ['', '#+end_DESCRIPTION']
+            ],
+            ''
+          ]
+        ]);
+      });
+    });
     test('LaTeX block', () {
       var result = parser.parse(r'''\begin{equation}
 \nabla \cdot \mathbf{B} = 0

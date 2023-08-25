@@ -112,9 +112,28 @@ bar/''');
       final block = result.value as OrgBlock;
       expect(block.header, '#+begin_center\n');
       final body = block.body as OrgContent;
-      final child = body.children[0] as OrgPlainText;
-      expect(child.content, '  foo ');
+      final child1 = body.children[0] as OrgPlainText;
+      expect(child1.content, '  foo ');
+      final child2 = body.children[1] as OrgMarkup;
+      expect(child2.content, 'bar');
       expect(block.footer, '#+end_center');
+      expect(block.trailing, '\n');
+    });
+    test('arbitrary block', () {
+      final parser = buildSpecific(parserDefinition.arbitraryGreaterBlock);
+      final result = parser.parse('''#+begin_blah
+  foo ~bar~
+  bizbaz
+#+end_blah
+''');
+      final block = result.value as OrgBlock;
+      expect(block.header, '#+begin_blah\n');
+      final body = block.body as OrgContent;
+      final child1 = body.children[0] as OrgPlainText;
+      expect(child1.content, '  foo ');
+      final child2 = body.children[1] as OrgMarkup;
+      expect(child2.content, 'bar');
+      expect(block.footer, '#+end_blah');
       expect(block.trailing, '\n');
     });
     test('table', () {

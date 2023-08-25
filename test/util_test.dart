@@ -1,4 +1,5 @@
 import 'package:org_parser/src/org.dart';
+import 'package:org_parser/src/util/block.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
@@ -100,5 +101,26 @@ void main() {
     expect(true, isOrgIdUrl('id:foo'));
     expect(false, isOrgIdUrl('foo'));
     expect('foo bar', parseOrgIdUrl('id:foo bar'));
+  });
+  test('block parser', () {
+    final parser = blockParser();
+    var result = parser.parse('''#+begin_foo
+   bar
+#+end_foo''');
+    expect(result.value, [
+      ['#+begin_', 'foo', '\n'],
+      '   bar\n',
+      ['', '#+end_foo']
+    ]);
+    result = parser.parse('''#+begin_foo
+#+end_foo''');
+    expect(result.value, [
+      ['#+begin_', 'foo', '\n'],
+      '',
+      ['', '#+end_foo']
+    ]);
+    result = parser.parse('''#+begin_foo
+    #+end_bar''');
+    expect(result is Failure, true);
   });
 }

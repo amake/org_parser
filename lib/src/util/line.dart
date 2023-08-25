@@ -9,3 +9,7 @@ Parser lineStart() => startOfInput() | was(Token.newlineParser());
 /// Returns a parser that matches the end of a line; this could be the
 /// end of input, or a line break.
 Parser lineEnd() => Token.newlineParser() | endOfInput();
+
+/// Returns a parser that matches everything up to and including the end of the
+/// line.
+Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();

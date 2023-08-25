@@ -1,5 +1,6 @@
 library org_parser;
 
+import 'package:org_parser/src/util/block.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
@@ -75,6 +76,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser element() =>
       ref0(block) |
       ref0(greaterBlock) |
+      ref0(arbitraryGreaterBlock) |
       ref0(latexBlock) |
       ref0(affiliatedKeyword) |
       ref0(fixedWidthArea) |
@@ -298,7 +300,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(': ') &
       ref0(lineTrailing).flatten('Trailing line content expected');
 
-  // TODO(aaron): Handle arbitrary blocks? See LatexBlockParser
   Parser block() =>
       ref1(namedBlock, 'comment') |
       ref1(namedBlock, 'example') |
@@ -354,6 +355,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     final end = ref1(namedBlockEnd, name);
     return ref1(textRun, end).starLazy(end);
   }
+
+  Parser arbitraryGreaterBlock() => indented(blockParser(ref0(textRun).star()));
 
   Parser indent() => lineStart() & ref0(insignificantWhitespace).star();
 

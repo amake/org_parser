@@ -265,6 +265,17 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
+  Parser arbitraryGreaterBlock() => super.arbitraryGreaterBlock().map((parts) {
+        final indent = parts[0] as String;
+        final body = parts[1] as List;
+        final header = (body[0] as List).join();
+        final content = OrgContent((body[1] as List).cast<OrgNode>());
+        final footer = (body[2] as List).join();
+        final trailing = parts[2] as String;
+        return OrgBlock(indent, header, content, footer, trailing);
+      });
+
+  @override
   Parser table() => super.table().map((items) {
         final rows = items[0] as List;
         final trailing = items[1] as String;
