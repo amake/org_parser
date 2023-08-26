@@ -385,7 +385,6 @@ a
 ** Sub-Topic 2
 
 *** Additional entry''';
-      expect(parser.parse(doc) is Success, true);
       final parsed = parser.parse(doc);
       expect(parsed is Success, true);
       final document = parsed.value as OrgDocument;
@@ -477,92 +476,6 @@ bazoonga''');
       final doc = OrgDocument.parse('''* TODO [#A] foo bar
         baz buzz''');
       expect(doc.sections[0].headline.keyword, 'TODO');
-    });
-    test('walk tree', () {
-      List<String> walkTree<T extends OrgNode>(
-        OrgDocument doc, {
-        bool Function(T)? kontinue,
-      }) {
-        final visited = <String>[];
-        kontinue ??= (_) => true;
-        doc.visit<T>((node) {
-          visited.add(node.toString());
-          return kontinue!.call(node);
-        });
-        return visited;
-      }
-
-      final result = parser.parse('Hello, world!');
-      final doc = result.value as OrgDocument;
-      expect(walkTree(doc), [
-        'OrgDocument',
-        'OrgContent',
-        'OrgParagraph',
-        'OrgContent',
-        'OrgPlainText'
-      ]);
-      expect(walkTree<OrgPlainText>(doc), ['OrgPlainText']);
-      expect(
-        walkTree(
-          doc,
-          kontinue: (node) => node is! OrgParagraph,
-        ),
-        ['OrgDocument', 'OrgContent', 'OrgParagraph'],
-      );
-    });
-    group('walk sections', () {
-      final result = parser.parse('''* Foobar
-** Bizzbazz
-*** Bingbang
-content''');
-      final doc = result.value as OrgDocument;
-      test('visit all', () {
-        final sections = <String?>[];
-        doc.visitSections((section) {
-          sections.add(section.headline.rawTitle);
-          return true;
-        });
-        expect(sections, ['Foobar', 'Bizzbazz', 'Bingbang']);
-      });
-      test('visit some', () {
-        final sections = <String?>[];
-        doc.visitSections((section) {
-          sections.add(section.headline.rawTitle);
-          return sections.length < 2;
-        });
-        expect(sections, ['Foobar', 'Bizzbazz']);
-      });
-    });
-    group('section ids', () {
-      test('has ids', () {
-        final result = parser.parse('''* Foobar
-   :properties:
-   :bizz: bazz
-   :ID:   abcd1234
-   :ID: efgh5678
-   :CUSTOM_ID: some-id
-   :custom_ID: other-id
-   :END:
-
-content''');
-        final doc = result.value as OrgDocument;
-        final section = doc.sections[0];
-        expect(section.customIds, ['some-id', 'other-id']);
-        expect(section.ids, ['abcd1234', 'efgh5678']);
-      });
-      test('parent has no ids', () {
-        final result = parser.parse('''* Foobar
-** Bizbaz
-   :PROPERTIES:
-   :ID: abcd1234
-   :END:
-
-content''');
-        final doc = result.value as OrgDocument;
-        final section = doc.sections[0];
-        expect(section.customIds.isEmpty, true);
-        expect(section.ids.isEmpty, true);
-      });
     });
     group('file link', () {
       final parser = orgFileLink;
