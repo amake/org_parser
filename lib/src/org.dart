@@ -38,7 +38,7 @@ String parseOrgIdUrl(String url) {
 }
 
 /// The base type of all Org AST objects
-abstract class OrgNode {
+sealed class OrgNode {
   /// The children of this node. May be empty.
   List<OrgNode> get children => const [];
 
@@ -66,7 +66,7 @@ abstract class OrgNode {
 }
 
 /// A node potentially containing [OrgSection]s
-abstract class OrgTree extends OrgNode {
+sealed class OrgTree extends OrgNode {
   OrgTree(this.content, [Iterable<OrgSection>? sections])
       : sections = List.unmodifiable(sections ?? const <OrgSection>[]);
 
@@ -524,7 +524,7 @@ class OrgTable extends OrgNode with IndentedElement {
   String toString() => 'OrgTable';
 }
 
-abstract class OrgTableRow extends OrgNode {
+sealed class OrgTableRow extends OrgNode {
   OrgTableRow(this.indent);
 
   final String indent;
@@ -686,7 +686,7 @@ class OrgList extends OrgNode with IndentedElement {
   String toString() => 'OrgList';
 }
 
-abstract class OrgListItem extends OrgNode {
+sealed class OrgListItem extends OrgNode {
   OrgListItem(this.indent, this.bullet, this.checkbox, this.body);
 
   final String indent;
