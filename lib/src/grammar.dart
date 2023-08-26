@@ -146,11 +146,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser path2() => (whitespace() | anyOf('()<>')).neg().plus();
 
   /*
-    Default value of org-link-brackets-re (org-20200302):
+    Default value of org-link-bracket-re (org 9.6.6):
 
-    \[\[\(\(?:[^][\]\|\\\(?:\\\\\)*[][]\|\\+[^][]\)+\)]\(?:\[\(\(?:.\|\n\)+?\)]\)?]
+    \[\[\(\(?:[^][\]\|\\\(?:\\\\\)*[][]\|\\+[^][]\)+\)]\(?:\[\([^z-a]+?\)]\)?]
 
-    Or in rx form:
+    Or in rx form via (pp (xr org-link-bracket-re)):
 
     (seq "[["
      (group
