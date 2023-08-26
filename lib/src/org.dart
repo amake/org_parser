@@ -63,6 +63,14 @@ sealed class OrgNode {
     }
     return true;
   }
+
+  String toMarkup() {
+    final buf = StringBuffer();
+    _toMarkupImpl(buf);
+    return buf.toString();
+  }
+
+  void _toMarkupImpl(StringBuffer buf);
 }
 
 /// A node potentially containing [OrgSection]s
@@ -111,6 +119,13 @@ sealed class OrgTree extends OrgNode {
 
   @override
   String toString() => runtimeType.toString();
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    for (final child in children) {
+      child._toMarkupImpl(buf);
+    }
+  }
 }
 
 /// The top-level node representing a full Org document
@@ -181,6 +196,31 @@ class OrgHeadline extends OrgNode {
 
   @override
   String toString() => 'OrgHeadline';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    // TODO(aaron): Properly restore whitespace
+    buf.write(stars);
+    if (keyword != null) {
+      buf
+        ..write(keyword)
+        ..write(' ');
+    }
+    if (priority != null) {
+      buf
+        ..write(priority)
+        ..write(' ');
+    }
+    title?._toMarkupImpl(buf);
+    if (tags.isNotEmpty) {
+      buf.write(' :');
+      for (final tag in tags) {
+        buf
+          ..write(tag)
+          ..write(':');
+      }
+    }
+  }
 }
 
 /// An Org section. May have nested sections, like
@@ -262,6 +302,10 @@ mixin SingleContentElement {
   String get content;
 
   bool contains(Pattern pattern) => content.contains(pattern);
+
+  void _toMarkupImpl(StringBuffer buf) {
+    buf.write(content);
+  }
 }
 
 mixin IndentedElement {
@@ -286,6 +330,13 @@ class OrgContent extends OrgNode {
 
   @override
   String toString() => 'OrgContent';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    for (final child in children) {
+      child._toMarkupImpl(buf);
+    }
+  }
 }
 
 /// Plain text that has no markup
@@ -329,6 +380,20 @@ class OrgLink extends OrgNode {
 
   @override
   String toString() => 'OrgLink';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    // TODO(aaron): Properly restore naked URL
+    buf
+      ..write('[[')
+      ..write(location);
+    if (description != null) {
+      buf
+        ..write('][')
+        ..write(description);
+    }
+    buf.write(']]');
+  }
 }
 
 /// Emphasis markup, like
@@ -365,6 +430,14 @@ class OrgMarkup extends OrgNode {
       leadingDecoration.contains(pattern) ||
       content.contains(pattern) ||
       trailingDecoration.contains(pattern);
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(leadingDecoration)
+      ..write(content)
+      ..write(trailingDecoration);
+  }
 }
 
 /// Supported styles for [OrgMarkup] nodes
@@ -415,6 +488,14 @@ class OrgMeta extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgMeta';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(keyword)
+      ..write(trailing);
+  }
 }
 
 /// A block, like
@@ -447,6 +528,17 @@ class OrgBlock extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgBlock';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(header);
+    body._toMarkupImpl(buf);
+    buf
+      ..write(footer)
+      ..write(trailing);
+  }
 }
 
 /// A source block, like
@@ -522,6 +614,15 @@ class OrgTable extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgTable';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    for (final row in rows) {
+      buf.write(indent);
+      row._toMarkupImpl(buf);
+      buf.write('\n');
+    }
+  }
 }
 
 sealed class OrgTableRow extends OrgNode {
@@ -541,6 +642,11 @@ class OrgTableDividerRow extends OrgTableRow {
 
   @override
   String toString() => 'OrgTableDividerRow';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    // TODO(aaron): Restore this
+  }
 }
 
 class OrgTableCellRow extends OrgTableRow {
@@ -560,6 +666,23 @@ class OrgTableCellRow extends OrgTableRow {
 
   @override
   String toString() => 'OrgTableCellRow';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    // TODO(aaron): Restore actual leading, trailing spaces for each cell
+    if (cells.isEmpty) {
+      buf.write('||');
+      return;
+    }
+    buf.write('| ');
+    for (final (i, cell) in cells.indexed) {
+      cell._toMarkupImpl(buf);
+      buf.write(' |');
+      if (i < cells.length - 1) {
+        buf.write(' ');
+      }
+    }
+  }
 }
 
 bool _tableCellIsNumeric(OrgContent cell) {
@@ -638,6 +761,14 @@ class OrgPlanningLine extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgPlanningLine';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf.write(indent);
+    keyword._toMarkupImpl(buf);
+    body._toMarkupImpl(buf);
+    buf.write(trailing);
+  }
 }
 
 /// A fixed-width area, like
@@ -661,6 +792,14 @@ class OrgFixedWidthArea extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgFixedWidthArea';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(content)
+      ..write(trailing);
+  }
 }
 
 /// A list, like
@@ -684,6 +823,14 @@ class OrgList extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgList';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    for (final item in items) {
+      item._toMarkupImpl(buf);
+    }
+    buf.write(trailing);
+  }
 }
 
 sealed class OrgListItem extends OrgNode {
@@ -744,6 +891,17 @@ class OrgListUnorderedItem extends OrgListItem {
 
   @override
   String toString() => 'OrgListUnorderedItem';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(bullet)
+      ..write(checkbox)
+      ..write(tag)
+      ..write(tagDelimiter);
+    body?._toMarkupImpl(buf);
+  }
 }
 
 /// An ordered list item, like
@@ -770,6 +928,15 @@ class OrgListOrderedItem extends OrgListItem {
 
   @override
   String toString() => 'OrgListOrderedItem';
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(bullet)
+      ..write(counterSet)
+      ..write(checkbox);
+    body?._toMarkupImpl(buf);
+  }
 }
 
 class OrgParagraph extends OrgNode {
@@ -787,6 +954,12 @@ class OrgParagraph extends OrgNode {
 
   @override
   String toString() => 'OrgParagraph';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf.write(indent);
+    body._toMarkupImpl(buf);
+  }
 }
 
 /// A drawer, like
@@ -832,6 +1005,17 @@ class OrgDrawer extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgDrawer';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(header);
+    body._toMarkupImpl(buf);
+    buf
+      ..write(footer)
+      ..write(trailing);
+  }
 }
 
 /// A property in a drawer, like
@@ -854,6 +1038,15 @@ class OrgProperty extends OrgNode with IndentedElement {
 
   @override
   String toString() => 'OrgProperty';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(indent)
+      ..write(key)
+      ..write(value)
+      ..write(trailing);
+  }
 }
 
 /// A footnote, like
@@ -875,6 +1068,12 @@ class OrgFootnote extends OrgNode {
 
   @override
   String toString() => 'OrgFootnote';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    marker._toMarkupImpl(buf);
+    content._toMarkupImpl(buf);
+  }
 }
 
 /// A footnote reference, like `[fn:1]`
@@ -913,6 +1112,16 @@ class OrgFootnoteReference extends OrgNode {
 
   @override
   String toString() => 'OrgFootnoteReference';
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(leading)
+      ..write(name ?? '')
+      ..write(definitionDelimiter ?? '');
+    definition?._toMarkupImpl(buf);
+    buf.write(trailing);
+  }
 }
 
 /// A LaTeX block, like
@@ -949,6 +1158,16 @@ class OrgLatexBlock extends OrgNode {
 
   @override
   String toString() => 'OrgLatexBlock';
+
+  @override
+  _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(leading)
+      ..write(begin)
+      ..write(content)
+      ..write(end)
+      ..write(trailing);
+  }
 }
 
 /// An inline LaTeX snippet, like `$E=mc^2$`
@@ -971,6 +1190,14 @@ class OrgLatexInline extends OrgNode {
       leadingDecoration.contains(pattern) ||
       content.contains(pattern) ||
       trailingDecoration.contains(pattern);
+
+  @override
+  _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(leadingDecoration)
+      ..write(content)
+      ..write(trailingDecoration);
+  }
 }
 
 /// An entity, like `\Omega`
@@ -986,6 +1213,14 @@ class OrgEntity extends OrgNode {
       leading.contains(pattern) ||
       name.contains(pattern) ||
       trailing.contains(pattern);
+
+  @override
+  _toMarkupImpl(StringBuffer buf) {
+    buf
+      ..write(leading)
+      ..write(name)
+      ..write(trailing);
+  }
 }
 
 /// A link to a file, like
