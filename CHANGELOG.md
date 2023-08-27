@@ -1,3 +1,8 @@
+## [4.1.0]
+
+* Support "greater" blocks with arbitrary names such as `#+begin_foo`
+* Add initial support for dumping AST back to Org markup: `OrgNode.toMarkup`
+
 ## [4.0.0]
 
 * Update to petitparser 6.0.1
