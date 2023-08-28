@@ -1,3 +1,7 @@
+## [4.1.1]
+
+* Fix support for inline markup in header titles
+
 ## [4.1.0]
 
 * Support "greater" blocks with arbitrary names such as `#+begin_foo`
