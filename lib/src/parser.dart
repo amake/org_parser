@@ -17,7 +17,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   Parser document() => super.document().map((items) {
         final firstContent = items[0] as OrgContent?;
         final sections = items[1] as List;
-        return [firstContent, _nestSections(sections.cast<OrgSection>())];
+        return [firstContent, _nestSections(sections.cast())];
       });
 
   List<OrgSection> _nestSections(List<OrgSection> sections) {
@@ -62,7 +62,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
           priority,
           title?[0] as OrgContent?,
           title?[1] as String?,
-          tags?.elements.cast<String>(),
+          tags?.elements.cast(),
         );
       });
 
@@ -106,7 +106,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser paragraph() => super.paragraph().map((items) {
         final indent = items[0] as String;
         final bodyElements = items[1] as List;
-        final body = OrgContent(bodyElements.cast<OrgNode>());
+        final body = OrgContent(bodyElements.cast());
         return OrgParagraph(indent, body);
       });
 
@@ -269,7 +269,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final indent = parts[0] as String;
         final body = parts[1] as List;
         final header = (body[0] as List).join();
-        final content = OrgContent((body[1] as List).cast<OrgNode>());
+        final content = OrgContent((body[1] as List).cast());
         final footer = (body[2] as List).join();
         final trailing = parts[2] as String;
         return OrgBlock(indent, header, content, footer, trailing);
@@ -279,7 +279,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser table() => super.table().map((items) {
         final rows = items[0] as List;
         final trailing = items[1] as String;
-        return OrgTable(rows.cast<OrgTableRow>(), trailing);
+        return OrgTable(rows.cast(), trailing);
       });
 
   @override
@@ -304,7 +304,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         if (trailing.trim().isNotEmpty) {
           cells.add(OrgContent([OrgPlainText(trailing.trim())]));
         }
-        return OrgTableCellRow(indent, cells.cast<OrgContent>());
+        return OrgTableCellRow(indent, cells.cast());
       });
 
   @override
@@ -332,7 +332,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final rest = values[1] as List;
         final keyword = rest[0] as OrgKeyword;
         final bodyElems = rest[1] as List;
-        final body = OrgContent(bodyElems.cast<OrgNode>());
+        final body = OrgContent(bodyElems.cast());
         final trailing = values[2] as String;
         return OrgPlanningLine(indent, keyword, body, trailing);
       });
@@ -341,7 +341,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser list() => super.list().map((items) {
         final listItems = items[0] as List;
         final trailing = items[1] as String;
-        return OrgList(listItems.cast<OrgListItem>(), trailing);
+        return OrgList(listItems.cast(), trailing);
       });
 
   @override
@@ -366,7 +366,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         String? tagDelimiter;
         if (tagParts != null) {
           final tagList = tagParts[0] as List;
-          tag = OrgContent(tagList.cast<OrgNode>());
+          tag = OrgContent(tagList.cast());
           tagDelimiter = tagParts[1] as String;
         }
         final body = rest[3] as OrgContent?;
