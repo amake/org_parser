@@ -281,7 +281,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   // See `org-element-macro-parser'
   Parser macroReferenceKey() =>
-      pattern('a-zA-Z') & pattern('-A-Za-z0-9_').plus();
+      pattern('a-zA-Z') & pattern('-A-Za-z0-9_').plusString();
 
   Parser macroReferenceArgs() =>
       char('(') & any().starLazy(char(')')) & char(')');
@@ -291,7 +291,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       );
 
   // TODO(aaron): Actually parse real keywords
-  Parser affiliatedKeywordBody() => string('#+') & whitespace().neg().plus();
+  Parser affiliatedKeywordBody() =>
+      string('#+') & whitespace().neg().plusString();
 
   Parser fixedWidthArea() => ref0(fixedWidthLine).plus() & ref0(blankLines);
 
@@ -326,8 +327,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser srcBlockLanguageToken() =>
       ref0(insignificantWhitespace)
-          .plus()
-          .flatten('Separating whitespace expected') &
+          .plusString('Separating whitespace expected') &
       whitespace().neg().plusString('Language token expected');
 
   Parser namedBlockStart(String name) =>
@@ -358,7 +358,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser arbitraryGreaterBlock() => indented(blockParser(ref0(textRun).star()));
 
-  Parser indent() => lineStart() & ref0(insignificantWhitespace).star();
+  Parser indent() => lineStart() & ref0(insignificantWhitespace).starString();
 
   Parser indented(Parser parser) =>
       ref0(indent).flatten('Indent expected') &
@@ -374,7 +374,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser lineTrailingWhitespace() =>
       ref0(insignificantWhitespace).starLazy(lineEnd()) & lineEnd();
 
-  Parser insignificantWhitespace() => anyOf(' \t');
+  Parser<String> insignificantWhitespace() => anyOf(' \t');
 
   Parser table() => ref0(tableLine).plus() & blankLines();
 
@@ -389,13 +389,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser tableCell() =>
-      ref0(tableCellLeading).flatten('Cell leading content expected') &
+      ref0(tableCellLeading) &
       ref0(tableCellContents) &
       ref0(tableCellTrailing).flatten('Cell trailing content expected');
 
-  Parser tableCellLeading() => char(' ').star();
+  Parser tableCellLeading() => char(' ').starString();
 
-  Parser tableCellTrailing() => char(' ').star() & char('|');
+  Parser tableCellTrailing() => char(' ').starString() & char('|');
 
   Parser tableCellContents() {
     final end = ref0(tableCellTrailing) | lineEnd();
@@ -468,8 +468,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser dayName() => (whitespace() | anyOf('+-]>\n') | digit())
       .neg()
-      .plus()
-      .flatten('Expected day name');
+      .plusString('Expected day name');
 
   Parser time() => ref0(hours) & char(':') & ref0(minutes);
 
@@ -498,7 +497,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser planningLine() => indented(ref0(_planningLine));
 
   Parser _planningLine() {
-    final limit = lineEnd() | endOfInput();
+    final limit = lineEnd();
     return ref0(keyword) & ref1(textRun, limit).plusLazy(limit);
   }
 
@@ -583,7 +582,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerEnd() =>
       ref0(indent).flatten('Drawer end indent expected') &
-      (stringIgnoreCase(':END:') & ref0(insignificantWhitespace).star())
+      (stringIgnoreCase(':END:') & ref0(insignificantWhitespace).starString())
           .flatten('Drawer end expected');
 
   Parser property() =>
@@ -596,7 +595,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(':') &
       any()
           .plusLazy(
-            char(':') & ref0(insignificantWhitespace).plus() & lineEnd().not(),
+            char(':') &
+                ref0(insignificantWhitespace).plusString() &
+                lineEnd().not(),
           )
           .flatten('Property name expected') &
       char(':');
