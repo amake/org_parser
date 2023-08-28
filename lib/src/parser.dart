@@ -68,8 +68,8 @@ class OrgParserDefinition extends OrgGrammarDefinition {
 
   @override
   Parser title() => super.title().map((title) {
-        final node = _textRunParser.parse(title as String).value as OrgNode;
-        final value = OrgContent([node]);
+        final nodes = _textRunParser.parse(title as String).value;
+        final value = OrgContent(nodes.cast());
         return [value, title];
       });
 
@@ -93,7 +93,7 @@ final _orgContentParser = OrgContentParserDefinition().build();
 /// used by [org] to parse text content in section headers.
 final _textRunParser = (() {
   final definition = OrgContentParserDefinition();
-  return definition.buildFrom(definition.textRun());
+  return definition.buildFrom(definition.textRun().star());
 })();
 
 /// Content-level parser definition

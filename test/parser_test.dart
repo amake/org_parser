@@ -358,16 +358,25 @@ a
     group('header', () {
       final parser = buildSpecific(parserDefinition.headline);
       test('full', () {
-        final result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
+        final result = parser.parse('** TODO [#A] Title *foo* bar :biz:baz:');
         final headline = result.value as OrgHeadline;
         final title = headline.title!.children[0] as OrgPlainText;
-        expect(title.content, 'Title foo bar');
+        expect(title.content, 'Title ');
+        final titleEmphasis = headline.title!.children[1] as OrgMarkup;
+        expect(titleEmphasis.content, 'foo');
         expect(headline.tags, ['biz', 'baz']);
       });
       test('empty', () {
         final result = parser.parse('* ');
         final headline = result.value as OrgHeadline;
         expect(headline.title, null);
+      });
+      test('with latex', () {
+        final result = parser.parse(r'* foo \( \pi \)');
+        final headline = result.value as OrgHeadline;
+        final [title0, title1] = headline.title!.children;
+        expect((title0 as OrgPlainText).content, 'foo ');
+        expect((title1 as OrgLatexInline).content, r' \pi ');
       });
     });
   });
