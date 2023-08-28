@@ -1,5 +1,4 @@
 import 'package:org_parser/src/org.dart';
-import 'package:org_parser/src/util/block.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';

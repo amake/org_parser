@@ -1,3 +1,4 @@
+export 'package:org_parser/src/util/block.dart';
 export 'package:org_parser/src/util/bof.dart';
 export 'package:org_parser/src/util/drop.dart';
 export 'package:org_parser/src/util/indent.dart';
