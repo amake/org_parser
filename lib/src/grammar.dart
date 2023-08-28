@@ -65,6 +65,10 @@ class OrgGrammarDefinition extends GrammarDefinition {
       ref0(stars).not() & any().plusLazy(ref0(stars) | endOfInput());
 }
 
+// Defined outside of grammar to avoid
+// https://github.com/petitparser/dart-petitparser/issues/155
+final _insignificantWhitespace = anyOf(' \t');
+
 /// Content grammar definition
 ///
 /// These rules cover all "content", as opposed to "structure". See
@@ -326,8 +330,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser srcBlockLanguageToken() =>
-      ref0(insignificantWhitespace)
-          .plusString('Separating whitespace expected') &
+      _insignificantWhitespace.plusString('Separating whitespace expected') &
       whitespace().neg().plusString('Language token expected');
 
   Parser namedBlockStart(String name) =>
@@ -358,7 +361,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser arbitraryGreaterBlock() => indented(blockParser(ref0(textRun).star()));
 
-  Parser indent() => lineStart() & ref0(insignificantWhitespace).starString();
+  Parser indent() => lineStart() & _insignificantWhitespace.starString();
 
   Parser indented(Parser parser) =>
       ref0(indent).flatten('Indent expected') &
@@ -372,9 +375,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
   Parser lineTrailingWhitespace() =>
-      ref0(insignificantWhitespace).starLazy(lineEnd()) & lineEnd();
-
-  Parser<String> insignificantWhitespace() => anyOf(' \t');
+      _insignificantWhitespace.starLazy(lineEnd()) & lineEnd();
 
   Parser table() => ref0(tableLine).plus() & blankLines();
 
@@ -582,7 +583,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerEnd() =>
       ref0(indent).flatten('Drawer end indent expected') &
-      (stringIgnoreCase(':END:') & ref0(insignificantWhitespace).starString())
+      (stringIgnoreCase(':END:') & _insignificantWhitespace.starString())
           .flatten('Drawer end expected');
 
   Parser property() =>
@@ -595,9 +596,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(':') &
       any()
           .plusLazy(
-            char(':') &
-                ref0(insignificantWhitespace).plusString() &
-                lineEnd().not(),
+            char(':') & _insignificantWhitespace.plusString() & lineEnd().not(),
           )
           .flatten('Property name expected') &
       char(':');
