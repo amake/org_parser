@@ -216,18 +216,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser code() => ref1(markup, '~');
 
-  Parser markup(String marker) => resultPredicate(
-        drop(ref1(_markup, marker), [0, -1]),
-        (result, from, to) {
-          for (var count = 0, i = from; i < to; i++) {
-            // Ensure at most one LF (U+000A) in markup span
-            if (result.codeUnitAt(i) == 0x000A && ++count > 1) {
-              return false;
-            }
+  Parser markup(String marker) =>
+      drop(ref1(_markup, marker), [0, -1]).castList<String>().where((value) {
+        final content = value[1];
+        for (var count = 0, i = 0; i < content.length; i++) {
+          // Ensure at most one LF (U+000A) in markup span
+          if (content.codeUnitAt(i) == 0x000A && ++count > 1) {
+            return false;
           }
-          return true;
-        },
-      );
+        }
+        return true;
+      });
 
   Parser _markup(String marker) =>
       (startOfInput() | was(ref0(preMarkup))) &
