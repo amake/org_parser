@@ -23,11 +23,11 @@ class _SeparatedListMatcher extends Matcher {
     var result = true;
 
     if (elements != null) {
-      result &= ListEquality().equals(elements, item.elements);
+      result &= ListEquality<dynamic>().equals(elements, item.elements);
     }
 
     if (separators != null) {
-      result &= ListEquality().equals(separators, item.separators);
+      result &= ListEquality<dynamic>().equals(separators, item.separators);
     }
 
     return result;

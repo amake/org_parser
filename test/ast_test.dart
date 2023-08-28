@@ -235,7 +235,6 @@ a
         expect(inline.toMarkup(), markup);
       });
     });
-    ;
     test('LaTeX block', () {
       final parser = buildSpecific(parserDefinition.latexBlock);
       final markup = r'''\begin{equation}

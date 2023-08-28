@@ -77,7 +77,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   Parser priority() => super.priority().flatten('Priority expected');
 
   @override
-  Parser tags() => super.tags().castList().pick(1);
+  Parser tags() => super.tags().castList<dynamic>().pick(1);
 
   @override
   Parser content() => super
@@ -119,17 +119,18 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.plainLink().map((value) => OrgLink(value as String, null));
 
   @override
-  Parser regularLink() => super.regularLink().castList().map((values) {
+  Parser regularLink() => super.regularLink().castList<dynamic>().map((values) {
         final location = values[1] as String;
         final description = values.length > 3 ? values[2] as String? : null;
         return OrgLink(location, description);
       });
 
   @override
-  Parser linkPart() => super.linkPart().castList().pick(1);
+  Parser linkPart() => super.linkPart().castList<String>().pick(1);
 
   @override
-  Parser linkDescription() => super.linkDescription().castList().pick(1);
+  Parser linkDescription() =>
+      super.linkDescription().castList<String>().pick(1);
 
   @override
   Parser bold() => mapMarkup(super.bold(), OrgStyle.bold);
@@ -180,7 +181,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser fixedWidthArea() => super.fixedWidthArea().castList().map((items) {
+  Parser fixedWidthArea() =>
+      super.fixedWidthArea().castList<dynamic>().map((items) {
         final body = items[0] as List;
         final firstLine = body[0] as List;
         final indent = firstLine[0] as String;
@@ -237,7 +239,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser srcBlockLanguageToken() =>
-      super.srcBlockLanguageToken().castList().pick(1);
+      super.srcBlockLanguageToken().castList<String>().pick(1);
 
   @override
   Parser namedBlockStart(String name) =>
@@ -285,16 +287,16 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser tableDotElDivider() => super
       .tableDotElDivider()
-      .castList()
+      .castList<String>()
       .pick(0)
-      .map((indent) => OrgTableDividerRow(indent as String));
+      .map((indent) => OrgTableDividerRow(indent));
 
   @override
   Parser tableRowRule() => super
       .tableRowRule()
-      .castList()
+      .castList<String>()
       .pick(0)
-      .map((item) => OrgTableDividerRow(item as String));
+      .map((item) => OrgTableDividerRow(item));
 
   @override
   Parser tableRowStandard() => super.tableRowStandard().map((items) {
@@ -308,7 +310,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser tableCell() => super.tableCell().castList().pick(1);
+  Parser tableCell() => super.tableCell().castList<dynamic>().pick(1);
 
   @override
   Parser tableCellContents() => super

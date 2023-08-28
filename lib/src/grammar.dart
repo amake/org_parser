@@ -182,7 +182,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       // Join instead of flatten to drop escape chars
       ref0(linkChar).plusLazy(char(']')).map((items) => items.join());
 
-  Parser linkChar() => ref0(linkEscape).castList().pick(1) | any();
+  Parser linkChar() => ref0(linkEscape).castList<String>().pick(1) | any();
 
   Parser linkEscape() => char(r'\') & anyOf(r'[]\');
 
@@ -192,7 +192,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
       char(']');
 
-  Parser anyChar() => ref0(escape).castList().pick(0) | any();
+  Parser anyChar() => ref0(escape).castList<String>().pick(0) | any();
 
   Parser escape() => any() & char('\u200b'); // zero-width space
 

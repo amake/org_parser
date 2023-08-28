@@ -8,16 +8,16 @@ Parser noOpFail() => NoOpParser(false);
 
 /// A parser that succeeds if [succeed] is true, or otherwise fails
 /// unconditionally, both without consuming anything.
-class NoOpParser extends Parser {
+class NoOpParser extends Parser<String> {
   NoOpParser(this.succeed);
 
   final bool succeed;
 
   @override
-  Parser copy() => NoOpParser(succeed);
+  NoOpParser copy() => NoOpParser(succeed);
 
   @override
-  Result parseOn(Context context) {
+  Result<String> parseOn(Context context) {
     if (succeed) {
       return context.success('');
     } else {

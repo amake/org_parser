@@ -16,7 +16,11 @@ Parser indentedRegion(
         {Parser? parser,
         int indentAdjust = 0,
         int maxSeparatingLineBreaks = -1}) =>
-    IndentedRegionParser(parser, indentAdjust, maxSeparatingLineBreaks);
+    IndentedRegionParser(
+      parser ?? any().starString('Region content expected'),
+      indentAdjust,
+      maxSeparatingLineBreaks,
+    );
 
 /// A parser that applies [delegate] to a uniformly indented region
 /// starting at the current position.
@@ -28,22 +32,22 @@ Parser indentedRegion(
 /// allowed without considering the region to have ended. The default is
 /// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
 /// allowed.
-class IndentedRegionParser extends DelegateParser {
+class IndentedRegionParser<R> extends DelegateParser<R, R> {
   IndentedRegionParser(
-      Parser? delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
+      Parser<R> delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
       : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
             maxSeparatingLineBreaks > 0),
-        super(delegate ?? any().starString('Region content expected'));
+        super(delegate);
 
   final int indentAdjust;
   final int maxSeparatingLineBreaks;
 
   @override
-  DelegateParser copy() =>
+  IndentedRegionParser<R> copy() =>
       IndentedRegionParser(delegate, indentAdjust, maxSeparatingLineBreaks);
 
   @override
-  Result parseOn(Context context) {
+  Result<R> parseOn(Context context) {
     final end = _endOfRegion(context.buffer, context.position);
     final delegateResult = delegate.parseOn(_regionContext(context, end));
     if (delegateResult is Failure) {

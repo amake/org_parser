@@ -51,7 +51,7 @@ void main() {
   test('recursive list parser', () {
     final listStart =
         (lineStart() & whitespace().starString() & string('- ')).flatten();
-    final list = undefined();
+    final list = undefined<dynamic>();
     list.set(listStart &
         indentedRegion(
             parser: (list | any().plusLazy(listStart | endOfInput()).flatten())

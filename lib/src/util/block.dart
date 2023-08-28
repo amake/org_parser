@@ -5,17 +5,17 @@ final _start = stringIgnoreCase('#+begin_') &
     whitespace().neg().plusString('Block name expected') &
     lineTrailing().flatten('Trailing line content expected');
 
-Parser blockParser([Parser? delegate]) => BlockParser(delegate);
+Parser blockParser([Parser? delegate]) =>
+    BlockParser(delegate ?? any().starString('Block content expected'));
 
-class BlockParser extends DelegateParser {
-  BlockParser(Parser? delegate)
-      : super(delegate ?? any().starString('Block content expected'));
-
-  @override
-  Parser copy() => BlockParser(delegate);
+class BlockParser<R> extends DelegateParser<R, List<dynamic>> {
+  BlockParser(Parser<R> delegate) : super(delegate);
 
   @override
-  Result parseOn(Context context) {
+  BlockParser<R> copy() => BlockParser(delegate);
+
+  @override
+  Result<List<dynamic>> parseOn(Context context) {
     final startResult = _start.parseOn(context);
     if (startResult is Failure) {
       return startResult;

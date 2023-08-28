@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_collection_literal
+
 import 'package:org_parser/org_parser.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';

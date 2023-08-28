@@ -13,7 +13,7 @@ class StartOfInputParser extends Parser<void> {
   StartOfInputParser(this.message);
 
   @override
-  Result parseOn(Context context) {
+  Result<void> parseOn(Context context) {
     if (context.position > 0) {
       return context.failure(message);
     } else {
