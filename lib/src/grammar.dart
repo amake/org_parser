@@ -25,22 +25,25 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser section() => ref0(headline) & ref0(content).optional();
 
-  Parser headline() => ref0(_headline).drop1(-1);
-
-  Parser _headline() =>
+  Parser headline() =>
       ref0(stars) &
-      ref0(todoKeyword).trim().optional() &
-      ref0(priority).trim().optional() &
+      ref0(todoKeyword).optional() &
+      ref0(priority).optional() &
       ref0(title).optional() &
       ref0(tags).optional() &
       lineEnd();
 
-  Parser stars() => (lineStart() & char('*').plusString() & char(' '))
-      .flatten('Stars expected');
+  Parser stars() =>
+      (lineStart() & char('*').plusString() & char(' ').plusString()).drop1(0);
 
-  Parser todoKeyword() => string('TODO') | string('DONE');
+  Parser todoKeyword() =>
+      (string('TODO') | string('DONE')) & char(' ').starString();
 
-  Parser priority() => string('[#') & letter() & char(']');
+  Parser priority() =>
+      string('[#') &
+      letter() &
+      (char(']') & char(' ').starString())
+          .flatten('Priority trailing expected');
 
   Parser title() {
     final limit = ref0(tags) | lineEnd();

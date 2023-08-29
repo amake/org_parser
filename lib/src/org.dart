@@ -155,18 +155,25 @@ class OrgHeadline extends OrgNode {
     this.keyword,
     this.priority,
     this.title,
-    this.rawTitle, [
-    Iterable<String>? tags,
-  ]) : tags = List.unmodifiable(tags ?? const <String>[]);
+    this.rawTitle,
+    ({String leading, Iterable<String> values, String trailing})? tags,
+    this.trailing,
+  ) : tags = tags == null
+            ? null
+            : (
+                leading: tags.leading,
+                values: List.unmodifiable(tags.values),
+                trailing: tags.trailing
+              );
 
-  /// Headline stars, like `*** `. Includes trailing space.
-  final String stars;
+  /// Headline stars, like `*** `. Includes trailing spaces.
+  final ({String value, String trailing}) stars;
 
   /// Headline keyword, like `TODO`
-  final String? keyword;
+  final ({String value, String trailing})? keyword;
 
   /// Headline priority, like `A`
-  final String? priority;
+  final ({String leading, String value, String trailing})? priority;
 
   /// Headline title
   final OrgContent? title;
@@ -176,11 +183,12 @@ class OrgHeadline extends OrgNode {
   /// title rather than the parsed title.
   final String? rawTitle;
 
-  /// Headline tags, like `:tag1:tag2:`, stored without the `:` delimiters
-  final List<String> tags;
+  /// Headline tags, like `:tag1:tag2:`
+  final ({String leading, List<String> values, String trailing})? tags;
 
-  // -1 for trailing space
-  int get level => stars.length - 1;
+  final String? trailing;
+
+  int get level => stars.value.length;
 
   @override
   List<OrgNode> get children => title == null ? const [] : [title!];
@@ -189,9 +197,9 @@ class OrgHeadline extends OrgNode {
   bool contains(Pattern pattern) {
     final keyword = this.keyword;
     final title = this.title;
-    return keyword != null && keyword.contains(pattern) ||
+    return keyword != null && keyword.value.contains(pattern) ||
         title != null && title.contains(pattern) ||
-        tags.any((tag) => tag.contains(pattern));
+        tags?.values.any((tag) => tag.contains(pattern)) == true;
   }
 
   @override
@@ -199,27 +207,32 @@ class OrgHeadline extends OrgNode {
 
   @override
   void _toMarkupImpl(StringBuffer buf) {
-    // TODO(aaron): Properly restore whitespace
-    buf.write(stars);
+    buf
+      ..write(stars.value)
+      ..write(stars.trailing);
     if (keyword != null) {
       buf
-        ..write(keyword)
-        ..write(' ');
+        ..write(keyword!.value)
+        ..write(keyword!.trailing);
     }
     if (priority != null) {
       buf
-        ..write(priority)
-        ..write(' ');
+        ..write(priority!.leading)
+        ..write(priority!.value)
+        ..write(priority!.trailing);
     }
     title?._toMarkupImpl(buf);
-    if (tags.isNotEmpty) {
-      buf.write(' :');
-      for (final tag in tags) {
-        buf
-          ..write(tag)
-          ..write(':');
+    if (tags?.values.isNotEmpty == true) {
+      buf.write(tags!.leading);
+      for (final (i, tag) in tags!.values.indexed) {
+        buf.write(tag);
+        if (i < tags!.values.length - 1) {
+          buf.write(':');
+        }
       }
+      buf.write(tags!.trailing);
     }
+    buf.write(trailing ?? '');
   }
 }
 

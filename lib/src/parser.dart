@@ -50,20 +50,35 @@ class OrgParserDefinition extends OrgGrammarDefinition {
       });
 
   @override
-  Parser headline() => super.headline().map((items) {
-        final stars = items[0] as String;
-        final keyword = items[1] as String?;
-        final priority = items[2] as String?;
-        final title = items[3] as List?;
-        final tags = items[4] as SeparatedList?;
+  Parser headline() => super.headline().castList<dynamic>().map((items) {
+        final [
+          stars as List,
+          keyword as List?,
+          priority as List?,
+          title as List?,
+          tags as List?,
+          trailing as String?
+        ] = items;
         return OrgHeadline(
-          stars,
-          keyword,
-          priority,
-          title?[0] as OrgContent?,
-          title?[1] as String?,
-          tags?.elements.cast(),
-        );
+            (value: stars[0], trailing: stars[1]),
+            keyword == null ? null : (value: keyword[0], trailing: keyword[1]),
+            priority == null
+                ? null
+                : (
+                    leading: priority[0],
+                    value: priority[1],
+                    trailing: priority[2]
+                  ),
+            title?[0] as OrgContent?,
+            title?[1] as String?,
+            tags == null
+                ? null
+                : (
+                    leading: tags[0],
+                    values: (tags[1] as SeparatedList).elements.cast(),
+                    trailing: tags[2]
+                  ),
+            trailing);
       });
 
   @override
@@ -72,12 +87,6 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         final value = OrgContent(nodes.cast());
         return [value, title];
       });
-
-  @override
-  Parser priority() => super.priority().flatten('Priority expected');
-
-  @override
-  Parser tags() => super.tags().castList<dynamic>().pick(1);
 
   @override
   Parser content() => super

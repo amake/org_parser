@@ -6,7 +6,7 @@ void main() {
 baz buzz''';
   final doc = OrgDocument.parse(docString);
   final section = doc.sections[0];
-  print(section.headline.keyword);
+  print(section.headline.keyword?.value);
   final title = section.headline.title!.children[0] as OrgPlainText;
   print(title.content);
   final paragraph = section.content!.children[0] as OrgParagraph;
@@ -27,7 +27,7 @@ baz buzz''';
 * TODO Take a nap''';
   final agenda = OrgDocument.parse(agendaDoc);
   agenda.visitSections((section) {
-    if (section.headline.keyword == 'TODO') {
+    if (section.headline.keyword?.value == 'TODO') {
       final title = section.headline.title!.children
           .whereType<OrgPlainText>()
           .map((plainText) => plainText.content)

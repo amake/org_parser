@@ -364,7 +364,7 @@ a
         expect(title.content, 'Title ');
         final titleEmphasis = headline.title!.children[1] as OrgMarkup;
         expect(titleEmphasis.content, 'foo');
-        expect(headline.tags, ['biz', 'baz']);
+        expect(headline.tags?.values, ['biz', 'baz']);
       });
       test('empty', () {
         final result = parser.parse('* ');
@@ -484,7 +484,7 @@ bazoonga''');
     test('readme example', () {
       final doc = OrgDocument.parse('''* TODO [#A] foo bar
         baz buzz''');
-      expect(doc.sections[0].headline.keyword, 'TODO');
+      expect(doc.sections[0].headline.keyword?.value, 'TODO');
     });
     group('file link', () {
       final parser = orgFileLink;

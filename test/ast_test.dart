@@ -341,7 +341,7 @@ a
       expect(document.contains('introduction'), true);
       expect(document.contains('A Headline'), true);
       expect(document.toMarkup(), doc);
-    }, skip: 'TODO(aaron): fix headline round-trip');
+    });
     test('footnotes', () {
       final parser = org;
       final doc = '''[fn:1] foo bar

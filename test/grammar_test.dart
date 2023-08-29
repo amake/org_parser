@@ -15,7 +15,14 @@ void main() {
       final result = parser.parse('* Title');
       expect(
         result.value,
-        ['* ', null, null, 'Title', null],
+        [
+          ['*', ' '],
+          null,
+          null,
+          'Title',
+          null,
+          null
+        ],
       );
     });
     test('parse almost-a-header', () {
@@ -26,22 +33,36 @@ void main() {
       final result = parser.parse('* ');
       expect(
         result.value,
-        ['* ', null, null, null, null],
+        [
+          ['*', ' '],
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
       );
     });
     test('parse a todo header', () {
       final result = parser.parse('* TODO Title');
       expect(
         result.value,
-        ['* ', 'TODO', null, 'Title', null],
+        [
+          ['*', ' '],
+          ['TODO', ' '],
+          null,
+          'Title',
+          null,
+          null
+        ],
       );
     });
     test('parse a complex header', () {
       final result = parser.parse('** TODO [#A] Title foo bar :biz:baz:');
       expect(result.value, [
-        '** ',
-        'TODO',
-        ['[#', 'A', ']'],
+        ['**', ' '],
+        ['TODO', ' '],
+        ['[#', 'A', '] '],
         'Title foo bar',
         [
           ' :',
@@ -52,8 +73,9 @@ void main() {
             ':'
           ]),
           ':',
-          null
-        ]
+          null,
+        ],
+        null
       ]);
     });
   });
@@ -72,11 +94,25 @@ bar
         null,
         [
           [
-            ['** ', null, null, null, null],
-            null
+            [
+              ['**', ' '],
+              null,
+              null,
+              null,
+              null,
+              '\n',
+            ],
+            null,
           ],
           [
-            ['* ', null, null, 'foo', null],
+            [
+              ['*', ' '],
+              null,
+              null,
+              'foo',
+              null,
+              null
+            ],
             null
           ]
         ]
@@ -95,7 +131,14 @@ foo''');
         null,
         [
           [
-            ['* ', null, null, 'Title', null],
+            [
+              ['*', ' '],
+              null,
+              null,
+              'Title',
+              null,
+              '\n'
+            ],
             '  Content1\n  Content2'
           ]
         ]
