@@ -25,7 +25,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser section() => ref0(headline) & ref0(content).optional();
 
-  Parser headline() => drop(ref0(_headline), [-1]);
+  Parser headline() => ref0(_headline).drop1(-1);
 
   Parser _headline() =>
       ref0(stars) &
@@ -216,16 +216,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser code() => ref1(markup, '~');
 
   Parser markup(String marker) =>
-      drop(ref1(_markup, marker), [0, -1]).castList<String>().where((value) {
-        final content = value[1];
-        for (var count = 0, i = 0; i < content.length; i++) {
-          // Ensure at most one LF (U+000A) in markup span
-          if (content.codeUnitAt(i) == 0x000A && ++count > 1) {
-            return false;
-          }
-        }
-        return true;
-      });
+      ref1(_markup, marker).drop([0, -1]).castList<String>().where((value) {
+            final content = value[1];
+            for (var count = 0, i = 0; i < content.length; i++) {
+              // Ensure at most one LF (U+000A) in markup span
+              if (content.codeUnitAt(i) == 0x000A && ++count > 1) {
+                return false;
+              }
+            }
+            return true;
+          });
 
   Parser _markup(String marker) =>
       (startOfInput() | was(ref0(preMarkup))) &
@@ -620,7 +620,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser footnoteDefinition() => textRun(char(']')).plusLazy(char(']'));
 
-  Parser footnote() => drop(ref0(_footnote), [0]);
+  Parser footnote() => ref0(_footnote).drop1(0);
 
   Parser _footnote() =>
       lineStart() &
@@ -642,7 +642,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref2(_latexInline, r'$$', r'$$') |
       ref2(_latexInline, r'\(', r'\)') |
       ref2(_latexInline, r'\[', r'\]') |
-      drop(_markup(r'$'), [0, -1]);
+      _markup(r'$').drop([0, -1]);
 
   Parser _latexInline(String start, String end) =>
       string(start) &
