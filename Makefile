@@ -6,7 +6,7 @@ test: test-unit test-example
 
 .PHONY: test-unit
 test-unit:
-	dart test
+	dart test --chain-stack-traces
 
 .PHONY: test-example
 test-example:
