@@ -82,7 +82,7 @@ void main() {
     parser = NoOpParser(true);
     result = parser.parse('');
     expect(result is Success, true);
-    expect(result.value, '');
+    expect(result.value, null);
   });
   test('local section url parser', () {
     expect(true, isOrgLocalSectionUrl('*foo'));
