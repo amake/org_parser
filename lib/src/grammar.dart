@@ -25,16 +25,16 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser section() => ref0(headline) & ref0(content).optional();
 
-  Parser headline() =>
-      ref0(stars) &
-      ref0(todoKeyword).optional() &
-      ref0(priority).optional() &
-      ref0(title).optional() &
-      ref0(tags).optional() &
-      lineEnd();
+  Parser headline() => (lineStart() &
+          ref0(stars) &
+          ref0(todoKeyword).optional() &
+          ref0(priority).optional() &
+          ref0(title).optional() &
+          ref0(tags).optional() &
+          lineEnd())
+      .drop1(0);
 
-  Parser stars() =>
-      (lineStart() & char('*').plusString() & char(' ').plusString()).drop1(0);
+  Parser stars() => char('*').plusString() & char(' ').plusString();
 
   Parser todoKeyword() =>
       (string('TODO') | string('DONE')) & char(' ').starString();
@@ -64,7 +64,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser content() => ref0(_content).flatten('Content expected');
 
   Parser _content() =>
-      ref0(stars).not() & any().plusLazy(ref0(stars) | endOfInput());
+      ref0(headline).not() & any().plusLazy(ref0(headline) | endOfInput());
 }
 
 // Defined outside of grammar to avoid
