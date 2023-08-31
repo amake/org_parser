@@ -125,13 +125,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser plainLink() =>
-      super.plainLink().map((value) => OrgLink(value as String, null));
+      super.plainLink().map((value) => OrgLink(value as String));
 
   @override
   Parser regularLink() => super.regularLink().castList<dynamic>().map((values) {
         final location = values[1] as String;
         final description = values.length > 3 ? values[2] as String? : null;
-        return OrgLink(location, description);
+        return OrgBracketLink(location, description);
       });
 
   @override

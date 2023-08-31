@@ -16,24 +16,38 @@ void main() {
       test('brackets in location', () {
         final markup = '[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]';
         var result = parser.parse(markup);
-        var link = result.value as OrgLink;
+        var link = result.value as OrgBracketLink;
         expect(link.contains('what?'), true);
         expect(link.toMarkup(), markup);
-      }, skip: 'TODO(aaron): fix link escaping');
+      });
       test('link with search option', () {
         final markup = '[[foo::1][bar]]';
         final result = parser.parse(markup);
-        final link = result.value as OrgLink;
+        final link = result.value as OrgBracketLink;
         expect(link.contains('foo'), true);
         expect(link.toMarkup(), markup);
       });
       test('quotes in search option', () {
         final markup = r'[[foo::"\[1\]"][bar]]';
         final result = parser.parse(markup);
-        final link = result.value as OrgLink;
+        final link = result.value as OrgBracketLink;
         expect(link.contains('foo'), true);
         expect(link.toMarkup(), markup);
-      }, skip: 'TODO(aaron): fix link escaping');
+      });
+      test('no description', () {
+        final markup = '[[foo::1]]';
+        final result = parser.parse(markup);
+        final link = result.value as OrgBracketLink;
+        expect(link.contains('foo'), true);
+        expect(link.toMarkup(), markup);
+      });
+      test('plain link', () {
+        final markup = 'http://example.com';
+        final result = parser.parse(markup);
+        final link = result.value as OrgLink;
+        expect(link.contains('example'), true);
+        expect(link.toMarkup(), markup);
+      });
     });
     group('markup', () {
       final parser = buildSpecific(parserDefinition.markups);
