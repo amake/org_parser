@@ -954,10 +954,15 @@ class OrgListUnorderedItem extends OrgListItem {
   void _toMarkupImpl(StringBuffer buf) {
     buf
       ..write(indent)
-      ..write(bullet)
-      ..write(checkbox)
-      ..write(tag)
-      ..write(tagDelimiter);
+      ..write(bullet);
+    // TODO(aaron): Retain actual separating white space
+    if (checkbox != null) {
+      buf
+        ..write(checkbox)
+        ..write(' ');
+    }
+    tag?._toMarkupImpl(buf);
+    buf.write(tagDelimiter ?? '');
     body?._toMarkupImpl(buf);
   }
 }
@@ -990,9 +995,18 @@ class OrgListOrderedItem extends OrgListItem {
   void _toMarkupImpl(StringBuffer buf) {
     buf
       ..write(indent)
-      ..write(bullet)
-      ..write(counterSet)
-      ..write(checkbox);
+      ..write(bullet);
+    // TODO(aaron): Retain actual separating white space
+    if (counterSet != null) {
+      buf
+        ..write(counterSet)
+        ..write(' ');
+    }
+    if (checkbox != null) {
+      buf
+        ..write(checkbox)
+        ..write(' ');
+    }
     body?._toMarkupImpl(buf);
   }
 }

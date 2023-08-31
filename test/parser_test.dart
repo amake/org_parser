@@ -271,6 +271,17 @@ bar/''');
         final markup = item.tag?.children[0] as OrgMarkup;
         expect(markup.content, 'foo');
       });
+      test('with following meta', () {
+        final result = parser.parse('''- ~foo~ ::
+  #+vindex: bar''');
+        final list = result.value as OrgList;
+        final item = list.items[0] as OrgListUnorderedItem;
+        expect(item.tagDelimiter, ' ::');
+        final text = item.body?.children[0] as OrgPlainText;
+        expect(text.content, '\n');
+        final meta = item.body?.children[1] as OrgMeta;
+        expect(meta.keyword, '#+vindex:');
+      });
     });
     test('planning line', () {
       final parser = buildSpecific(parserDefinition.planningLine);

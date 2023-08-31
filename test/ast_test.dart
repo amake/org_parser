@@ -174,6 +174,84 @@ bar/''';
         expect(table.toMarkup(), markup);
       });
     });
+    group('list', () {
+      final parser = buildSpecific(parserDefinition.list);
+      test('single line', () {
+        final markup = '- foo';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('multiple lines', () {
+        final markup = '''- foo
+  - bar''';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.contains('bar'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('multiline item', () {
+        final markup = '''- foo
+
+  bar''';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.contains('bar'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('multiline item with eol white space', () {
+        final markup = '  - foo\n'
+            ' \n'
+            '    bar';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.contains('bar'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('complex', () {
+        final markup = '''30. [@30] foo
+   - bar :: baz
+     blah
+   - [ ] *bazinga*''';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.contains('bar'), true);
+        expect(list.contains('baz'), true);
+        expect(list.contains('blah'), true);
+        expect(list.contains('bazinga'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('item with block', () {
+        final markup = '''- foo
+  #+begin_src sh
+    echo bar
+  #+end_src''';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('echo bar'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('with tag', () {
+        final markup = '- ~foo~ ::';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('foo'), true);
+        expect(list.toMarkup(), markup);
+      });
+      test('with following meta', () {
+        final markup = '''- ~foo~ ::
+  #+vindex: bar''';
+        final result = parser.parse(markup);
+        final list = result.value as OrgList;
+        expect(list.contains('bar'), true);
+        expect(list.toMarkup(), markup);
+      });
+    });
     test('planning line', () {
       final parser = buildSpecific(parserDefinition.planningLine);
       final markup =
