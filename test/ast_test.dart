@@ -152,13 +152,13 @@ bar/''';
         expect(table.contains('bar'), true);
         expect(table.contains('*bar*'), false);
         expect(table.toMarkup(), markup);
-      }, skip: 'TODO(aaron): fix table whitespace, divider');
+      });
       test('empty', () {
         final markup = '||';
         final result = parser.parse(markup);
         final table = result.value as OrgTable;
         expect(table.toMarkup(), markup);
-      }, skip: 'TODO(aaron): fix table whitespace');
+      });
     });
     test('planning line', () {
       final parser = buildSpecific(parserDefinition.planningLine);

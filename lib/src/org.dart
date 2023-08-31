@@ -616,9 +616,9 @@ class OrgTable extends OrgNode with IndentedElement {
         .map((row) => row.cells[colIdx])
         .toList(growable: false);
     final totalCount = cells.length;
-    final emptyCount = cells.where(_tableCellIsEmpty).length;
+    final emptyCount = cells.where((c) => c.isEmpty).length;
     final nonEmptyCount = totalCount - emptyCount;
-    final numberCount = cells.where(_tableCellIsNumeric).length;
+    final numberCount = cells.where((c) => c.isNumeric).length;
     return numberCount / nonEmptyCount >= _orgTableNumberFraction;
   }
 
@@ -631,10 +631,9 @@ class OrgTable extends OrgNode with IndentedElement {
   @override
   void _toMarkupImpl(StringBuffer buf) {
     for (final row in rows) {
-      buf.write(indent);
       row._toMarkupImpl(buf);
-      buf.write('\n');
     }
+    buf.write(trailing);
   }
 }
 
@@ -648,26 +647,32 @@ abstract class OrgTableRow extends OrgNode {
 }
 
 class OrgTableDividerRow extends OrgTableRow {
-  OrgTableDividerRow(String indent) : super(indent);
+  OrgTableDividerRow(String indent, this.content) : super(indent);
 
   @override
   bool contains(Pattern pattern) => false;
+
+  final String content;
 
   @override
   String toString() => 'OrgTableDividerRow';
 
   @override
   void _toMarkupImpl(StringBuffer buf) {
-    // TODO(aaron): Restore this
+    buf
+      ..write(indent)
+      ..write(content);
   }
 }
 
 class OrgTableCellRow extends OrgTableRow {
-  OrgTableCellRow(String indent, Iterable<OrgContent> cells)
+  OrgTableCellRow(String indent, Iterable<OrgTableCell> cells, this.trailing)
       : cells = List.unmodifiable(cells),
         super(indent);
 
-  final List<OrgContent> cells;
+  final List<OrgTableCell> cells;
+
+  final String trailing;
 
   @override
   List<OrgNode> get children => cells;
@@ -682,33 +687,52 @@ class OrgTableCellRow extends OrgTableRow {
 
   @override
   void _toMarkupImpl(StringBuffer buf) {
-    // TODO(aaron): Restore actual leading, trailing spaces for each cell
-    if (cells.isEmpty) {
-      buf.write('||');
-      return;
-    }
-    buf.write('| ');
-    for (final (i, cell) in cells.indexed) {
+    buf.write(indent);
+    buf.write('|');
+    for (final cell in cells) {
       cell._toMarkupImpl(buf);
-      buf.write(' |');
-      if (i < cells.length - 1) {
-        buf.write(' ');
+    }
+    buf.write(trailing);
+  }
+}
+
+class OrgTableCell extends OrgNode {
+  OrgTableCell(this.leading, this.content, this.trailing);
+
+  final String leading;
+  final OrgContent content;
+  final String trailing;
+
+  @override
+  List<OrgNode> get children => [content];
+
+  bool get isEmpty => content.children.isEmpty;
+
+  bool get isNumeric {
+    if (content.children.length == 1) {
+      final onlyContent = content.children.first;
+      if (onlyContent is OrgPlainText) {
+        return _orgTableNumberRegexp.hasMatch(onlyContent.content);
       }
     }
+    return false;
   }
-}
 
-bool _tableCellIsNumeric(OrgContent cell) {
-  if (cell.children.length == 1) {
-    final content = cell.children.first;
-    if (content is OrgPlainText) {
-      return _orgTableNumberRegexp.hasMatch(content.content);
-    }
+  @override
+  bool contains(Pattern pattern) {
+    return content.contains(pattern);
   }
-  return false;
-}
 
-bool _tableCellIsEmpty(OrgContent cell) => cell.children.isEmpty;
+  @override
+  void _toMarkupImpl(StringBuffer buf) {
+    buf.write(leading);
+    content._toMarkupImpl(buf);
+    buf.write(trailing);
+  }
+
+  @override
+  String toString() => 'OrgTableCell';
+}
 
 // Default number-detecting regexp from org-mode 20200504, converted with:
 //   (kill-new (rxt-elisp-to-pcre org-table-number-regexp))

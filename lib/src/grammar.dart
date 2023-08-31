@@ -411,9 +411,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableDotElDivider() =>
       ref0(indent).flatten('Table.el divider indent expected') &
-      (string('+-') & anyOf('+-').starString())
-          .flatten('Table divider expected') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      (string('+-') & anyOf('+-').starString() & ref0(lineTrailing))
+          .flatten('Table divider expected');
 
   Parser timestamp() =>
       ref0(timestampDiary) |

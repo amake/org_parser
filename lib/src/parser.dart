@@ -297,29 +297,29 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser tableDotElDivider() => super
       .tableDotElDivider()
       .castList<String>()
-      .pick(0)
-      .map((indent) => OrgTableDividerRow(indent));
+      .map((indent) => OrgTableDividerRow(indent[0], indent[1]));
 
   @override
   Parser tableRowRule() => super
       .tableRowRule()
       .castList<String>()
-      .pick(0)
-      .map((item) => OrgTableDividerRow(item));
+      .map((item) => OrgTableDividerRow(item[0], item[1]));
 
   @override
   Parser tableRowStandard() => super.tableRowStandard().map((items) {
         final indent = items[0] as String;
         final cells = items[2] as List;
         final trailing = items[3] as String;
-        if (trailing.trim().isNotEmpty) {
-          cells.add(OrgContent([OrgPlainText(trailing.trim())]));
-        }
-        return OrgTableCellRow(indent, cells.cast());
+        return OrgTableCellRow(indent, cells.cast(), trailing);
       });
 
   @override
-  Parser tableCell() => super.tableCell().castList<dynamic>().pick(1);
+  Parser tableCell() => super.tableCell().map((items) {
+        final indent = items[0] as String;
+        final content = items[1] as OrgContent;
+        final trailing = items[2] as String;
+        return OrgTableCell(indent, content, trailing);
+      });
 
   @override
   Parser tableCellContents() => super
