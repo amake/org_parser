@@ -12,6 +12,13 @@ test-unit:
 test-example:
 	diff <(dart example/example.dart) test/example-gold.txt
 
+roundtrip = diff <(dart test/bin/roundtrip.dart $(1)) $(1)
+
+.PHONY: test-roundtrip
+test-roundtrip:
+	$(call roundtrip,test/org-manual.org)
+	$(call roundtrip,test/org-syntax.org)
+
 .PHONY: help
 help: ## Show this help text
 	$(info usage: make [target])
