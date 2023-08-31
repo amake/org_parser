@@ -458,7 +458,7 @@ bazoonga''';
       final document = result.value as OrgDocument;
       expect(document.toMarkup().length, doc.length);
       expect(document.toMarkup(), doc);
-    }, skip: 'TODO(aaron): holy grail');
+    });
     test('complex document 2', () {
       final doc = File('test/org-manual.org').readAsStringSync();
       final result = parser.parse(doc);
@@ -466,7 +466,7 @@ bazoonga''';
       final document = result.value as OrgDocument;
       expect(document.toMarkup().length, doc.length);
       expect(document.toMarkup(), doc);
-    }, skip: 'TODO(aaron): holy grail');
+    });
     test('walk tree', () {
       List<String> walkTree<T extends OrgNode>(
         OrgDocument doc, {

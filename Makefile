@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 
 .PHONY: test
 test: # Run all tests
-test: test-unit test-example
+test: test-unit test-example test-roundtrip
 
 .PHONY: test-unit
 test-unit:
