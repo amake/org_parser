@@ -1165,7 +1165,7 @@ class OrgFootnoteReference extends OrgNode {
   final String trailing;
 
   @override
-  List<OrgNode> get children => [if (definition != null) definition!];
+  List<OrgNode> get children => definition == null ? const [] : [definition!];
 
   @override
   bool contains(Pattern pattern) {
