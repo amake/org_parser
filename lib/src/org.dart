@@ -332,7 +332,9 @@ mixin IndentedElement {
 /// A generic node that contains children
 class OrgContent extends OrgNode {
   OrgContent(Iterable<OrgNode> children)
-      : children = List.unmodifiable(children);
+      : children = children.length == 1 && children.firstOrNull is OrgContent
+            ? (children.first as OrgContent).children
+            : List.unmodifiable(children);
 
   @override
   final List<OrgNode> children;
