@@ -252,7 +252,7 @@ bar/''');
         final item1 = sublist.items[0] as OrgListUnorderedItem;
         expect(item1.bullet, '- ');
         expect(item1.checkbox, isNull);
-        expect(item1.tagDelimiter, ' :: ');
+        expect(item1.tag?.delimiter, ' :: ');
       });
       test('item with block', () {
         final result = parser.parse('''- foo
@@ -267,8 +267,8 @@ bar/''');
         final result = parser.parse('- ~foo~ ::');
         final list = result.value as OrgList;
         final item = list.items[0] as OrgListUnorderedItem;
-        expect(item.tagDelimiter, ' ::');
-        final markup = item.tag?.children[0] as OrgMarkup;
+        expect(item.tag?.delimiter, ' ::');
+        final markup = item.tag?.value.children[0] as OrgMarkup;
         expect(markup.content, 'foo');
       });
       test('with following meta', () {
@@ -276,7 +276,7 @@ bar/''');
   #+vindex: bar''');
         final list = result.value as OrgList;
         final item = list.items[0] as OrgListUnorderedItem;
-        expect(item.tagDelimiter, ' ::');
+        expect(item.tag?.delimiter, ' ::');
         final text = item.body?.children[0] as OrgPlainText;
         expect(text.content, '\n');
         final meta = item.body?.children[1] as OrgMeta;

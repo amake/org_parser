@@ -922,28 +922,20 @@ abstract class OrgListItem extends OrgNode {
 /// ```
 class OrgListUnorderedItem extends OrgListItem {
   OrgListUnorderedItem(
-    String indent,
-    String bullet,
-    String? checkbox,
+    super.indent,
+    super.bullet,
+    super.checkbox,
     this.tag,
-    this.tagDelimiter,
-    OrgContent? body,
-  )   : assert(tag == null && tagDelimiter == null ||
-            tag != null && tagDelimiter != null),
-        super(indent, bullet, checkbox, body);
+    super.body,
+  );
 
-  final OrgContent? tag;
-  final String? tagDelimiter;
-
-  @override
-  List<OrgNode> get children => [if (tag != null) tag!, ...super.children];
+  final ({OrgContent value, String delimiter})? tag;
 
   @override
   bool contains(Pattern pattern) {
     final tag = this.tag;
-    final tagDelimiter = this.tagDelimiter;
-    return tag != null && tag.contains(pattern) ||
-        tagDelimiter != null && tagDelimiter.contains(pattern) ||
+    return tag != null &&
+            (tag.value.contains(pattern) || tag.delimiter.contains(pattern)) ||
         super.contains(pattern);
   }
 
@@ -961,8 +953,10 @@ class OrgListUnorderedItem extends OrgListItem {
         ..write(checkbox)
         ..write(' ');
     }
-    tag?._toMarkupImpl(buf);
-    buf.write(tagDelimiter ?? '');
+    if (tag != null) {
+      tag!.value._toMarkupImpl(buf);
+      buf.write(tag!.delimiter);
+    }
     body?._toMarkupImpl(buf);
   }
 }

@@ -372,21 +372,18 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final rest = values[1] as List;
         final bullet = rest[0] as String;
         final checkBox = rest[1] as String?;
-        final tagParts = rest[2] as List?;
-        OrgContent? tag;
-        String? tagDelimiter;
-        if (tagParts != null) {
-          final tagList = tagParts[0] as List;
-          tag = OrgContent(tagList.cast());
-          tagDelimiter = tagParts[1] as String;
-        }
+        final tag = rest[2] as List?;
         final body = rest[3] as OrgContent?;
         return OrgListUnorderedItem(
           indent,
           bullet,
           checkBox,
-          tag,
-          tagDelimiter,
+          tag == null
+              ? null
+              : (
+                  value: OrgContent((tag[0] as List).cast()),
+                  delimiter: tag[1] as String,
+                ),
           body,
         );
       });
