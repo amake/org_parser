@@ -297,13 +297,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser tableDotElDivider() => super
       .tableDotElDivider()
       .castList<String>()
-      .map((indent) => OrgTableDividerRow(indent[0], indent[1]));
+      .map((items) => OrgTableDividerRow(items[0], items[1], items[2]));
 
   @override
   Parser tableRowRule() => super
       .tableRowRule()
       .castList<String>()
-      .map((item) => OrgTableDividerRow(item[0], item[1]));
+      .map((items) => OrgTableDividerRow(items[0], items[1], items[2]));
 
   @override
   Parser tableRowStandard() => super.tableRowStandard().map((items) {

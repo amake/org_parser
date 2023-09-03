@@ -406,13 +406,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableRowRule() =>
       ref0(indent).flatten('Table row rule indent expected') &
-      (string('|-') & ref0(lineTrailing))
-          .flatten('Trailing line content expected');
+      (string('|-') & anyOf('-+').starString() & char('|'))
+          .flatten('Trailing line content expected') &
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser tableDotElDivider() =>
       ref0(indent).flatten('Table.el divider indent expected') &
-      (string('+-') & anyOf('+-').starString() & ref0(lineTrailing))
-          .flatten('Table divider expected');
+      (string('+-') & anyOf('+-').starString())
+          .flatten('Table divider expected') &
+      ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser timestamp() =>
       ref0(timestampDiary) |

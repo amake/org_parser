@@ -658,17 +658,20 @@ class OrgTable extends OrgNode with IndentedElement {
   }
 }
 
-abstract class OrgTableRow extends OrgNode {
-  OrgTableRow(this.indent);
+abstract class OrgTableRow extends OrgNode with IndentedElement {
+  OrgTableRow(this.indent, this.trailing);
 
+  @override
   final String indent;
+  @override
+  final String trailing;
 
   @override
   String toString() => runtimeType.toString();
 }
 
 class OrgTableDividerRow extends OrgTableRow {
-  OrgTableDividerRow(String indent, this.content) : super(indent);
+  OrgTableDividerRow(super.indent, this.content, super.trailing);
 
   @override
   bool contains(Pattern pattern) => false;
@@ -682,18 +685,16 @@ class OrgTableDividerRow extends OrgTableRow {
   void _toMarkupImpl(StringBuffer buf) {
     buf
       ..write(indent)
-      ..write(content);
+      ..write(content)
+      ..write(trailing);
   }
 }
 
 class OrgTableCellRow extends OrgTableRow {
-  OrgTableCellRow(String indent, Iterable<OrgTableCell> cells, this.trailing)
-      : cells = List.unmodifiable(cells),
-        super(indent);
+  OrgTableCellRow(super.indent, Iterable<OrgTableCell> cells, super.trailing)
+      : cells = List.unmodifiable(cells);
 
   final List<OrgTableCell> cells;
-
-  final String trailing;
 
   @override
   List<OrgNode> get children => cells;
