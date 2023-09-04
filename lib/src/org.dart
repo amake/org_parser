@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:functional_zipper/functional_zipper.dart';
 import 'package:org_parser/org_parser.dart';
 
 /// Identify URLs that point to a section within the current document (starting
@@ -39,8 +40,9 @@ String parseOrgIdUrl(String url) {
 
 /// The base type of all Org AST objects
 abstract class OrgNode {
-  /// The children of this node. May be empty.
-  List<OrgNode> get children => const [];
+  /// The children of this node. May be empty (no children) or null (an object
+  /// that can't have children).
+  List<OrgNode>? get children;
 
   /// Return true if this node or any of its children recursively match the
   /// supplied [pattern]
@@ -56,9 +58,11 @@ abstract class OrgNode {
         return false;
       }
     }
-    for (final child in children) {
-      if (!child.visit<T>(visitor)) {
-        return false;
+    if (children != null) {
+      for (final child in children!) {
+        if (!child.visit<T>(visitor)) {
+          return false;
+        }
       }
     }
     return true;
@@ -73,8 +77,20 @@ abstract class OrgNode {
   void _toMarkupImpl(StringBuffer buf);
 }
 
+sealed class OrgLeafNode extends OrgNode {
+  @override
+  List<OrgNode>? get children => null;
+}
+
+sealed class OrgParentNode extends OrgNode {
+  @override
+  List<OrgNode> get children;
+
+  OrgParentNode fromChildren(List<OrgNode> children);
+}
+
 /// A node potentially containing [OrgSection]s
-abstract class OrgTree extends OrgNode {
+sealed class OrgTree extends OrgParentNode {
   OrgTree(this.content, [Iterable<OrgSection>? sections])
       : sections = List.unmodifiable(sections ?? const <OrgSection>[]);
 
@@ -142,6 +158,32 @@ class OrgDocument extends OrgTree {
 
   @override
   String toString() => 'OrgDocument';
+
+  OrgZipper edit() => ZipperLocation.root(
+        sectionP: (obj) => obj is OrgParentNode,
+        node: this,
+        getChildren: (obj) => obj.children,
+        makeSection: (node, children) => node.fromChildren(children),
+      );
+
+  OrgZipper? editNode(OrgNode node) => edit().find(node);
+
+  OrgDocument copyWith({
+    OrgContent? content,
+    Iterable<OrgSection>? sections,
+  }) =>
+      OrgDocument(
+        content ?? this.content,
+        sections ?? this.sections,
+      );
+
+  @override
+  OrgDocument fromChildren(List<OrgNode> children) {
+    final content =
+        children.first is OrgContent ? children.first as OrgContent : null;
+    final sections = content == null ? children : children.skip(1);
+    return copyWith(content: content, sections: sections.cast());
+  }
 }
 
 /// An Org headline, like
@@ -149,7 +191,7 @@ class OrgDocument extends OrgTree {
 /// ```
 /// **** TODO [#A] COMMENT Title :tag1:tag2:
 /// ```
-class OrgHeadline extends OrgNode {
+class OrgHeadline extends OrgParentNode {
   OrgHeadline(
     this.stars,
     this.keyword,
@@ -194,6 +236,10 @@ class OrgHeadline extends OrgNode {
   List<OrgNode> get children => title == null ? const [] : [title!];
 
   @override
+  OrgHeadline fromChildren(List<OrgNode> children) =>
+      copyWith(title: children.single as OrgContent);
+
+  @override
   bool contains(Pattern pattern) {
     final keyword = this.keyword;
     final title = this.title;
@@ -234,6 +280,25 @@ class OrgHeadline extends OrgNode {
     }
     buf.write(trailing ?? '');
   }
+
+  OrgHeadline copyWith({
+    ({String value, String trailing})? stars,
+    ({String value, String trailing})? keyword,
+    ({String leading, String value, String trailing})? priority,
+    OrgContent? title,
+    String? rawTitle,
+    ({String leading, List<String> values, String trailing})? tags,
+    String? trailing,
+  }) =>
+      OrgHeadline(
+        stars ?? this.stars,
+        keyword ?? this.keyword,
+        priority ?? this.priority,
+        title ?? this.title,
+        rawTitle ?? this.rawTitle,
+        tags ?? this.tags,
+        trailing ?? this.trailing,
+      );
 }
 
 /// An Org section. May have nested sections, like
@@ -254,6 +319,19 @@ class OrgSection extends OrgTree {
 
   @override
   List<OrgNode> get children => [headline, ...super.children];
+
+  @override
+  OrgSection fromChildren(List<OrgNode> children) {
+    final headline = children.first as OrgHeadline;
+    final content =
+        children[1] is OrgContent ? children[1] as OrgContent : null;
+    final sections = content == null ? children.skip(1) : children.skip(2);
+    return copyWith(
+      headline: headline,
+      content: content,
+      sections: sections.cast(),
+    );
+  }
 
   @override
   int get level => headline.level;
@@ -330,7 +408,7 @@ mixin IndentedElement {
 }
 
 /// A generic node that contains children
-class OrgContent extends OrgNode {
+class OrgContent extends OrgParentNode {
   OrgContent(Iterable<OrgNode> children)
       : children = children.length == 1 && children.firstOrNull is OrgContent
             ? (children.first as OrgContent).children
@@ -338,6 +416,9 @@ class OrgContent extends OrgNode {
 
   @override
   final List<OrgNode> children;
+
+  @override
+  OrgContent fromChildren(List<OrgNode> children) => OrgContent(children);
 
   @override
   bool contains(Pattern pattern) =>
@@ -355,7 +436,7 @@ class OrgContent extends OrgNode {
 }
 
 /// Plain text that has no markup
-class OrgPlainText extends OrgNode with SingleContentElement {
+class OrgPlainText extends OrgLeafNode with SingleContentElement {
   OrgPlainText(this.content);
 
   @override
@@ -369,7 +450,7 @@ class OrgPlainText extends OrgNode with SingleContentElement {
 /// ```
 /// https://example.com
 /// ```
-class OrgLink extends OrgNode {
+class OrgLink extends OrgLeafNode {
   OrgLink(this.location);
 
   /// Where the link points
@@ -442,7 +523,7 @@ class OrgBracketLink extends OrgLink {
 /// ```
 ///
 /// See [OrgStyle] for supported emphasis types
-class OrgMarkup extends OrgNode {
+class OrgMarkup extends OrgLeafNode {
   // TODO(aaron): Get rid of this hack
   OrgMarkup.just(String content, OrgStyle style) : this('', content, '', style);
 
@@ -490,7 +571,7 @@ enum OrgStyle {
 /// ```
 /// {{{my_macro}}}
 /// ```
-class OrgMacroReference extends OrgNode with SingleContentElement {
+class OrgMacroReference extends OrgLeafNode with SingleContentElement {
   OrgMacroReference(this.content);
 
   @override
@@ -506,7 +587,7 @@ class OrgMacroReference extends OrgNode with SingleContentElement {
 /// ```
 ///
 /// TODO(aaron): Should this be renamed to `OrgKeyword`?
-class OrgMeta extends OrgNode with IndentedElement {
+class OrgMeta extends OrgLeafNode with IndentedElement {
   OrgMeta(this.indent, this.keyword, this.trailing);
 
   @override
@@ -542,7 +623,7 @@ class OrgMeta extends OrgNode with IndentedElement {
 /// ```
 ///
 /// See also [OrgSrcBlock]
-class OrgBlock extends OrgNode with IndentedElement {
+class OrgBlock extends OrgParentNode with IndentedElement {
   OrgBlock(this.indent, this.header, this.body, this.footer, this.trailing);
 
   @override
@@ -555,6 +636,10 @@ class OrgBlock extends OrgNode with IndentedElement {
 
   @override
   List<OrgNode> get children => [body];
+
+  @override
+  OrgBlock fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single);
 
   @override
   bool contains(Pattern pattern) =>
@@ -574,6 +659,22 @@ class OrgBlock extends OrgNode with IndentedElement {
     buf
       ..write(footer)
       ..write(trailing);
+  }
+
+  OrgBlock copyWith({
+    String? indent,
+    String? header,
+    OrgNode? body,
+    String? footer,
+    String? trailing,
+  }) {
+    return OrgBlock(
+      indent ?? this.indent,
+      header ?? this.header,
+      body ?? this.body,
+      footer ?? this.footer,
+      trailing ?? this.trailing,
+    );
   }
 }
 
@@ -604,7 +705,7 @@ class OrgSrcBlock extends OrgBlock {
 /// | Lorem ipsum | 30.000 |    1 |
 /// | 123         |        |      |
 /// ```
-class OrgTable extends OrgNode with IndentedElement {
+class OrgTable extends OrgParentNode with IndentedElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing)
       : rows = List.unmodifiable(rows);
 
@@ -612,6 +713,10 @@ class OrgTable extends OrgNode with IndentedElement {
 
   @override
   List<OrgNode> get children => rows;
+
+  @override
+  OrgTable fromChildren(List<OrgNode> children) =>
+      copyWith(rows: children.cast());
 
   @override
   String get indent => rows.isEmpty ? '' : rows.first.indent;
@@ -658,9 +763,19 @@ class OrgTable extends OrgNode with IndentedElement {
     }
     buf.write(trailing);
   }
+
+  OrgTable copyWith({
+    Iterable<OrgTableRow>? rows,
+    String? trailing,
+  }) {
+    return OrgTable(
+      rows ?? this.rows,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
-abstract class OrgTableRow extends OrgNode with IndentedElement {
+sealed class OrgTableRow extends OrgParentNode with IndentedElement {
   OrgTableRow(this.indent, this.trailing);
 
   @override
@@ -679,6 +794,12 @@ class OrgTableDividerRow extends OrgTableRow {
   bool contains(Pattern pattern) => false;
 
   final String content;
+
+  @override
+  List<OrgNode> get children => [];
+
+  @override
+  OrgTableDividerRow fromChildren(List<OrgNode> children) => this;
 
   @override
   String toString() => 'OrgTableDividerRow';
@@ -701,6 +822,10 @@ class OrgTableCellRow extends OrgTableRow {
   @override
   List<OrgNode> get children => cells;
 
+  @override
+  OrgTableCellRow fromChildren(List<OrgNode> children) =>
+      copyWith(cells: children.cast());
+
   int get cellCount => cells.length;
 
   @override
@@ -718,9 +843,21 @@ class OrgTableCellRow extends OrgTableRow {
     }
     buf.write(trailing);
   }
+
+  OrgTableCellRow copyWith({
+    String? indent,
+    Iterable<OrgTableCell>? cells,
+    String? trailing,
+  }) {
+    return OrgTableCellRow(
+      indent ?? this.indent,
+      cells ?? this.cells,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
-class OrgTableCell extends OrgNode {
+class OrgTableCell extends OrgParentNode {
   OrgTableCell(this.leading, this.content, this.trailing);
 
   final String leading;
@@ -729,6 +866,10 @@ class OrgTableCell extends OrgNode {
 
   @override
   List<OrgNode> get children => [content];
+
+  @override
+  OrgTableCell fromChildren(List<OrgNode> children) =>
+      copyWith(content: children.single as OrgContent);
 
   bool get isEmpty => content.children.isEmpty;
 
@@ -756,6 +897,18 @@ class OrgTableCell extends OrgNode {
 
   @override
   String toString() => 'OrgTableCell';
+
+  OrgTableCell copyWith({
+    String? leading,
+    OrgContent? content,
+    String? trailing,
+  }) {
+    return OrgTableCell(
+      leading ?? this.leading,
+      content ?? this.content,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
 // Default number-detecting regexp from org-mode 20200504, converted with:
@@ -768,7 +921,7 @@ final _orgTableNumberRegexp = RegExp(
 const _orgTableNumberFraction = 0.5;
 
 /// A timestamp, like `[2020-05-05 Tue]`
-class OrgTimestamp extends OrgNode with SingleContentElement {
+class OrgTimestamp extends OrgLeafNode with SingleContentElement {
   OrgTimestamp(this.content);
 
   // TODO(aaron): Expose actual data
@@ -782,7 +935,7 @@ class OrgTimestamp extends OrgNode with SingleContentElement {
 /// A planning keyword, like `SCHEDULED:` or `DEADLINE:`
 ///
 /// TODO(aaron): Rename this to "OrgPlanningKeyword"?
-class OrgKeyword extends OrgNode with SingleContentElement {
+class OrgKeyword extends OrgLeafNode with SingleContentElement {
   OrgKeyword(this.content);
 
   @override
@@ -800,7 +953,7 @@ class OrgKeyword extends OrgNode with SingleContentElement {
 /// ```
 /// CLOSED: [2021-12-09 Thu 12:02]
 /// ```
-class OrgPlanningLine extends OrgNode with IndentedElement {
+class OrgPlanningLine extends OrgParentNode with IndentedElement {
   OrgPlanningLine(this.indent, this.keyword, this.body, this.trailing);
 
   @override
@@ -812,6 +965,12 @@ class OrgPlanningLine extends OrgNode with IndentedElement {
 
   @override
   List<OrgNode> get children => [keyword, body];
+
+  @override
+  OrgPlanningLine fromChildren(List<OrgNode> children) => copyWith(
+        keyword: children[0] as OrgKeyword,
+        body: children[1] as OrgContent,
+      );
 
   @override
   bool contains(Pattern pattern) =>
@@ -830,13 +989,27 @@ class OrgPlanningLine extends OrgNode with IndentedElement {
     body._toMarkupImpl(buf);
     buf.write(trailing);
   }
+
+  OrgPlanningLine copyWith({
+    String? indent,
+    OrgKeyword? keyword,
+    OrgContent? body,
+    String? trailing,
+  }) {
+    return OrgPlanningLine(
+      indent ?? this.indent,
+      keyword ?? this.keyword,
+      body ?? this.body,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
 /// A fixed-width area, like
 /// ```
 /// : result of source block, or whatever
 /// ```
-class OrgFixedWidthArea extends OrgNode with IndentedElement {
+class OrgFixedWidthArea extends OrgLeafNode with IndentedElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing);
 
   @override
@@ -869,7 +1042,7 @@ class OrgFixedWidthArea extends OrgNode with IndentedElement {
 /// - bar
 ///   - baz
 /// ```
-class OrgList extends OrgNode with IndentedElement {
+class OrgList extends OrgParentNode with IndentedElement {
   OrgList(Iterable<OrgListItem> items, this.trailing)
       : items = List.unmodifiable(items);
   final List<OrgListItem> items;
@@ -878,6 +1051,13 @@ class OrgList extends OrgNode with IndentedElement {
   String get indent => items.isEmpty ? '' : items.first.indent;
   @override
   final String trailing;
+
+  @override
+  List<OrgNode> get children => items;
+
+  @override
+  OrgList fromChildren(List<OrgNode> children) =>
+      copyWith(items: children.cast());
 
   @override
   bool contains(Pattern pattern) => items.any((item) => item.contains(pattern));
@@ -892,9 +1072,19 @@ class OrgList extends OrgNode with IndentedElement {
     }
     buf.write(trailing);
   }
+
+  OrgList copyWith({
+    Iterable<OrgListItem>? items,
+    String? trailing,
+  }) {
+    return OrgList(
+      items ?? this.items,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
-abstract class OrgListItem extends OrgNode {
+sealed class OrgListItem extends OrgParentNode {
   OrgListItem(this.indent, this.bullet, this.checkbox, this.body);
 
   final String indent;
@@ -935,6 +1125,10 @@ class OrgListUnorderedItem extends OrgListItem {
   final ({OrgContent value, String delimiter})? tag;
 
   @override
+  OrgListUnorderedItem fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single as OrgContent);
+
+  @override
   bool contains(Pattern pattern) {
     final tag = this.tag;
     return tag != null &&
@@ -962,6 +1156,22 @@ class OrgListUnorderedItem extends OrgListItem {
     }
     body?._toMarkupImpl(buf);
   }
+
+  OrgListUnorderedItem copyWith({
+    String? indent,
+    String? bullet,
+    String? checkbox,
+    ({OrgContent value, String delimiter})? tag,
+    OrgContent? body,
+  }) {
+    return OrgListUnorderedItem(
+      indent ?? this.indent,
+      bullet ?? this.bullet,
+      checkbox ?? this.checkbox,
+      tag ?? this.tag,
+      body ?? this.body,
+    );
+  }
 }
 
 /// An ordered list item, like
@@ -987,6 +1197,10 @@ class OrgListOrderedItem extends OrgListItem {
   }
 
   @override
+  OrgListOrderedItem fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single as OrgContent);
+
+  @override
   String toString() => 'OrgListOrderedItem';
   @override
   void _toMarkupImpl(StringBuffer buf) {
@@ -1006,9 +1220,25 @@ class OrgListOrderedItem extends OrgListItem {
     }
     body?._toMarkupImpl(buf);
   }
+
+  OrgListOrderedItem copyWith({
+    String? indent,
+    String? bullet,
+    String? counterSet,
+    String? checkbox,
+    OrgContent? body,
+  }) {
+    return OrgListOrderedItem(
+      indent ?? this.indent,
+      bullet ?? this.bullet,
+      counterSet ?? this.counterSet,
+      checkbox ?? this.checkbox,
+      body ?? this.body,
+    );
+  }
 }
 
-class OrgParagraph extends OrgNode {
+class OrgParagraph extends OrgParentNode {
   OrgParagraph(this.indent, this.body);
 
   final String indent;
@@ -1016,6 +1246,10 @@ class OrgParagraph extends OrgNode {
 
   @override
   List<OrgNode> get children => [body];
+
+  @override
+  OrgParagraph fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single as OrgContent);
 
   @override
   bool contains(Pattern pattern) =>
@@ -1029,6 +1263,16 @@ class OrgParagraph extends OrgNode {
     buf.write(indent);
     body._toMarkupImpl(buf);
   }
+
+  OrgParagraph copyWith({
+    String? indent,
+    OrgContent? body,
+  }) {
+    return OrgParagraph(
+      indent ?? this.indent,
+      body ?? this.body,
+    );
+  }
 }
 
 /// A drawer, like
@@ -1037,7 +1281,7 @@ class OrgParagraph extends OrgNode {
 /// :CUSTOM_ID: foobar
 /// :END:
 /// ```
-class OrgDrawer extends OrgNode with IndentedElement {
+class OrgDrawer extends OrgParentNode with IndentedElement {
   OrgDrawer(this.indent, this.header, this.body, this.footer, this.trailing);
 
   @override
@@ -1050,6 +1294,10 @@ class OrgDrawer extends OrgNode with IndentedElement {
 
   @override
   List<OrgNode> get children => [body];
+
+  @override
+  OrgDrawer fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single);
 
   /// Get a list of [OrgProperty] nodes contained within this block. Optionally
   /// filter the result to include only properties with the specified [key].
@@ -1085,13 +1333,29 @@ class OrgDrawer extends OrgNode with IndentedElement {
       ..write(footer)
       ..write(trailing);
   }
+
+  OrgDrawer copyWith({
+    String? indent,
+    String? header,
+    OrgNode? body,
+    String? footer,
+    String? trailing,
+  }) {
+    return OrgDrawer(
+      indent ?? this.indent,
+      header ?? this.header,
+      body ?? this.body,
+      footer ?? this.footer,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
 /// A property in a drawer, like
 /// ```
 /// :CUSTOM_ID: foobar
 /// ```
-class OrgProperty extends OrgNode with IndentedElement {
+class OrgProperty extends OrgLeafNode with IndentedElement {
   OrgProperty(this.indent, this.key, this.value, this.trailing);
 
   @override
@@ -1122,7 +1386,7 @@ class OrgProperty extends OrgNode with IndentedElement {
 /// ```
 /// [fn:1] this is a footnote
 /// ```
-class OrgFootnote extends OrgNode {
+class OrgFootnote extends OrgParentNode {
   OrgFootnote(this.marker, this.content);
 
   final OrgFootnoteReference marker;
@@ -1130,6 +1394,11 @@ class OrgFootnote extends OrgNode {
 
   @override
   List<OrgNode> get children => [marker, content];
+
+  @override
+  OrgFootnote fromChildren(List<OrgNode> children) => copyWith(
+      marker: children[0] as OrgFootnoteReference,
+      content: children[1] as OrgContent);
 
   @override
   bool contains(Pattern pattern) =>
@@ -1143,10 +1412,20 @@ class OrgFootnote extends OrgNode {
     marker._toMarkupImpl(buf);
     content._toMarkupImpl(buf);
   }
+
+  OrgFootnote copyWith({
+    OrgFootnoteReference? marker,
+    OrgContent? content,
+  }) {
+    return OrgFootnote(
+      marker ?? this.marker,
+      content ?? this.content,
+    );
+  }
 }
 
 /// A footnote reference, like `[fn:1]`
-class OrgFootnoteReference extends OrgNode {
+class OrgFootnoteReference extends OrgParentNode {
   OrgFootnoteReference.named(String leading, String name, String trailing)
       : this(leading, name, null, null, trailing);
 
@@ -1166,6 +1445,10 @@ class OrgFootnoteReference extends OrgNode {
 
   @override
   List<OrgNode> get children => definition == null ? const [] : [definition!];
+
+  @override
+  OrgFootnoteReference fromChildren(List<OrgNode> children) =>
+      copyWith(definition: children.single as OrgContent);
 
   @override
   bool contains(Pattern pattern) {
@@ -1191,6 +1474,22 @@ class OrgFootnoteReference extends OrgNode {
     definition?._toMarkupImpl(buf);
     buf.write(trailing);
   }
+
+  OrgFootnoteReference copyWith({
+    String? leading,
+    String? name,
+    String? definitionDelimiter,
+    OrgContent? definition,
+    String? trailing,
+  }) {
+    return OrgFootnoteReference(
+      leading ?? this.leading,
+      name ?? this.name,
+      definitionDelimiter ?? this.definitionDelimiter,
+      definition ?? this.definition,
+      trailing ?? this.trailing,
+    );
+  }
 }
 
 /// A LaTeX block, like
@@ -1199,7 +1498,7 @@ class OrgFootnoteReference extends OrgNode {
 /// \nabla \cdot \mathbf{B} = 0
 /// \end{equation}
 /// ```
-class OrgLatexBlock extends OrgNode {
+class OrgLatexBlock extends OrgLeafNode {
   OrgLatexBlock(
     this.environment,
     this.leading,
@@ -1240,7 +1539,7 @@ class OrgLatexBlock extends OrgNode {
 }
 
 /// An inline LaTeX snippet, like `$E=mc^2$`
-class OrgLatexInline extends OrgNode {
+class OrgLatexInline extends OrgLeafNode {
   OrgLatexInline(
     this.leadingDecoration,
     this.content,
@@ -1270,7 +1569,7 @@ class OrgLatexInline extends OrgNode {
 }
 
 /// An entity, like `\Omega`
-class OrgEntity extends OrgNode {
+class OrgEntity extends OrgLeafNode {
   OrgEntity(this.leading, this.name, this.trailing);
 
   final String leading;

@@ -89,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
+  functional_zipper:
+    dependency: "direct main"
+    description:
+      name: functional_zipper
+      sha256: "1010a17991c1d1f9bffff65777abb34d39c5ce05bfe2203e18f395fc05296ad5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   glob:
     dependency: transitive
     description:
