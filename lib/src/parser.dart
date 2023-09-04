@@ -213,6 +213,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         switch (name) {
           case 'example':
           case 'export':
+            // TODO(aaron): We are using "verbatim" markup here just to get the
+            // visual styling of example and export blocks. This mixes
+            // presentation with semantics; instead we should expose the block
+            // name in the AST and let the UI layer decide how to render it.
             bodyContent = OrgMarkup.just(content, OrgStyle.verbatim);
             break;
           default:
