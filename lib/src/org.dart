@@ -1125,8 +1125,23 @@ class OrgListUnorderedItem extends OrgListItem {
   final ({OrgContent value, String delimiter})? tag;
 
   @override
-  OrgListUnorderedItem fromChildren(List<OrgNode> children) =>
-      copyWith(body: children.single as OrgContent);
+  List<OrgNode> get children =>
+      [if (tag != null) tag!.value, ...super.children];
+
+  @override
+  OrgListUnorderedItem fromChildren(List<OrgNode> children) {
+    if (children.length == 1) {
+      return copyWith(body: children.single as OrgContent);
+    } else {
+      return copyWith(
+        tag: (
+          value: children[0] as OrgContent,
+          delimiter: tag?.delimiter ?? ' '
+        ),
+        body: children[1] as OrgContent,
+      );
+    }
+  }
 
   @override
   bool contains(Pattern pattern) {
