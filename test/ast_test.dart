@@ -17,35 +17,35 @@ void main() {
         final markup = '[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]';
         var result = parser.parse(markup);
         var link = result.value as OrgBracketLink;
-        expect(link.contains('what?'), true);
+        expect(link.contains('what?'), isTrue);
         expect(link.toMarkup(), markup);
       });
       test('link with search option', () {
         final markup = '[[foo::1][bar]]';
         final result = parser.parse(markup);
         final link = result.value as OrgBracketLink;
-        expect(link.contains('foo'), true);
+        expect(link.contains('foo'), isTrue);
         expect(link.toMarkup(), markup);
       });
       test('quotes in search option', () {
         final markup = r'[[foo::"\[1\]"][bar]]';
         final result = parser.parse(markup);
         final link = result.value as OrgBracketLink;
-        expect(link.contains('foo'), true);
+        expect(link.contains('foo'), isTrue);
         expect(link.toMarkup(), markup);
       });
       test('no description', () {
         final markup = '[[foo::1]]';
         final result = parser.parse(markup);
         final link = result.value as OrgBracketLink;
-        expect(link.contains('foo'), true);
+        expect(link.contains('foo'), isTrue);
         expect(link.toMarkup(), markup);
       });
       test('plain link', () {
         final markup = 'http://example.com';
         final result = parser.parse(markup);
         final link = result.value as OrgLink;
-        expect(link.contains('example'), true);
+        expect(link.contains('example'), isTrue);
         expect(link.toMarkup(), markup);
       });
     });
@@ -56,7 +56,7 @@ void main() {
 bar/''';
         var result = parser.parse(markup);
         final markupNode = result.value as OrgMarkup;
-        expect(markupNode.contains('foo'), true);
+        expect(markupNode.contains('foo'), isTrue);
         expect(markupNode.toMarkup(), markup);
       });
     });
@@ -66,14 +66,14 @@ bar/''';
         final markup = '{{{name(arg1, arg2)}}}';
         var result = parser.parse(markup);
         var ref = result.value as OrgMacroReference;
-        expect(ref.contains('name'), true);
+        expect(ref.contains('name'), isTrue);
         expect(ref.toMarkup(), markup);
       });
       test('simple', () {
         final markup = '{{{foobar}}}';
         final result = parser.parse(markup);
         final ref = result.value as OrgMacroReference;
-        expect(ref.contains('foobar'), true);
+        expect(ref.contains('foobar'), isTrue);
         expect(ref.toMarkup(), markup);
       });
     });
@@ -85,7 +85,7 @@ bar/''';
 ''';
         var result = parser.parse(markup);
         var area = result.value as OrgFixedWidthArea;
-        expect(area.contains('foo'), true);
+        expect(area.contains('foo'), isTrue);
         expect(area.toMarkup(), markup);
       });
       test('empty', () {
@@ -104,7 +104,7 @@ bar/''';
 ''';
       final result = parser.parse(markup);
       final block = result.value as OrgBlock;
-      expect(block.contains("echo 'foo'"), true);
+      expect(block.contains("echo 'foo'"), isTrue);
       expect(block.toMarkup(), markup);
     });
     group('source block', () {
@@ -117,7 +117,7 @@ bar/''';
 ''';
         var result = parser.parse(markup);
         var block = result.value as OrgSrcBlock;
-        expect(block.contains("echo 'foo'"), true);
+        expect(block.contains("echo 'foo'"), isTrue);
         expect(block.toMarkup(), markup);
       });
       test('empty', () {
@@ -137,7 +137,7 @@ bar/''';
 ''';
       final result = parser.parse(markup);
       final block = result.value as OrgBlock;
-      expect(block.contains('bizbaz'), true);
+      expect(block.contains('bizbaz'), isTrue);
       expect(block.contains('foo ~bar~'), false);
       expect(block.toMarkup(), markup);
     });
@@ -150,7 +150,7 @@ bar/''';
 ''';
       final result = parser.parse(markup);
       final block = result.value as OrgBlock;
-      expect(block.contains('bizbaz'), true);
+      expect(block.contains('bizbaz'), isTrue);
       expect(block.toMarkup(), markup);
     });
     group('table', () {
@@ -162,8 +162,8 @@ bar/''';
 ''';
         final result = parser.parse(markup);
         final table = result.value as OrgTable;
-        expect(table.contains('foo'), true);
-        expect(table.contains('bar'), true);
+        expect(table.contains('foo'), isTrue);
+        expect(table.contains('bar'), isTrue);
         expect(table.contains('*bar*'), false);
         expect(table.toMarkup(), markup);
       });
@@ -180,7 +180,7 @@ bar/''';
         final markup = '- foo';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
+        expect(list.contains('foo'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('multiple lines', () {
@@ -188,8 +188,8 @@ bar/''';
   - bar''';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
-        expect(list.contains('bar'), true);
+        expect(list.contains('foo'), isTrue);
+        expect(list.contains('bar'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('multiline item', () {
@@ -198,8 +198,8 @@ bar/''';
   bar''';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
-        expect(list.contains('bar'), true);
+        expect(list.contains('foo'), isTrue);
+        expect(list.contains('bar'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('multiline item with eol white space', () {
@@ -208,8 +208,8 @@ bar/''';
             '    bar';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
-        expect(list.contains('bar'), true);
+        expect(list.contains('foo'), isTrue);
+        expect(list.contains('bar'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('complex', () {
@@ -219,11 +219,11 @@ bar/''';
    - [ ] *bazinga*''';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
-        expect(list.contains('bar'), true);
-        expect(list.contains('baz'), true);
-        expect(list.contains('blah'), true);
-        expect(list.contains('bazinga'), true);
+        expect(list.contains('foo'), isTrue);
+        expect(list.contains('bar'), isTrue);
+        expect(list.contains('baz'), isTrue);
+        expect(list.contains('blah'), isTrue);
+        expect(list.contains('bazinga'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('item with block', () {
@@ -233,14 +233,14 @@ bar/''';
   #+end_src''';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('echo bar'), true);
+        expect(list.contains('echo bar'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('with tag', () {
         final markup = '- ~foo~ ::';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('foo'), true);
+        expect(list.contains('foo'), isTrue);
         expect(list.toMarkup(), markup);
       });
       test('with following meta', () {
@@ -248,7 +248,7 @@ bar/''';
   #+vindex: bar''';
         final result = parser.parse(markup);
         final list = result.value as OrgList;
-        expect(list.contains('bar'), true);
+        expect(list.contains('bar'), isTrue);
         expect(list.toMarkup(), markup);
       });
     });
@@ -258,7 +258,7 @@ bar/''';
           'CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49';
       final result = parser.parse(markup);
       final planningLine = result.value as OrgPlanningLine;
-      expect(planningLine.contains('CLOCK'), true);
+      expect(planningLine.contains('CLOCK'), isTrue);
       expect(planningLine.toMarkup(), markup);
     });
     group('drawer', () {
@@ -272,7 +272,7 @@ bar/''';
 ''';
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
-        expect(drawer.contains('foo'), true);
+        expect(drawer.contains('foo'), isTrue);
         expect(drawer.toMarkup(), markup);
       });
       test('simple', () {
@@ -282,7 +282,7 @@ a
 ''';
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
-        expect(drawer.contains('a'), true);
+        expect(drawer.contains('a'), isTrue);
         expect(drawer.toMarkup(), markup);
       });
       test('empty', () {
@@ -299,7 +299,7 @@ a
         final markup = '[fn:1] foo *bar* biz baz';
         var result = parser.parse(markup);
         final footnote = result.value as OrgFootnote;
-        expect(footnote.contains('foo'), true);
+        expect(footnote.contains('foo'), isTrue);
         expect(footnote.toMarkup(), markup);
       });
     });
@@ -309,21 +309,21 @@ a
         final markup = '[fn:1]';
         var result = parser.parse(markup);
         final named = result.value as OrgFootnoteReference;
-        expect(named.contains('1'), true);
+        expect(named.contains('1'), isTrue);
         expect(named.toMarkup(), markup);
       });
       test('with definition', () {
         final markup = '[fn:: who /what/ why]';
         final result = parser.parse(markup);
         final anonymous = result.value as OrgFootnoteReference;
-        expect(anonymous.contains('who'), true);
+        expect(anonymous.contains('who'), isTrue);
         expect(anonymous.toMarkup(), markup);
       });
       test('with name', () {
         final markup = '[fn:abc123: when /where/ how]';
         final result = parser.parse(markup);
         final inline = result.value as OrgFootnoteReference;
-        expect(inline.contains('abc123'), true);
+        expect(inline.contains('abc123'), isTrue);
         expect(inline.toMarkup(), markup);
       });
     });
@@ -338,7 +338,7 @@ a
 ''';
       final result = parser.parse(markup);
       final latex = result.value as OrgLatexBlock;
-      expect(latex.contains(r'\begin{matrix}'), true);
+      expect(latex.contains(r'\begin{matrix}'), isTrue);
       expect(latex.toMarkup(), markup);
     });
     group('inline LaTeX', () {
@@ -347,28 +347,28 @@ a
         final markup = r'$i$';
         final result = parser.parse(markup);
         final latex = result.value as OrgLatexInline;
-        expect(latex.contains('i'), true);
+        expect(latex.contains('i'), isTrue);
         expect(latex.toMarkup(), markup);
       });
       test(r'double-$ delimiter', () {
         final markup = r'$$ a^2 $$';
         final result = parser.parse(markup);
         final latex = result.value as OrgLatexInline;
-        expect(latex.contains('a^2'), true);
+        expect(latex.contains('a^2'), isTrue);
         expect(latex.toMarkup(), markup);
       });
       test('paren delimiter', () {
         final markup = r'\( foo \)';
         final result = parser.parse(markup);
         final latex = result.value as OrgLatexInline;
-        expect(latex.contains('foo'), true);
+        expect(latex.contains('foo'), isTrue);
         expect(latex.toMarkup(), markup);
       });
       test('bracket delimiter', () {
         final markup = r'\[ bar \]';
         final result = parser.parse(markup);
         final latex = result.value as OrgLatexInline;
-        expect(latex.contains('bar'), true);
+        expect(latex.contains('bar'), isTrue);
         expect(latex.toMarkup(), markup);
       });
     });
@@ -378,14 +378,14 @@ a
         final markup = r'\frac12';
         final result = parser.parse(markup);
         final entity = result.value as OrgEntity;
-        expect(entity.contains('frac12'), true);
+        expect(entity.contains('frac12'), isTrue);
         expect(entity.toMarkup(), markup);
       });
       test('with terminator', () {
         final markup = r'\foobar{}';
         final result = parser.parse(markup);
         final entity = result.value as OrgEntity;
-        expect(entity.contains('foobar'), true);
+        expect(entity.contains('foobar'), isTrue);
         expect(entity.toMarkup(), markup);
       });
     });
@@ -402,7 +402,7 @@ a
         final markup = '** TODO [#A] Title foo bar :biz:baz:';
         final result = parser.parse(markup);
         final headline = result.value as OrgHeadline;
-        expect(headline.contains('Title foo'), true);
+        expect(headline.contains('Title foo'), isTrue);
         expect(headline.toMarkup(), markup);
       });
       test('empty', () {
@@ -428,10 +428,10 @@ a
 
 *** Additional entry''';
       final parsed = parser.parse(doc);
-      expect(parsed is Success, true);
+      expect(parsed is Success, isTrue);
       final document = parsed.value as OrgDocument;
-      expect(document.contains('introduction'), true);
-      expect(document.contains('A Headline'), true);
+      expect(document.contains('introduction'), isTrue);
+      expect(document.contains('A Headline'), isTrue);
       expect(document.toMarkup(), doc);
     });
     test('footnotes', () {
@@ -445,16 +445,16 @@ biz baz
 
 bazoonga''';
       final result = parser.parse(doc);
-      expect(result is Success, true);
+      expect(result is Success, isTrue);
       final document = result.value as OrgDocument;
-      expect(document.contains('foo bar'), true);
-      expect(document.contains('bazinga'), true);
+      expect(document.contains('foo bar'), isTrue);
+      expect(document.contains('bazinga'), isTrue);
       expect(document.toMarkup(), doc);
     });
     test('complex document', () {
       final doc = File('test/org-syntax.org').readAsStringSync();
       final result = parser.parse(doc);
-      expect(result is Success, true);
+      expect(result is Success, isTrue);
       final document = result.value as OrgDocument;
       expect(document.toMarkup().length, doc.length);
       expect(document.toMarkup(), doc);
@@ -462,7 +462,7 @@ bazoonga''';
     test('complex document 2', () {
       final doc = File('test/org-manual.org').readAsStringSync();
       final result = parser.parse(doc);
-      expect(result is Success, true);
+      expect(result is Success, isTrue);
       final document = result.value as OrgDocument;
       expect(document.toMarkup().length, doc.length);
       expect(document.toMarkup(), doc);
@@ -549,8 +549,8 @@ content''');
 content''');
         final doc = result.value as OrgDocument;
         final section = doc.sections[0];
-        expect(section.customIds.isEmpty, true);
-        expect(section.ids.isEmpty, true);
+        expect(section.customIds.isEmpty, isTrue);
+        expect(section.ids.isEmpty, isTrue);
       });
     });
   });

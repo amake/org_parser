@@ -27,7 +27,7 @@ void main() {
     });
     test('parse almost-a-header', () {
       final result = parser.parse('**');
-      expect(result is Failure, true);
+      expect(result, isA<Failure>());
     });
     test('parse just an empty header', () {
       final result = parser.parse('* ');
@@ -151,7 +151,7 @@ foo''');
         '*** Some e-mail',
         '**** TODO [#A] COMMENT Title :tag:a2%:',
       ]) {
-        expect(grammar.parse(valid) is Success, true);
+        expect(grammar.parse(valid), isA<Success<dynamic>>());
       }
     });
   });
@@ -228,7 +228,7 @@ maybe''');
       });
       test('arbitrary protocol', () {
         final result = parser.parse('foobar://example.com');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
     });
     group('markup', () {
@@ -236,17 +236,17 @@ maybe''');
       test('bad pre and post chars', () {
         final result = parser.parse('''a/b
 c/d''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('bad post char', () {
         final result = parser.parse('''a /b
 c/d''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('bad pre char', () {
         final result = parser.parse('''a/b
 c/ d''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('single char', () {
         final result = parser.parse('/a/');
@@ -262,7 +262,7 @@ c/ d''');
       });
       test('empty', () {
         final result = parser.parse('//');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('single comma', () {
         final result = parser.parse('~,~');
@@ -285,7 +285,7 @@ bar+''');
         final result = parser.parse('''+foo
 
 bar+''');
-        expect(true, result is Failure);
+        expect(result, isA<Failure>());
       });
     });
     group('macro reference', () {
@@ -300,11 +300,11 @@ bar+''');
       });
       test('empty', () {
         final result = parser.parse('{{{}}}');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('invalid key', () {
         final result = parser.parse('{{{0abc}}}');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
     });
     group('affiliated keyword', () {
@@ -315,7 +315,7 @@ bar+''');
       });
       test('not at beginning of line', () {
         final result = parser.parse('''a   #+blah''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
     });
     group('block', () {
@@ -606,11 +606,11 @@ bar+''');
       });
       test('invalid sexp', () {
         final result = parser.parse('''<%%(what (the (f))>''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('with seconds', () {
         final result = parser.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
-        expect(result is Failure, true, reason: 'Seconds not supported');
+        expect(result, isA<Failure>(), reason: 'Seconds not supported');
       });
     });
     group('fixed-width area', () {
@@ -957,7 +957,7 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
 :bar:
 :end:
 :end:''');
-        expect(result is Failure, true,
+        expect(result, isA<Failure>(),
             reason: 'Nested drawer disallowed; the trailing ":end:" is '
                 'a separate paragraph, which fails the drawer-specific parser');
       });
@@ -975,16 +975,16 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
       });
       test('missing value', () {
         final result = parser.parse(':foo:');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('missing delimiter', () {
         final result = parser.parse(':foo:blah');
-        expect(result is Failure, true, reason: 'Delimiting space required');
+        expect(result, isA<Failure>(), reason: 'Delimiting space required');
       });
       test('line break', () {
         final result = parser.parse(''':foo:
 bar''');
-        expect(result is Failure, true, reason: 'Value must be on same line');
+        expect(result, isA<Failure>(), reason: 'Value must be on same line');
       });
     });
     group('footnote', () {
@@ -1017,11 +1017,11 @@ baz bazinga
       });
       test('indented', () {
         final result = parser.parse(' [fn:1] foo *bar*');
-        expect(result is Failure, true, reason: 'Indent not allowed');
+        expect(result, isA<Failure>(), reason: 'Indent not allowed');
       });
       test('complex reference', () {
         final result = parser.parse('[fn:1: blah] foo *bar*');
-        expect(result is Failure, true,
+        expect(result, isA<Failure>(),
             reason: 'Only simple references allowed');
       });
     });
@@ -1072,7 +1072,7 @@ baz bazinga
       });
       test('sup invalid', () {
         final result = parser.parse(r'\sup5');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('valid frac', () {
         final result = parser.parse(r'\frac12');
@@ -1080,7 +1080,7 @@ baz bazinga
       });
       test('invalid frac', () {
         final result = parser.parse(r'\frac15');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('arbitrary alphabetical', () {
         final result = parser.parse(r'\foobar');
@@ -1088,7 +1088,7 @@ baz bazinga
       });
       test('arbitrary alphanumeric', () {
         final result = parser.parse(r'\foobar2');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('with terminator', () {
         final result = parser.parse(r'\foobar{}');
@@ -1628,11 +1628,11 @@ I am''');
     group('non-files', () {
       test('https', () {
         final result = parser.parse('https://example.com');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
       test('mailto', () {
         final result = parser.parse('mailto:me@example.com');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
     });
     test('detect common problems', () {

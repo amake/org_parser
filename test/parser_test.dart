@@ -59,7 +59,7 @@ bar/''');
         final result = parser.parse('''/foo
 
 bar/''');
-        expect(result is Failure, true);
+        expect(result, isA<Failure>());
       });
     });
     group('macro reference', () {
@@ -76,11 +76,11 @@ bar/''');
       });
       test('empty', () {
         final result = parser.parse('{{{}}}');
-        expect(result is Failure, true, reason: 'Body missing');
+        expect(result, isA<Failure>(), reason: 'Body missing');
       });
       test('invalid key', () {
         final result = parser.parse('{{{0abc}}}');
-        expect(result is Failure, true, reason: 'Invalid key');
+        expect(result, isA<Failure>(), reason: 'Invalid key');
       });
     });
     group('fixed-width area', () {
@@ -135,7 +135,7 @@ bar/''');
 #+end_src''');
         final block = result.value as OrgSrcBlock;
         final body = block.body as OrgPlainText;
-        expect(block.language, null);
+        expect(block.language, isNull);
         expect(body.content, '');
       });
     });
@@ -189,7 +189,7 @@ bar/''');
         expect(row0Cell1.leadingDecoration, '*');
         expect(row0Cell1.trailingDecoration, '*');
         expect(row0.cells.length, 3);
-        expect(table.rows[1] is OrgTableDividerRow, true);
+        expect(table.rows[1], isA<OrgTableDividerRow>());
         final row2 = table.rows[2] as OrgTableCellRow;
         expect(row2.cells.length, 3);
       });
@@ -197,7 +197,7 @@ bar/''');
         final result = parser.parse('||');
         final table = result.value as OrgTable;
         final row0 = table.rows[0] as OrgTableCellRow;
-        expect(row0.cells[0].content.children.isEmpty, true);
+        expect(row0.cells[0].content.children.isEmpty, isTrue);
       });
     });
     group('list', () {
@@ -318,7 +318,7 @@ a
 ''');
         final drawer = result.value as OrgDrawer;
         expect(drawer.header, ':LOGBOOK:\n');
-        expect(drawer.properties().isEmpty, true);
+        expect(drawer.properties().isEmpty, isTrue);
         final body = drawer.body as OrgContent;
         final text = body.children[0] as OrgPlainText;
         expect(text.content, 'a\n');
@@ -327,9 +327,9 @@ a
         final result = parser.parse(''':FOOBAR:
 :END:''');
         final drawer = result.value as OrgDrawer;
-        expect(drawer.properties().isEmpty, true);
+        expect(drawer.properties().isEmpty, isTrue);
         final body = drawer.body as OrgContent;
-        expect(body.children.isEmpty, true);
+        expect(body.children.isEmpty, isTrue);
       });
     });
     group('footnote', () {
@@ -343,7 +343,7 @@ a
       });
       test('invalid indent', () {
         final result = parser.parse(' [fn:2] bazinga');
-        expect(result is Failure, true, reason: 'Indent not allowed');
+        expect(result, isA<Failure>(), reason: 'Indent not allowed');
       });
     });
     group('footnote reference', () {
@@ -353,15 +353,15 @@ a
         final named = result.value as OrgFootnoteReference;
         expect(named.leading, '[fn:');
         expect(named.name, '1');
-        expect(named.definitionDelimiter, null);
-        expect(named.definition, null);
+        expect(named.definitionDelimiter, isNull);
+        expect(named.definition, isNull);
         expect(named.trailing, ']');
       });
       test('with definition', () {
         final result = parser.parse('[fn:: who /what/ why]');
         final anonymous = result.value as OrgFootnoteReference;
         expect(anonymous.leading, '[fn:');
-        expect(anonymous.name, null);
+        expect(anonymous.name, isNull);
         expect(anonymous.definitionDelimiter, ':');
         final defText0 = anonymous.definition!.children[0] as OrgPlainText;
         expect(defText0.content, ' who ');
@@ -463,7 +463,7 @@ a
       test('empty', () {
         final result = parser.parse('* ');
         final headline = result.value as OrgHeadline;
-        expect(headline.title, null);
+        expect(headline.title, isNull);
       });
       test('with latex', () {
         final result = parser.parse(r'* foo \( \pi \)');
@@ -489,7 +489,7 @@ a
 
 *** Additional entry''';
       final parsed = parser.parse(doc);
-      expect(parsed is Success, true);
+      expect(parsed, isA<Success<dynamic>>());
       final document = parsed.value as OrgDocument;
       final paragraph = document.content!.children[0] as OrgParagraph;
       final text = paragraph.body.children[0] as OrgPlainText;
@@ -499,10 +499,11 @@ a
           topSection.headline.title!.children[0] as OrgPlainText;
       expect(topContent0.content, 'A Headline');
       expect(topSection.sections.length, 2);
-      expect(document.contains('bold'), true);
-      expect(document.contains('*bold*'), false); // TODO(aaron): could improve?
-      expect(document.contains(RegExp(r'Add')), true);
-      expect(document.contains(RegExp(r'\bAdd\b')), false);
+      expect(document.contains('bold'), isTrue);
+      expect(
+          document.contains('*bold*'), isFalse); // TODO(aaron): could improve?
+      expect(document.contains(RegExp(r'Add')), isTrue);
+      expect(document.contains(RegExp(r'\bAdd\b')), isFalse);
     });
     test('footnotes', () {
       final parser = org;
@@ -514,7 +515,7 @@ biz baz
 
 
 bazoonga''');
-      expect(result is Success, true);
+      expect(result, isA<Success<dynamic>>());
       final document = result.value as OrgDocument;
       final footnote0 = document.content!.children[0] as OrgFootnote;
       expect(footnote0.marker.name, '1');
@@ -568,12 +569,12 @@ bazoonga''');
     test('complex document', () {
       final result =
           parser.parse(File('test/org-syntax.org').readAsStringSync());
-      expect(result is Success, true);
+      expect(result, isA<Success<dynamic>>());
     });
     test('complex document 2', () {
       final result =
           parser.parse(File('test/org-manual.org').readAsStringSync());
-      expect(result is Success, true);
+      expect(result, isA<Success<dynamic>>());
     });
     test('readme example', () {
       final doc = OrgDocument.parse('''* TODO [#A] foo bar
@@ -588,18 +589,18 @@ bazoonga''');
           var link = result.value as OrgFileLink;
           expect(link.scheme, 'file:');
           expect(link.body, '/home/dominik/images/jupiter.jpg');
-          expect(link.extra, null);
-          expect(link.isRelative, false);
-          expect(link.isLocal, false);
+          expect(link.extra, isNull);
+          expect(link.isRelative, isFalse);
+          expect(link.isLocal, isFalse);
         });
         test('relative path', () {
           final result = parser.parse('file:papers/last.pdf');
           final link = result.value as OrgFileLink;
           expect(link.scheme, 'file:');
           expect(link.body, 'papers/last.pdf');
-          expect(link.extra, null);
-          expect(link.isRelative, true);
-          expect(link.isLocal, false);
+          expect(link.extra, isNull);
+          expect(link.isRelative, isTrue);
+          expect(link.isLocal, isFalse);
         });
       });
       group('with extra', () {
@@ -609,8 +610,8 @@ bazoonga''');
           expect(link.scheme, 'file:');
           expect(link.body, 'projects.org');
           expect(link.extra, 'some words');
-          expect(link.isRelative, true);
-          expect(link.isLocal, false);
+          expect(link.isRelative, isTrue);
+          expect(link.isLocal, isFalse);
         });
         test('local file', () {
           final result = parser.parse('file:::#custom-id');
@@ -618,46 +619,46 @@ bazoonga''');
           expect(link.scheme, 'file:');
           expect(link.body, '');
           expect(link.extra, '#custom-id');
-          expect(link.isRelative, true);
-          expect(link.isLocal, true);
+          expect(link.isRelative, isTrue);
+          expect(link.isLocal, isTrue);
         });
       });
       group('without scheme', () {
         test('absolute path', () {
           final result = parser.parse('/home/dominik/images/jupiter.jpg');
           final link = result.value as OrgFileLink;
-          expect(link.scheme, null);
+          expect(link.scheme, isNull);
           expect(link.body, '/home/dominik/images/jupiter.jpg');
-          expect(link.extra, null);
-          expect(link.isRelative, false);
-          expect(link.isLocal, false);
+          expect(link.extra, isNull);
+          expect(link.isRelative, isFalse);
+          expect(link.isLocal, isFalse);
         });
         test('relative path', () {
           final result = parser.parse('./papers/last.pdf');
           final link = result.value as OrgFileLink;
-          expect(link.scheme, null);
+          expect(link.scheme, isNull);
           expect(link.body, './papers/last.pdf');
-          expect(link.extra, null);
-          expect(link.isRelative, true);
-          expect(link.isLocal, false);
+          expect(link.extra, isNull);
+          expect(link.isRelative, isTrue);
+          expect(link.isLocal, isFalse);
         });
       });
       group('non-files', () {
         test('https', () {
           final result = parser.parse('https://example.com');
-          expect(result is Failure, true);
+          expect(result, isA<Failure>());
         });
         test('mailto', () {
           final result = parser.parse('mailto:me@example.com');
-          expect(result is Failure, true);
+          expect(result, isA<Failure>());
         });
       });
       test('factory', () {
         final link = OrgFileLink.parse('file:papers/last.pdf');
         expect(link.scheme, 'file:');
         expect(link.body, 'papers/last.pdf');
-        expect(link.extra, null);
-        expect(link.isRelative, true);
+        expect(link.extra, isNull);
+        expect(link.isRelative, isTrue);
         try {
           OrgFileLink.parse('https://example.com');
           fail('OrgFileLink parser should not accept HTTPS link');
