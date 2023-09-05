@@ -83,6 +83,14 @@ sealed class OrgLeafNode extends OrgNode {
 }
 
 sealed class OrgParentNode extends OrgNode {
+  OrgParentNode([String? id])
+      : id = id ?? Random().nextInt(pow(2, 32).toInt()).toString();
+
+  /// A unique ID for this node. Use this to identify nodes across edits via
+  /// [OrgDocument.edit], because [OrgParentNode]s can be recreated and thus
+  /// will not be equal via [identical].
+  final String id;
+
   @override
   List<OrgNode> get children;
 
@@ -91,7 +99,7 @@ sealed class OrgParentNode extends OrgNode {
 
 /// A node potentially containing [OrgSection]s
 sealed class OrgTree extends OrgParentNode {
-  OrgTree(this.content, [Iterable<OrgSection>? sections])
+  OrgTree(this.content, [Iterable<OrgSection>? sections, super.id])
       : sections = List.unmodifiable(sections ?? const <OrgSection>[]);
 
   /// Leading content
@@ -150,8 +158,7 @@ class OrgDocument extends OrgTree {
   factory OrgDocument.parse(String text) =>
       org.parse(text).value as OrgDocument;
 
-  OrgDocument(OrgContent? content, Iterable<OrgSection> sections)
-      : super(content, sections);
+  OrgDocument(super.content, super.sections, [super.id]);
 
   @override
   int get level => 0;
@@ -171,10 +178,12 @@ class OrgDocument extends OrgTree {
   OrgDocument copyWith({
     OrgContent? content,
     Iterable<OrgSection>? sections,
+    String? id,
   }) =>
       OrgDocument(
         content ?? this.content,
         sections ?? this.sections,
+        id ?? this.id,
       );
 
   @override
@@ -199,8 +208,9 @@ class OrgHeadline extends OrgParentNode {
     this.title,
     this.rawTitle,
     ({String leading, Iterable<String> values, String trailing})? tags,
-    this.trailing,
-  ) : tags = tags == null
+    this.trailing, [
+    super.id,
+  ]) : tags = tags == null
             ? null
             : (
                 leading: tags.leading,
@@ -289,6 +299,7 @@ class OrgHeadline extends OrgParentNode {
     String? rawTitle,
     ({String leading, List<String> values, String trailing})? tags,
     String? trailing,
+    String? id,
   }) =>
       OrgHeadline(
         stars ?? this.stars,
@@ -298,6 +309,7 @@ class OrgHeadline extends OrgParentNode {
         rawTitle ?? this.rawTitle,
         tags ?? this.tags,
         trailing ?? this.trailing,
+        id ?? this.id,
       );
 }
 
@@ -312,9 +324,10 @@ class OrgHeadline extends OrgParentNode {
 class OrgSection extends OrgTree {
   OrgSection(
     this.headline,
-    OrgContent? content, [
-    Iterable<OrgSection>? sections,
-  ]) : super(content, sections);
+    super.content, [
+    super.sections,
+    super.id,
+  ]);
   final OrgHeadline headline;
 
   @override
@@ -373,11 +386,13 @@ class OrgSection extends OrgTree {
     OrgHeadline? headline,
     OrgContent? content,
     Iterable<OrgSection>? sections,
+    String? id,
   }) =>
       OrgSection(
         headline ?? this.headline,
         content ?? this.content,
         sections ?? this.sections,
+        id ?? this.id,
       );
 
   @override
@@ -409,7 +424,7 @@ mixin IndentedElement {
 
 /// A generic node that contains children
 class OrgContent extends OrgParentNode {
-  OrgContent(Iterable<OrgNode> children)
+  OrgContent(Iterable<OrgNode> children, [super.id])
       : children = children.length == 1 && children.firstOrNull is OrgContent
             ? (children.first as OrgContent).children
             : List.unmodifiable(children);
@@ -418,7 +433,8 @@ class OrgContent extends OrgParentNode {
   final List<OrgNode> children;
 
   @override
-  OrgContent fromChildren(List<OrgNode> children) => OrgContent(children);
+  OrgContent fromChildren(List<OrgNode> children) =>
+      copyWith(children: children);
 
   @override
   bool contains(Pattern pattern) =>
@@ -433,6 +449,9 @@ class OrgContent extends OrgParentNode {
       child._toMarkupImpl(buf);
     }
   }
+
+  OrgContent copyWith({List<OrgNode>? children, String? id}) =>
+      OrgContent(children ?? this.children, id ?? this.id);
 }
 
 /// Plain text that has no markup
@@ -624,7 +643,14 @@ class OrgMeta extends OrgLeafNode with IndentedElement {
 ///
 /// See also [OrgSrcBlock]
 class OrgBlock extends OrgParentNode with IndentedElement {
-  OrgBlock(this.indent, this.header, this.body, this.footer, this.trailing);
+  OrgBlock(
+    this.indent,
+    this.header,
+    this.body,
+    this.footer,
+    this.trailing, [
+    super.id,
+  ]);
 
   @override
   final String indent;
@@ -667,15 +693,16 @@ class OrgBlock extends OrgParentNode with IndentedElement {
     OrgNode? body,
     String? footer,
     String? trailing,
-  }) {
-    return OrgBlock(
-      indent ?? this.indent,
-      header ?? this.header,
-      body ?? this.body,
-      footer ?? this.footer,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgBlock(
+        indent ?? this.indent,
+        header ?? this.header,
+        body ?? this.body,
+        footer ?? this.footer,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 /// A source block, like
@@ -706,7 +733,7 @@ class OrgSrcBlock extends OrgBlock {
 /// | 123         |        |      |
 /// ```
 class OrgTable extends OrgParentNode with IndentedElement {
-  OrgTable(Iterable<OrgTableRow> rows, this.trailing)
+  OrgTable(Iterable<OrgTableRow> rows, this.trailing, [super.id])
       : rows = List.unmodifiable(rows);
 
   final List<OrgTableRow> rows;
@@ -767,16 +794,18 @@ class OrgTable extends OrgParentNode with IndentedElement {
   OrgTable copyWith({
     Iterable<OrgTableRow>? rows,
     String? trailing,
+    String? id,
   }) {
     return OrgTable(
       rows ?? this.rows,
       trailing ?? this.trailing,
+      id ?? this.id,
     );
   }
 }
 
 sealed class OrgTableRow extends OrgParentNode with IndentedElement {
-  OrgTableRow(this.indent, this.trailing);
+  OrgTableRow(this.indent, this.trailing, [super.id]);
 
   @override
   final String indent;
@@ -788,7 +817,7 @@ sealed class OrgTableRow extends OrgParentNode with IndentedElement {
 }
 
 class OrgTableDividerRow extends OrgTableRow {
-  OrgTableDividerRow(super.indent, this.content, super.trailing);
+  OrgTableDividerRow(super.indent, this.content, super.trailing, [super.id]);
 
   @override
   bool contains(Pattern pattern) => false;
@@ -799,7 +828,7 @@ class OrgTableDividerRow extends OrgTableRow {
   List<OrgNode> get children => [];
 
   @override
-  OrgTableDividerRow fromChildren(List<OrgNode> children) => this;
+  OrgTableDividerRow fromChildren(List<OrgNode> children) => copyWith();
 
   @override
   String toString() => 'OrgTableDividerRow';
@@ -811,11 +840,29 @@ class OrgTableDividerRow extends OrgTableRow {
       ..write(content)
       ..write(trailing);
   }
+
+  OrgTableDividerRow copyWith({
+    String? indent,
+    String? content,
+    String? trailing,
+    String? id,
+  }) {
+    return OrgTableDividerRow(
+      indent ?? this.indent,
+      content ?? this.content,
+      trailing ?? this.trailing,
+      id ?? this.id,
+    );
+  }
 }
 
 class OrgTableCellRow extends OrgTableRow {
-  OrgTableCellRow(super.indent, Iterable<OrgTableCell> cells, super.trailing)
-      : cells = List.unmodifiable(cells);
+  OrgTableCellRow(
+    super.indent,
+    Iterable<OrgTableCell> cells,
+    super.trailing, [
+    super.id,
+  ]) : cells = List.unmodifiable(cells);
 
   final List<OrgTableCell> cells;
 
@@ -848,17 +895,18 @@ class OrgTableCellRow extends OrgTableRow {
     String? indent,
     Iterable<OrgTableCell>? cells,
     String? trailing,
-  }) {
-    return OrgTableCellRow(
-      indent ?? this.indent,
-      cells ?? this.cells,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgTableCellRow(
+        indent ?? this.indent,
+        cells ?? this.cells,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 class OrgTableCell extends OrgParentNode {
-  OrgTableCell(this.leading, this.content, this.trailing);
+  OrgTableCell(this.leading, this.content, this.trailing, [super.id]);
 
   final String leading;
   final OrgContent content;
@@ -902,11 +950,13 @@ class OrgTableCell extends OrgParentNode {
     String? leading,
     OrgContent? content,
     String? trailing,
+    String? id,
   }) {
     return OrgTableCell(
       leading ?? this.leading,
       content ?? this.content,
       trailing ?? this.trailing,
+      id ?? this.id,
     );
   }
 }
@@ -954,7 +1004,13 @@ class OrgKeyword extends OrgLeafNode with SingleContentElement {
 /// CLOSED: [2021-12-09 Thu 12:02]
 /// ```
 class OrgPlanningLine extends OrgParentNode with IndentedElement {
-  OrgPlanningLine(this.indent, this.keyword, this.body, this.trailing);
+  OrgPlanningLine(
+    this.indent,
+    this.keyword,
+    this.body,
+    this.trailing, [
+    super.id,
+  ]);
 
   @override
   final String indent;
@@ -995,14 +1051,15 @@ class OrgPlanningLine extends OrgParentNode with IndentedElement {
     OrgKeyword? keyword,
     OrgContent? body,
     String? trailing,
-  }) {
-    return OrgPlanningLine(
-      indent ?? this.indent,
-      keyword ?? this.keyword,
-      body ?? this.body,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgPlanningLine(
+        indent ?? this.indent,
+        keyword ?? this.keyword,
+        body ?? this.body,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 /// A fixed-width area, like
@@ -1043,7 +1100,7 @@ class OrgFixedWidthArea extends OrgLeafNode with IndentedElement {
 ///   - baz
 /// ```
 class OrgList extends OrgParentNode with IndentedElement {
-  OrgList(Iterable<OrgListItem> items, this.trailing)
+  OrgList(Iterable<OrgListItem> items, this.trailing, [super.id])
       : items = List.unmodifiable(items);
   final List<OrgListItem> items;
 
@@ -1076,16 +1133,17 @@ class OrgList extends OrgParentNode with IndentedElement {
   OrgList copyWith({
     Iterable<OrgListItem>? items,
     String? trailing,
-  }) {
-    return OrgList(
-      items ?? this.items,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgList(
+        items ?? this.items,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 sealed class OrgListItem extends OrgParentNode {
-  OrgListItem(this.indent, this.bullet, this.checkbox, this.body);
+  OrgListItem(this.indent, this.bullet, this.checkbox, this.body, [super.id]);
 
   final String indent;
   final String bullet;
@@ -1119,8 +1177,9 @@ class OrgListUnorderedItem extends OrgListItem {
     super.bullet,
     super.checkbox,
     this.tag,
-    super.body,
-  );
+    super.body, [
+    super.id,
+  ]);
 
   final ({OrgContent value, String delimiter})? tag;
 
@@ -1178,15 +1237,16 @@ class OrgListUnorderedItem extends OrgListItem {
     String? checkbox,
     ({OrgContent value, String delimiter})? tag,
     OrgContent? body,
-  }) {
-    return OrgListUnorderedItem(
-      indent ?? this.indent,
-      bullet ?? this.bullet,
-      checkbox ?? this.checkbox,
-      tag ?? this.tag,
-      body ?? this.body,
-    );
-  }
+    String? id,
+  }) =>
+      OrgListUnorderedItem(
+        indent ?? this.indent,
+        bullet ?? this.bullet,
+        checkbox ?? this.checkbox,
+        tag ?? this.tag,
+        body ?? this.body,
+        id ?? this.id,
+      );
 }
 
 /// An ordered list item, like
@@ -1195,12 +1255,13 @@ class OrgListUnorderedItem extends OrgListItem {
 /// ```
 class OrgListOrderedItem extends OrgListItem {
   OrgListOrderedItem(
-    String indent,
-    String bullet,
+    super.indent,
+    super.bullet,
     this.counterSet,
-    String? checkbox,
-    OrgContent? body,
-  ) : super(indent, bullet, checkbox, body);
+    super.checkbox,
+    super.body, [
+    String? id,
+  ]);
 
   final String? counterSet;
 
@@ -1242,19 +1303,20 @@ class OrgListOrderedItem extends OrgListItem {
     String? counterSet,
     String? checkbox,
     OrgContent? body,
-  }) {
-    return OrgListOrderedItem(
-      indent ?? this.indent,
-      bullet ?? this.bullet,
-      counterSet ?? this.counterSet,
-      checkbox ?? this.checkbox,
-      body ?? this.body,
-    );
-  }
+    String? id,
+  }) =>
+      OrgListOrderedItem(
+        indent ?? this.indent,
+        bullet ?? this.bullet,
+        counterSet ?? this.counterSet,
+        checkbox ?? this.checkbox,
+        body ?? this.body,
+        id ?? this.id,
+      );
 }
 
 class OrgParagraph extends OrgParentNode {
-  OrgParagraph(this.indent, this.body);
+  OrgParagraph(this.indent, this.body, [super.id]);
 
   final String indent;
   final OrgContent body;
@@ -1282,12 +1344,13 @@ class OrgParagraph extends OrgParentNode {
   OrgParagraph copyWith({
     String? indent,
     OrgContent? body,
-  }) {
-    return OrgParagraph(
-      indent ?? this.indent,
-      body ?? this.body,
-    );
-  }
+    String? id,
+  }) =>
+      OrgParagraph(
+        indent ?? this.indent,
+        body ?? this.body,
+        id ?? this.id,
+      );
 }
 
 /// A drawer, like
@@ -1297,7 +1360,14 @@ class OrgParagraph extends OrgParentNode {
 /// :END:
 /// ```
 class OrgDrawer extends OrgParentNode with IndentedElement {
-  OrgDrawer(this.indent, this.header, this.body, this.footer, this.trailing);
+  OrgDrawer(
+    this.indent,
+    this.header,
+    this.body,
+    this.footer,
+    this.trailing, [
+    super.id,
+  ]);
 
   @override
   final String indent;
@@ -1355,15 +1425,16 @@ class OrgDrawer extends OrgParentNode with IndentedElement {
     OrgNode? body,
     String? footer,
     String? trailing,
-  }) {
-    return OrgDrawer(
-      indent ?? this.indent,
-      header ?? this.header,
-      body ?? this.body,
-      footer ?? this.footer,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgDrawer(
+        indent ?? this.indent,
+        header ?? this.header,
+        body ?? this.body,
+        footer ?? this.footer,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 /// A property in a drawer, like
@@ -1402,7 +1473,7 @@ class OrgProperty extends OrgLeafNode with IndentedElement {
 /// [fn:1] this is a footnote
 /// ```
 class OrgFootnote extends OrgParentNode {
-  OrgFootnote(this.marker, this.content);
+  OrgFootnote(this.marker, this.content, [super.id]);
 
   final OrgFootnoteReference marker;
   final OrgContent content;
@@ -1431,26 +1502,32 @@ class OrgFootnote extends OrgParentNode {
   OrgFootnote copyWith({
     OrgFootnoteReference? marker,
     OrgContent? content,
-  }) {
-    return OrgFootnote(
-      marker ?? this.marker,
-      content ?? this.content,
-    );
-  }
+    String? id,
+  }) =>
+      OrgFootnote(
+        marker ?? this.marker,
+        content ?? this.content,
+        id ?? this.id,
+      );
 }
 
 /// A footnote reference, like `[fn:1]`
 class OrgFootnoteReference extends OrgParentNode {
-  OrgFootnoteReference.named(String leading, String name, String trailing)
-      : this(leading, name, null, null, trailing);
+  OrgFootnoteReference.named(
+    String leading,
+    String name,
+    String trailing, [
+    String? id,
+  ]) : this(leading, name, null, null, trailing, id);
 
   OrgFootnoteReference(
     this.leading,
     this.name,
     this.definitionDelimiter,
     this.definition,
-    this.trailing,
-  );
+    this.trailing, [
+    super.id,
+  ]);
 
   final String leading;
   final String? name;
@@ -1496,15 +1573,16 @@ class OrgFootnoteReference extends OrgParentNode {
     String? definitionDelimiter,
     OrgContent? definition,
     String? trailing,
-  }) {
-    return OrgFootnoteReference(
-      leading ?? this.leading,
-      name ?? this.name,
-      definitionDelimiter ?? this.definitionDelimiter,
-      definition ?? this.definition,
-      trailing ?? this.trailing,
-    );
-  }
+    String? id,
+  }) =>
+      OrgFootnoteReference(
+        leading ?? this.leading,
+        name ?? this.name,
+        definitionDelimiter ?? this.definitionDelimiter,
+        definition ?? this.definition,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 /// A LaTeX block, like
