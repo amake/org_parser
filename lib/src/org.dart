@@ -87,8 +87,8 @@ sealed class OrgParentNode extends OrgNode {
       : id = id ?? Random().nextInt(pow(2, 32).toInt()).toString();
 
   /// A unique ID for this node. Use this to identify nodes across edits via
-  /// [OrgDocument.edit], because [OrgParentNode]s can be recreated and thus
-  /// will not be equal via [identical].
+  /// [OrgTree.edit], because [OrgParentNode]s can be recreated and thus will
+  /// not be equal via [identical].
   final String id;
 
   @override
@@ -132,6 +132,15 @@ sealed class OrgTree extends OrgParentNode {
     return true;
   }
 
+  OrgZipper edit() => ZipperLocation.root(
+        sectionP: (obj) => obj is OrgParentNode,
+        node: this,
+        getChildren: (obj) => obj.children,
+        makeSection: (node, children) => node.fromChildren(children),
+      );
+
+  OrgZipper? editNode(OrgNode node) => edit().find(node);
+
   @override
   bool contains(Pattern pattern, {bool includeChildren = true}) {
     final content = this.content;
@@ -165,15 +174,6 @@ class OrgDocument extends OrgTree {
 
   @override
   String toString() => 'OrgDocument';
-
-  OrgZipper edit() => ZipperLocation.root(
-        sectionP: (obj) => obj is OrgParentNode,
-        node: this,
-        getChildren: (obj) => obj.children,
-        makeSection: (node, children) => node.fromChildren(children),
-      );
-
-  OrgZipper? editNode(OrgNode node) => edit().find(node);
 
   OrgDocument copyWith({
     OrgContent? content,
