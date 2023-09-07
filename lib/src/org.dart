@@ -1165,6 +1165,17 @@ sealed class OrgListItem extends OrgParentNode {
 
   @override
   String toString() => runtimeType.toString();
+
+  OrgListItem toggleCheckbox() {
+    final toggledCheckbox =
+        switch (checkbox) { '[X]' => '[ ]', '[ ]' => '[X]', _ => checkbox };
+    final self = this;
+    // TODO(aaron): Is there no better way to do this?
+    return switch (self) {
+      OrgListOrderedItem() => self.copyWith(checkbox: toggledCheckbox),
+      OrgListUnorderedItem() => self.copyWith(checkbox: toggledCheckbox),
+    };
+  }
 }
 
 /// An unordered list item, like
