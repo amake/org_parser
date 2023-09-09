@@ -249,6 +249,15 @@ class OrgHeadline extends OrgParentNode {
   OrgHeadline fromChildren(List<OrgNode> children) =>
       copyWith(title: children.single as OrgContent);
 
+  OrgHeadline cycleTodo() => switch (keyword) {
+        (value: 'TODO', :var trailing) =>
+          copyWith(keyword: (value: 'DONE', trailing: trailing)),
+        (value: 'DONE', trailing: _) => OrgHeadline(
+            stars, null, priority, title, rawTitle, tags, trailing, id),
+        null => copyWith(keyword: (value: 'TODO', trailing: ' ')),
+        _ => this,
+      };
+
   @override
   bool contains(Pattern pattern) {
     final keyword = this.keyword;
