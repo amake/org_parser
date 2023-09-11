@@ -132,6 +132,9 @@ sealed class OrgTree extends OrgParentNode {
     return true;
   }
 
+  /// Obtain a zipper starting at the root of this tree. The zipper can be used
+  /// to edit the tree; call [ZipperLocation.commit] to obtain a new tree with
+  /// the edits applied.
   OrgZipper edit() => ZipperLocation.root(
         sectionP: (obj) => obj is OrgParentNode,
         node: this,
@@ -139,6 +142,10 @@ sealed class OrgTree extends OrgParentNode {
         makeSection: (node, children) => node.fromChildren(children),
       );
 
+  /// Obtain a zipper for the specified [node], which is presumed to be in this
+  /// tree. Returns null if the node is not found. The zipper can be used to
+  /// edit the tree; call [ZipperLocation.commit] to obtain a new tree with the
+  /// edits applied.
   OrgZipper? editNode(OrgNode node) => edit().find(node);
 
   @override

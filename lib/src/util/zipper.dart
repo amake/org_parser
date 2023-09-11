@@ -34,6 +34,7 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
     return cs.isNotEmpty;
   }
 
+  /// Return the root node of this zipper, thereby "applying" any changes made.
   ZR commit() {
     var location = this;
     while (location.path is! TopPath) {
@@ -42,6 +43,8 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
     return location.node as ZR;
   }
 
+  /// Navigate to the supplied [node], which is presumed to be a child in the
+  /// tree of this zipper. Returns null if the node is not found.
   ZipperLocation<ZR, ZI, ZS>? find(ZR node) {
     var location = this;
     while (true) {
