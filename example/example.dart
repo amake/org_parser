@@ -39,4 +39,20 @@ baz buzz''';
       return true;
     });
   }
+
+  {
+    // Edit a document
+    final docString = '''* TODO [#A] foo bar
+baz buzz''';
+    final doc = OrgDocument.parse(docString);
+    final newDoc = doc
+        .edit()
+        .goDown()
+        .goDown()
+        .goRight()
+        .goDown()
+        .replace(OrgPlainText('bazinga'))
+        .commit();
+    print(newDoc.toMarkup());
+  }
 }
