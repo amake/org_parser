@@ -1,3 +1,16 @@
+## [5.0.0]
+
+* Full support for dumping AST back to Org markup: `OrgNode.toMarkup`
+  * Errors in round-tripping are now considered bugs
+* Various changes in AST class properties to better support dumping to markup
+* While the AST remains immutable, editing operations are now possible via
+  [zipper](https://en.wikipedia.org/wiki/Zipper_(data_structure)); see
+  `OrgTree.edit` and `OrgTree.editNode`, as well as
+  [example.dart](./example/example.dart)
+* Simple editing convenience methods added:
+  * `OrgListItem.toggleCheckbox`
+  * `OrgHeadline.cycleTodo`
+
 ## [4.1.1]
 
 * Fix support for inline markup in header titles
