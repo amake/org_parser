@@ -522,6 +522,51 @@ content''');
         expect(sections, ['Foobar', 'Bizzbazz']);
       });
     });
+    group('find', () {
+      final result = parser.parse('''* Foobar
+** Bizzbazz
+/boo/
+*** Bingbang
+*blah*''');
+      final doc = result.value as OrgDocument;
+      test('find deep with type', () {
+        var visited = 0;
+        final found = doc.find<OrgMarkup>((node) {
+          visited += 1;
+          return node.style == OrgStyle.bold;
+        });
+        expect(found, isNotNull);
+        expect(found!.node.content, 'blah');
+        expect(visited, 2);
+        expect(found.path.map((n) => n.toString()), [
+          'OrgSection',
+          'OrgSection',
+          'OrgSection',
+          'OrgContent',
+          'OrgParagraph',
+          'OrgContent',
+          'OrgMarkup'
+        ]);
+      });
+      test('find shallow with type', () {
+        var visited = 0;
+        final found = doc.find<OrgMarkup>((node) {
+          visited += 1;
+          return node.style == OrgStyle.italic;
+        });
+        expect(found, isNotNull);
+        expect(found!.node.content, 'boo');
+        expect(visited, 1);
+        expect(found.path.map((n) => n.toString()), [
+          'OrgSection',
+          'OrgSection',
+          'OrgContent',
+          'OrgParagraph',
+          'OrgContent',
+          'OrgMarkup'
+        ]);
+      });
+    });
     group('section ids', () {
       test('has ids', () {
         final result = parser.parse('''* Foobar

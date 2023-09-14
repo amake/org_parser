@@ -38,6 +38,8 @@ String parseOrgIdUrl(String url) {
   return url.substring(3);
 }
 
+typedef OrgPath = List<OrgNode>;
+
 /// The base type of all Org AST objects
 abstract class OrgNode {
   /// The children of this node. May be empty (no children) or null (an object
@@ -66,6 +68,25 @@ abstract class OrgNode {
       }
     }
     return true;
+  }
+
+  ({T node, OrgPath path})? find<T extends OrgNode>(
+    bool Function(T) predicate, [
+    OrgPath path = const [],
+  ]) {
+    final self = this;
+    if (self is T && predicate(self)) {
+      return (node: self, path: path);
+    }
+    if (children != null) {
+      for (final child in children!) {
+        final result = child.find<T>(predicate, [...path, child]);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
   }
 
   String toMarkup() {
