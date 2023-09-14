@@ -353,7 +353,7 @@ a
         final named = result.value as OrgFootnoteReference;
         expect(named.leading, '[fn:');
         expect(named.name, '1');
-        expect(named.definitionDelimiter, isNull);
+        expect(named.definition?.delimiter, isNull);
         expect(named.definition, isNull);
         expect(named.trailing, ']');
       });
@@ -362,8 +362,9 @@ a
         final anonymous = result.value as OrgFootnoteReference;
         expect(anonymous.leading, '[fn:');
         expect(anonymous.name, isNull);
-        expect(anonymous.definitionDelimiter, ':');
-        final defText0 = anonymous.definition!.children[0] as OrgPlainText;
+        expect(anonymous.definition?.delimiter, ':');
+        final defText0 =
+            anonymous.definition!.value.children[0] as OrgPlainText;
         expect(defText0.content, ' who ');
         expect(anonymous.trailing, ']');
       });
@@ -372,8 +373,8 @@ a
         final inline = result.value as OrgFootnoteReference;
         expect(inline.leading, '[fn:');
         expect(inline.name, 'abc123');
-        expect(inline.definitionDelimiter, ':');
-        final defText0 = inline.definition!.children[0] as OrgPlainText;
+        expect(inline.definition?.delimiter, ':');
+        final defText0 = inline.definition!.value.children[0] as OrgPlainText;
         expect(defText0.content, ' when ');
         expect(inline.trailing, ']');
       });

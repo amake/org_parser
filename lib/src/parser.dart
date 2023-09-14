@@ -458,14 +458,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.footnoteReferenceInline().map((values) {
         final leading = values[0] as String;
         final name = values[1] as String?;
-        final delimiter = values[2] as String?;
-        final content = values[3] as OrgContent?;
+        final delimiter = values[2] as String;
+        final content = values[3] as OrgContent;
         final trailing = values[4] as String;
         return OrgFootnoteReference(
           leading,
           name,
-          delimiter,
-          content,
+          (delimiter: delimiter, value: content),
           trailing,
         );
       });

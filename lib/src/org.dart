@@ -1545,12 +1545,11 @@ class OrgFootnoteReference extends OrgParentNode {
     String name,
     String trailing, [
     String? id,
-  ]) : this(leading, name, null, null, trailing, id);
+  ]) : this(leading, name, null, trailing, id);
 
   OrgFootnoteReference(
     this.leading,
     this.name,
-    this.definitionDelimiter,
     this.definition,
     this.trailing, [
     super.id,
@@ -1558,26 +1557,28 @@ class OrgFootnoteReference extends OrgParentNode {
 
   final String leading;
   final String? name;
-  final String? definitionDelimiter;
-  final OrgContent? definition;
+  final ({String delimiter, OrgContent value})? definition;
   final String trailing;
 
   @override
-  List<OrgNode> get children => definition == null ? const [] : [definition!];
+  List<OrgNode> get children =>
+      definition == null ? const [] : [definition!.value];
 
   @override
   OrgFootnoteReference fromChildren(List<OrgNode> children) =>
-      copyWith(definition: children.single as OrgContent);
+      copyWith(definition: (
+        delimiter: definition?.delimiter ?? ':',
+        value: children.single as OrgContent,
+      ));
 
   @override
   bool contains(Pattern pattern) {
     final name = this.name;
-    final definitionDelimiter = this.definitionDelimiter;
     final definition = this.definition;
     return leading.contains(pattern) ||
         name != null && name.contains(pattern) ||
-        definitionDelimiter != null && definitionDelimiter.contains(pattern) ||
-        definition != null && definition.contains(pattern) ||
+        definition != null && definition.delimiter.contains(pattern) ||
+        definition != null && definition.value.contains(pattern) ||
         trailing.contains(pattern);
   }
 
@@ -1589,23 +1590,21 @@ class OrgFootnoteReference extends OrgParentNode {
     buf
       ..write(leading)
       ..write(name ?? '')
-      ..write(definitionDelimiter ?? '');
-    definition?._toMarkupImpl(buf);
+      ..write(definition?.delimiter ?? '');
+    definition?.value._toMarkupImpl(buf);
     buf.write(trailing);
   }
 
   OrgFootnoteReference copyWith({
     String? leading,
     String? name,
-    String? definitionDelimiter,
-    OrgContent? definition,
+    ({String delimiter, OrgContent value})? definition,
     String? trailing,
     String? id,
   }) =>
       OrgFootnoteReference(
         leading ?? this.leading,
         name ?? this.name,
-        definitionDelimiter ?? this.definitionDelimiter,
         definition ?? this.definition,
         trailing ?? this.trailing,
         id ?? this.id,
