@@ -337,6 +337,7 @@ a
       test('simple', () {
         final result = parser.parse('[fn:1] foo *bar* biz baz');
         final footnote = result.value as OrgFootnote;
+        expect(footnote.marker.isDefinition, isTrue);
         expect(footnote.marker.name, '1');
         final firstText = footnote.content.children[0] as OrgPlainText;
         expect(firstText.content, ' foo ');
@@ -351,6 +352,7 @@ a
       test('simple', () {
         var result = parser.parse('[fn:1]');
         final named = result.value as OrgFootnoteReference;
+        expect(named.isDefinition, isFalse);
         expect(named.leading, '[fn:');
         expect(named.name, '1');
         expect(named.definition?.delimiter, isNull);
@@ -360,6 +362,7 @@ a
       test('with definition', () {
         final result = parser.parse('[fn:: who /what/ why]');
         final anonymous = result.value as OrgFootnoteReference;
+        expect(anonymous.isDefinition, isFalse);
         expect(anonymous.leading, '[fn:');
         expect(anonymous.name, isNull);
         expect(anonymous.definition?.delimiter, ':');
@@ -371,6 +374,7 @@ a
       test('with name', () {
         final result = parser.parse('[fn:abc123: when /where/ how]');
         final inline = result.value as OrgFootnoteReference;
+        expect(inline.isDefinition, isFalse);
         expect(inline.leading, '[fn:');
         expect(inline.name, 'abc123');
         expect(inline.definition?.delimiter, ':');

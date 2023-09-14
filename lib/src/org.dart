@@ -1500,7 +1500,8 @@ class OrgProperty extends OrgLeafNode with IndentedElement {
 /// [fn:1] this is a footnote
 /// ```
 class OrgFootnote extends OrgParentNode {
-  OrgFootnote(this.marker, this.content, [super.id]);
+  OrgFootnote(this.marker, this.content, [super.id])
+      : assert(marker.isDefinition);
 
   final OrgFootnoteReference marker;
   final OrgContent content;
@@ -1545,9 +1546,10 @@ class OrgFootnoteReference extends OrgParentNode {
     String name,
     String trailing, [
     String? id,
-  ]) : this(leading, name, null, trailing, id);
+  ]) : this(false, leading, name, null, trailing, id);
 
   OrgFootnoteReference(
+    this.isDefinition,
     this.leading,
     this.name,
     this.definition,
@@ -1555,6 +1557,7 @@ class OrgFootnoteReference extends OrgParentNode {
     super.id,
   ]);
 
+  final bool isDefinition;
   final String leading;
   final String? name;
   final ({String delimiter, OrgContent value})? definition;
@@ -1596,6 +1599,7 @@ class OrgFootnoteReference extends OrgParentNode {
   }
 
   OrgFootnoteReference copyWith({
+    bool? isDefinition,
     String? leading,
     String? name,
     ({String delimiter, OrgContent value})? definition,
@@ -1603,6 +1607,7 @@ class OrgFootnoteReference extends OrgParentNode {
     String? id,
   }) =>
       OrgFootnoteReference(
+        isDefinition ?? this.isDefinition,
         leading ?? this.leading,
         name ?? this.name,
         definition ?? this.definition,

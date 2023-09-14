@@ -462,6 +462,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final content = values[3] as OrgContent;
         final trailing = values[4] as String;
         return OrgFootnoteReference(
+          false,
           leading,
           name,
           (delimiter: delimiter, value: content),
@@ -483,7 +484,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         if (trailing.isNotEmpty) {
           content = OrgContent(content.children + [OrgPlainText(trailing)]);
         }
-        return OrgFootnote(marker, content);
+        return OrgFootnote(marker.copyWith(isDefinition: true), content);
       });
 
   @override
