@@ -1,3 +1,11 @@
+## [5.1.0]
+
+* Add `OrgNode.find` method for searching for a particular node and its "path"
+  in the document
+* Change `OrgFootnoteReference` properties
+* Add `OrgFootnoteReference.isDefinition` to indicate whether reference is part
+  of a footnote definition or merely a reference
+
 ## [5.0.0]
 
 * Full support for dumping AST back to Org markup: `OrgNode.toMarkup`
