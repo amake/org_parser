@@ -7,7 +7,7 @@ Parser<T> was<T>(Parser<T> parser) => LookBehindParser(parser);
 /// A parser that attempts to match the given parser from one character behind
 /// the actual current position.
 class LookBehindParser<T> extends DelegateParser<T, T> {
-  LookBehindParser(Parser<T> delegate) : super(delegate);
+  LookBehindParser(super.delegate);
 
   @override
   Result<T> parseOn(Context context) {

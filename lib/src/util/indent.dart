@@ -34,10 +34,11 @@ Parser indentedRegion(
 /// allowed.
 class IndentedRegionParser<R> extends DelegateParser<R, R> {
   IndentedRegionParser(
-      Parser<R> delegate, this.indentAdjust, this.maxSeparatingLineBreaks)
-      : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
-            maxSeparatingLineBreaks > 0),
-        super(delegate);
+    super.delegate,
+    this.indentAdjust,
+    this.maxSeparatingLineBreaks,
+  ) : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
+            maxSeparatingLineBreaks > 0);
 
   final int indentAdjust;
   final int maxSeparatingLineBreaks;

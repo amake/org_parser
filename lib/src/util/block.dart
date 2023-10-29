@@ -9,7 +9,7 @@ Parser blockParser([Parser? delegate]) =>
     BlockParser(delegate ?? any().starString('Block content expected'));
 
 class BlockParser<R> extends DelegateParser<R, List<dynamic>> {
-  BlockParser(Parser<R> delegate) : super(delegate);
+  BlockParser(super.delegate);
 
   @override
   BlockParser<R> copy() => BlockParser(delegate);
