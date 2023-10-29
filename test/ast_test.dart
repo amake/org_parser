@@ -567,6 +567,26 @@ content''');
         ]);
       });
     });
+    group('local variables', () {
+      test('simple', () {
+        final result = parser.parse(r'''* foo
+blah
+
+# Local Variables:
+# my-foo: bar
+# my-bar: baz\\
+# eval: (list 'a \
+#             'b)
+# End:''');
+        final doc = result.value as OrgDocument;
+        final lvars = doc.extractLocalVariables();
+        expect(lvars, [
+          (key: 'my-foo', value: 'bar'),
+          (key: 'my-bar', value: r'baz\\'),
+          (key: 'eval', value: "(list 'a             'b)"),
+        ]);
+      });
+    });
     group('section ids', () {
       test('has ids', () {
         final result = parser.parse('''* Foobar

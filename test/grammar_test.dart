@@ -154,6 +154,32 @@ foo''');
         expect(grammar.parse(valid), isA<Success<dynamic>>());
       }
     });
+    test('local variables', () {
+      final result = grammar.parse('''* foo
+  # Local Variables:
+  # my-foo: bar
+  # End:
+''');
+      expect(
+        result.value,
+        [
+          null,
+          [
+            [
+              [
+                ['*', ' '],
+                null,
+                null,
+                'foo',
+                null,
+                '\n'
+              ],
+              '  # Local Variables:\n  # my-foo: bar\n  # End:\n'
+            ]
+          ]
+        ],
+      );
+    });
   });
 
   group('content grammar parts', () {

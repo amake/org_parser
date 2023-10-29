@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:functional_zipper/functional_zipper.dart';
 import 'package:org_parser/org_parser.dart';
+import 'package:org_parser/src/local_variables.dart';
 
 /// Identify URLs that point to a section within the current document (starting
 /// with '*')
@@ -220,6 +221,15 @@ class OrgDocument extends OrgTree {
         children.first is OrgContent ? children.first as OrgContent : null;
     final sections = content == null ? children : children.skip(1);
     return copyWith(content: content, sections: sections.cast());
+  }
+
+  LocalVariables? extractLocalVariables() {
+    LocalVariables? result;
+    visit<OrgPlainText>((node) {
+      result = parseLocalVariables(node.content);
+      return result == null;
+    });
+    return result;
   }
 }
 
