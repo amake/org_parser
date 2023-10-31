@@ -47,10 +47,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser title() {
     final limit = ref0(tags) | lineEnd();
-    return Token.newlineParser()
-        .neg()
-        .plusLazy(limit)
-        .flatten('Title expected');
+    return newline().neg().plusLazy(limit).flatten('Title expected');
   }
 
   Parser tags() =>
@@ -370,8 +367,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (ref0(lineTrailing) & ref0(blankLines))
           .flatten('Trailing line content expected');
 
-  Parser blankLines() =>
-      Token.newlineParser().starString('Blank lines expected');
+  Parser blankLines() => newline().starString('Blank lines expected');
 
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
@@ -630,13 +626,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       lineStart() &
       ref0(footnoteReferenceNamed) &
       ref0(footnoteBody) &
-      Token.newlineParser()
-          .repeatString(0, 3, 'Footnote trailing content expected');
+      newline().repeatString(0, 3, 'Footnote trailing content expected');
 
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
-        Token.newlineParser().repeat(3);
+        newline().repeat(3);
     return ref1(textRun, end).plusLazy(end);
   }
 
