@@ -70,6 +70,9 @@ abstract class OrgNode {
     return true;
   }
 
+  /// Find the first node in the AST that satisfies [predicate]. Specify a type
+  /// [T] to only visit nodes of that type. Returns a tuple of the node and its
+  /// path from the root of the tree, or null if no node is found.
   ({T node, OrgPath path})? find<T extends OrgNode>(
     bool Function(T) predicate, [
     OrgPath path = const [],
