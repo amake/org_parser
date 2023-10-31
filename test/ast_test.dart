@@ -389,6 +389,27 @@ a
         expect(entity.toMarkup(), markup);
       });
     });
+    group('local variables', () {
+      final parser = buildSpecific(parserDefinition.localVariables);
+      test('simple', () {
+        final markup = '''# Local Variables:
+# foo: bar
+# End: ''';
+        final result = parser.parse(markup);
+        final lvars = result.value as OrgLocalVariables;
+        expect(lvars.contains('foo'), isTrue);
+        expect(lvars.toMarkup(), markup);
+      });
+      test('with suffix', () {
+        final markup = '''# Local Variables: #
+# foo: bar #
+# End: #''';
+        final result = parser.parse(markup);
+        final lvars = result.value as OrgLocalVariables;
+        expect(lvars.contains('foo'), isTrue);
+        expect(lvars.toMarkup(), markup);
+      });
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

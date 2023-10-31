@@ -84,6 +84,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(planningLine) |
       ref0(drawer) |
       ref0(footnote) |
+      ref0(localVariables) |
       ref0(paragraph);
 
   Parser paragraph() =>
@@ -298,6 +299,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(indent).flatten('Fixed-width line indent expected') &
       string(': ') &
       ref0(lineTrailing).flatten('Trailing line content expected');
+
+  Parser localVariables() => localVariablesParser();
 
   Parser block() =>
       ref1(namedBlock, 'comment') |

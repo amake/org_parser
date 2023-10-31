@@ -447,6 +447,36 @@ a
         expect(entity.trailing, '{}');
       });
     });
+    group('local variables', () {
+      final parser = buildSpecific(parserDefinition.localVariables);
+      test('simple', () {
+        final result = parser.parse('''# Local Variables:
+# foo: bar
+# End: ''');
+        final variables = result.value as OrgLocalVariables;
+        expect(variables.start, '# Local Variables:\n');
+        expect(variables.end, '# End: ');
+        expect(variables.entries.length, 1);
+        expect(
+          variables.entries[0],
+          (prefix: '# ', content: 'foo: bar', suffix: '\n'),
+        );
+      });
+      test('with indent and suffix', () {
+        final result = parser.parse(''' /* Local Variables: */
+ /* foo: bar */
+ /* baz: bazinga */
+ /* End: */''');
+        final variables = result.value as OrgLocalVariables;
+        expect(variables.start, ' /* Local Variables: */\n');
+        expect(variables.end, ' /* End: */');
+        expect(variables.entries.length, 2);
+        expect(
+          variables.entries[0],
+          (prefix: ' /* ', content: 'foo: bar ', suffix: '*/\n'),
+        );
+      });
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

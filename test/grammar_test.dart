@@ -154,32 +154,6 @@ foo''');
         expect(grammar.parse(valid), isA<Success<dynamic>>());
       }
     });
-    test('local variables', () {
-      final result = grammar.parse('''* foo
-  # Local Variables:
-  # my-foo: bar
-  # End:
-''');
-      expect(
-        result.value,
-        [
-          null,
-          [
-            [
-              [
-                ['*', ' '],
-                null,
-                null,
-                'foo',
-                null,
-                '\n'
-              ],
-              '  # Local Variables:\n  # my-foo: bar\n  # End:\n'
-            ]
-          ]
-        ],
-      );
-    });
   });
 
   group('content grammar parts', () {
@@ -1121,6 +1095,46 @@ baz bazinga
         expect(result.value, [r'\', 'foobar', '{}']);
       });
     });
+
+    group('local variables', () {
+      final parser = buildSpecific(grammarDefinition.localVariables);
+      test('simple', () {
+        final result = parser.parse('''# Local Variables:
+# foo: bar
+# End: ''');
+        expect(result.value, [
+          '# Local Variables:\n',
+          [
+            ['# ', 'foo: bar', '\n']
+          ],
+          '# End: '
+        ]);
+      });
+      test('with suffix', () {
+        final result = parser.parse('''# Local Variables: #
+# foo: bar #
+# End: #''');
+        expect(result.value, [
+          '# Local Variables: #\n',
+          [
+            ['# ', 'foo: bar ', '#\n']
+          ],
+          '# End: #'
+        ]);
+      });
+      test('bad prefix', () {
+        final result = parser.parse('''# Local Variables:
+## foo: bar
+# End:''');
+        expect(result, isA<Failure>());
+      });
+      test('bad suffix', () {
+        final result = parser.parse('''/* Local Variables: */
+/* foo: bar */
+/* End: **/''');
+        expect(result, isA<Failure>());
+      });
+    });
   });
 
   group('content grammar complete', () {
@@ -1580,6 +1594,35 @@ I am''');
           ]
         ]);
       });
+    });
+    test('local variables', () {
+      final result = parser.parse('''foo
+  # Local Variables:
+  # my-foo: bar
+  # End:
+
+bar
+''');
+      expect(
+        result.value,
+        [
+          [
+            '',
+            ['foo\n']
+          ],
+          [
+            '  # Local Variables:\n',
+            [
+              ['  # ', 'my-foo: bar', '\n']
+            ],
+            '  # End:\n'
+          ],
+          [
+            '',
+            ['\nbar\n']
+          ]
+        ],
+      );
     });
     test('detect common problems', () {
       expect(

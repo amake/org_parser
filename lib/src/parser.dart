@@ -202,6 +202,20 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser localVariables() => super.localVariables().map((items) {
+        final firstLine = items[0] as String;
+        final content = items[1] as List;
+        final trailing = items[2] as String;
+        return OrgLocalVariables(
+          firstLine,
+          content.map(
+            (line) => (prefix: line[0], content: line[1], suffix: line[2]),
+          ),
+          trailing,
+        );
+      });
+
+  @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;
