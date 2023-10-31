@@ -596,16 +596,17 @@ blah
 # Local Variables:
 # my-foo: bar
 # my-bar: baz\\
-# eval: (list 'a \
+# eval: (list 'a
 #             'b)
 # End:''');
         final doc = result.value as OrgDocument;
-        final lvars = doc.extractLocalVariables();
-        expect(lvars, [
-          (key: 'my-foo', value: 'bar'),
-          (key: 'my-bar', value: r'baz\\'),
-          (key: 'eval', value: "(list 'a             'b)"),
-        ]);
+        final found = doc.find<OrgLocalVariables>((_) => true);
+        expect(found, isNotNull);
+        final lvars = found!.node;
+        expect(lvars.contentString, r'''my-foo: bar
+my-bar: baz\\
+eval: (list 'a
+            'b)''');
       });
     });
     group('section ids', () {
