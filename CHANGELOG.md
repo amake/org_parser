@@ -1,3 +1,9 @@
+## [5.2.0]
+* Parse Emacs [local variables
+  lists](https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html)
+  to `OrgLocalVariables` AST node. The content, stripped of prefixes and
+  suffixes, is available from `OrgLocalVariables.contentString`.
+
 ## [5.1.0]
 
 * Add `OrgNode.find` method for searching for a particular node and its "path"
