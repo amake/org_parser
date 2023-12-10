@@ -560,6 +560,7 @@ content''');
         expect(found!.node.content, 'blah');
         expect(visited, 2);
         expect(found.path.map((n) => n.toString()), [
+          'OrgDocument',
           'OrgSection',
           'OrgSection',
           'OrgSection',
@@ -579,6 +580,7 @@ content''');
         expect(found!.node.content, 'boo');
         expect(visited, 1);
         expect(found.path.map((n) => n.toString()), [
+          'OrgDocument',
           'OrgSection',
           'OrgSection',
           'OrgContent',

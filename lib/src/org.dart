@@ -78,6 +78,9 @@ abstract class OrgNode {
     OrgPath path = const [],
   ]) {
     final self = this;
+    if (path.isEmpty) {
+      path = [self];
+    }
     if (self is T && predicate(self)) {
       return (node: self, path: path);
     }
