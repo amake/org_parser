@@ -609,8 +609,20 @@ eval: (list 'a
             'b)''');
       });
     });
-    group('section ids', () {
-      test('has ids', () {
+    group('ids', () {
+      test('root has ids', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:ID:   abcd1234
+:CUSTOM_ID: some-id
+:END:
+
+content''');
+        final doc = result.value as OrgDocument;
+        expect(doc.ids, ['abcd1234']);
+        expect(doc.customIds, ['some-id']);
+      });
+      test('section has ids', () {
         final result = parser.parse('''* Foobar
    :properties:
    :bizz: bazz
