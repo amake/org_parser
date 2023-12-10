@@ -1823,4 +1823,11 @@ class OrgFileLink {
 
   /// Whether this link points to a section within the current document.
   bool get isLocal => body.isEmpty && extra != null;
+
+  OrgFileLink copyWith({String? scheme, String? body, String? extra}) =>
+      OrgFileLink(
+        scheme ?? this.scheme,
+        body ?? this.body,
+        extra ?? this.extra,
+      );
 }
