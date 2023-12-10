@@ -208,6 +208,15 @@ sealed class OrgTree extends OrgParentNode {
     return result;
   }
 
+  /// Find the immediate parent [OrgSection] or [OrgDocument] of the specified
+  /// [node].
+  OrgTree? findContainingTree<T extends OrgNode>(T node) {
+    final found = find<T>((n) => identical(node, n));
+    if (found == null) return null;
+    final (node: _, path: path) = found;
+    return path.reversed.firstWhere((node) => node is OrgTree) as OrgTree;
+  }
+
   /// Get the directory in which attachments are expected to be found for this
   /// section. The behavior follows Org Mode defaults:
   /// `org-attach-use-inheritance` is `selective` and

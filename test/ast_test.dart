@@ -590,6 +590,33 @@ content''');
         ]);
       });
     });
+    group('find containing tree', () {
+      final result = parser.parse('''
+~blah~
+* Foobar
+** Bizzbazz
+/boo/
+*** Bingbang
+*blah*''');
+      final doc = result.value as OrgDocument;
+      test('root', () {
+        final found = doc.find<OrgMarkup>(
+            (node) => node.style == OrgStyle.code && node.content == 'blah');
+        expect(found, isNotNull);
+        final tree = doc.findContainingTree(found!.node);
+        expect(tree, isNotNull);
+        expect(tree, same(doc));
+      });
+      test('section', () {
+        final found = doc.find<OrgMarkup>(
+            (node) => node.style == OrgStyle.bold && node.content == 'blah');
+        expect(found, isNotNull);
+        final tree = doc.findContainingTree(found!.node);
+        expect(tree, isNotNull);
+        expect(tree, isA<OrgSection>());
+        expect((tree as OrgSection).headline.toMarkup(), '*** Bingbang\n');
+      });
+    });
     group('local variables', () {
       test('simple', () {
         final result = parser.parse(r'''* foo
