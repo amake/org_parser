@@ -205,6 +205,21 @@ sealed class OrgTree extends OrgParentNode {
     return result;
   }
 
+  /// Get the directory in which attachments are expected to be found for this
+  /// section. The behavior follows Org Mode defaults:
+  /// `org-attach-use-inheritance` is `selective` and
+  /// `org-use-property-inheritance` is `nil`, meaning that the relevant
+  /// properties are not inherited from parent sections.
+  String? get attachDir {
+    final dir = dirs.lastOrNull;
+    if (dir != null) return dir;
+    final id = ids.lastOrNull;
+    if (id != null && id.length >= 3) {
+      return 'data/${id.substring(0, 2)}/${id.substring(2)}';
+    }
+    return null;
+  }
+
   @override
   bool contains(Pattern pattern, {bool includeChildren = true}) {
     final content = this.content;

@@ -675,6 +675,65 @@ content''');
         expect(section.dirs, ['/foo/']);
       });
     });
+    group('attach dir', () {
+      test('from dir', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:DIR: /foo/
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, '/foo/');
+      });
+      test('from id', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:ID: abcd1234
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, 'data/ab/cd1234');
+      });
+      test('dir overrides id', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:ID: abcd1234
+:DIR: /foo/
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, '/foo/');
+      });
+      test('invalid id', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:ID: a
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, isNull);
+      });
+      test('multiple ids', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:ID: abcd1234
+:ID: efgh5678
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, 'data/ef/gh5678');
+      });
+      test('multiple dirs', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:DIR: /foo/
+:DIR: /bar/
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.attachDir, '/bar/');
+      });
+    });
   });
   group('file link', () {
     test('file: relative', () {
