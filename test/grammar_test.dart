@@ -226,6 +226,10 @@ maybe''');
         final result = parser.parse('file:example.txt');
         expect(result.value, 'file:example.txt');
       });
+      test('bare attachment URL', () {
+        final result = parser.parse('attachment:example.txt');
+        expect(result.value, 'attachment:example.txt');
+      });
       test('arbitrary protocol', () {
         final result = parser.parse('foobar://example.com');
         expect(result, isA<Failure>());
@@ -1651,6 +1655,13 @@ bar
         expect(
           result.value,
           ['file:', '/ssh:me@some.where:papers/last.pdf', null],
+        );
+      });
+      test('attachment', () {
+        final result = parser.parse('attachment:foo.png');
+        expect(
+          result.value,
+          ['attachment:', 'foo.png', null],
         );
       });
     });
