@@ -1,3 +1,12 @@
+## [5.3.0]
+* Support the `attachment:` protocol in `OrgFileLink`
+* `ids`, `customIds` is now on `OrgTree` rather than `OrgSection`
+* Added `OrgTree.dirs` to get the `:DIR:` property values of the tree
+* Added `OrgTree.attachDir` to get the attachment directory for the tree
+* The `OrgPath` returned by `OrgNode.find` now includes the starting node as the
+  first item
+* Added `OrgFileLink.copyWith`
+
 ## [5.2.0]
 * Parse Emacs [local variables
   lists](https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html)
