@@ -179,6 +179,9 @@ sealed class OrgTree extends OrgParentNode {
   /// any.
   List<String> get customIds => _getProperties(':CUSTOM_ID:');
 
+  /// Get the DIR properties from this section's PROPERTIES drawer, if any.
+  List<String> get dirs => _getProperties(':DIR:');
+
   List<String> _getProperties(String key) =>
       _propertiesDrawer
           ?.properties(key: key)

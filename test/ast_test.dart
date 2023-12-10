@@ -652,6 +652,29 @@ content''');
         expect(section.ids.isEmpty, isTrue);
       });
     });
+    group('dirs', () {
+      test('root dir', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:DIR: /foo/
+:END:
+
+content''');
+        final doc = result.value as OrgDocument;
+        expect(doc.dirs, ['/foo/']);
+      });
+      test('section dir', () {
+        final result = parser.parse('''* Foobar
+   :properties:
+   :DIR: /foo/
+   :END:
+
+content''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        expect(section.dirs, ['/foo/']);
+      });
+    });
   });
   group('file link', () {
     test('file: relative', () {
