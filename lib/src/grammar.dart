@@ -85,6 +85,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(drawer) |
       ref0(footnote) |
       ref0(localVariables) |
+      ref0(pgpBlock) |
       ref0(paragraph);
 
   Parser paragraph() =>
@@ -301,6 +302,20 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(lineTrailing).flatten('Trailing line content expected');
 
   Parser localVariables() => localVariablesParser();
+
+  Parser pgpBlock() =>
+      ref0(indent).flatten('Indent expected') &
+      ref0(pgpBlockStart) &
+      ref0(pgpBlockBody) &
+      ref0(pgpBlockEnd) &
+      ref0(lineTrailing).flatten('Trailing line content expected');
+
+  Parser pgpBlockStart() => string('-----BEGIN PGP MESSAGE-----');
+
+  Parser pgpBlockBody() =>
+      any().starLazy(ref0(pgpBlockEnd)).flatten('PGP block body expected');
+
+  Parser pgpBlockEnd() => string('-----END PGP MESSAGE-----');
 
   Parser block() =>
       ref1(namedBlock, 'comment') |

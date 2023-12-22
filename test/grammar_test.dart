@@ -1139,6 +1139,49 @@ baz bazinga
         expect(result, isA<Failure>());
       });
     });
+
+    group('PGP block', () {
+      final parser = buildSpecific(grammarDefinition.pgpBlock);
+      test('simple', () {
+        final result = parser.parse('''-----BEGIN PGP MESSAGE-----
+
+jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O
+X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
+=chda
+-----END PGP MESSAGE-----
+''');
+        expect(result.value, [
+          '',
+          '-----BEGIN PGP MESSAGE-----',
+          '\n\n'
+              'jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
+              'X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
+              '=chda\n',
+          '-----END PGP MESSAGE-----',
+          '\n'
+        ]);
+      });
+      test('indented', () {
+        final result = parser.parse('''   -----BEGIN PGP MESSAGE-----
+
+   jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O
+   X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
+   =chda
+   -----END PGP MESSAGE-----
+''');
+        expect(result.value, [
+          '   ',
+          '-----BEGIN PGP MESSAGE-----',
+          '\n\n'
+              '   jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
+              '   X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
+              '   =chda\n'
+              '   ',
+          '-----END PGP MESSAGE-----',
+          '\n'
+        ]);
+      });
+    });
   });
 
   group('content grammar complete', () {
