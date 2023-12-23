@@ -446,6 +446,16 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
 -----END PGP MESSAGE-----''');
       });
     });
+    group('Comments', () {
+      final parser = buildSpecific(parserDefinition.comment);
+      test('simple', () {
+        final markup = '# foo bar';
+        final result = parser.parse(markup);
+        final comment = result.value as OrgComment;
+        expect(comment.contains('foo'), isTrue);
+        expect(comment.toMarkup(), markup);
+      });
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

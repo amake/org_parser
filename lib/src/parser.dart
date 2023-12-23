@@ -228,6 +228,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser comment() => super.comment().castList<dynamic>().map((items) {
+        final [indent as String, content as String, trailing as String] = items;
+        return OrgComment(indent, content, trailing);
+      });
+
+  @override
   Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;

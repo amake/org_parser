@@ -501,6 +501,16 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
         expect(block.trailing, '\n');
       });
     });
+    group('Comment', () {
+      final parser = buildSpecific(parserDefinition.comment);
+      test('simple', () {
+        final result = parser.parse('# foo bar');
+        final comment = result.value as OrgComment;
+        expect(comment.indent, '');
+        expect(comment.start, '# ');
+        expect(comment.content, 'foo bar');
+      });
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

@@ -1182,6 +1182,17 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
         ]);
       });
     });
+    group('Comment', () {
+      final parser = buildSpecific(grammarDefinition.comment);
+      test('simple', () {
+        final result = parser.parse('''# foo bar''');
+        expect(result.value, ['', '# ', 'foo bar']);
+      });
+      test('indented', () {
+        final result = parser.parse('''   # foo bar''');
+        expect(result.value, ['   ', '# ', 'foo bar']);
+      });
+    });
   });
 
   group('content grammar complete', () {
