@@ -1845,6 +1845,56 @@ class OrgPgpBlock extends OrgLeafNode with IndentedElement {
       toMarkup().trim().replaceAll(RegExp('^[ \t]*', multiLine: true), '');
 }
 
+class OrgDecryptedContent extends OrgTree {
+  static OrgDecryptedContent fromDecryptedResult(
+      OrgPgpBlock cyphertext, String plaintext) {
+    final parsed = OrgDocument.parse(plaintext);
+    return OrgDecryptedContent(
+      cyphertext,
+      parsed.content,
+      parsed.sections,
+      parsed.id,
+    );
+  }
+
+  OrgDecryptedContent(this.cyphertext, super.content, super.sections, super.id);
+
+  final OrgPgpBlock cyphertext;
+
+  @override
+  void _toMarkupImpl(StringBuffer buf) => cyphertext._toMarkupImpl(buf);
+
+  @override
+  int get level => -1;
+
+  @override
+  String toString() => 'OrgDecryptedContent';
+
+  @override
+  List<OrgNode> get children => [if (content != null) content!, ...sections];
+
+  @override
+  OrgParentNode fromChildren(List<OrgNode> children) {
+    final content =
+        children.first is OrgContent ? children.first as OrgContent : null;
+    final sections = content == null ? children : children.skip(1);
+    return copyWith(content: content, sections: sections.cast());
+  }
+
+  OrgDecryptedContent copyWith({
+    OrgPgpBlock? cyphertext,
+    OrgContent? content,
+    Iterable<OrgSection>? sections,
+    String? id,
+  }) =>
+      OrgDecryptedContent(
+        cyphertext ?? this.cyphertext,
+        content ?? this.content,
+        sections ?? this.sections,
+        id ?? this.id,
+      );
+}
+
 class OrgComment extends OrgLeafNode {
   OrgComment(this.indent, this.start, this.content);
 
