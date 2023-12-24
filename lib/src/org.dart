@@ -139,10 +139,6 @@ sealed class OrgTree extends OrgParentNode {
   @override
   List<OrgNode> get children => [if (content != null) content!, ...sections];
 
-  /// The "level" (depth) of this node in the tree; corresponds to the number of
-  /// '*' characters in the section heading
-  int get level;
-
   /// Walk only section nodes of the AST with [visitor]. More efficient than
   /// calling [visit]. The visitor function must return `true` to continue
   /// iterating, or `false` to stop.
@@ -259,9 +255,6 @@ class OrgDocument extends OrgTree {
       org.parse(text).value as OrgDocument;
 
   OrgDocument(super.content, super.sections, [super.id]);
-
-  @override
-  int get level => 0;
 
   @override
   String toString() => 'OrgDocument';
@@ -452,7 +445,6 @@ class OrgSection extends OrgTree {
     );
   }
 
-  @override
   int get level => headline.level;
 
   /// A section may be empty if it has no content or sub-sections
@@ -1863,9 +1855,6 @@ class OrgDecryptedContent extends OrgTree {
 
   @override
   void _toMarkupImpl(StringBuffer buf) => cyphertext._toMarkupImpl(buf);
-
-  @override
-  int get level => -1;
 
   @override
   String toString() => 'OrgDecryptedContent';
