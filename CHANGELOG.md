@@ -1,3 +1,9 @@
+## [5.4.0]
+* Parse PGP encrypted blocks, add representation for decrypted content
+* Parse comment lines
+* Fix some editing bugs
+* Remove `OrgTree.level` (`OrgSection.level` remains)
+
 ## [5.3.0]
 * Support the `attachment:` protocol in `OrgFileLink`
 * `ids`, `customIds` is now on `OrgTree` rather than `OrgSection`
