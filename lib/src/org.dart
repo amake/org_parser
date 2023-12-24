@@ -279,6 +279,9 @@ class OrgDocument extends OrgTree {
 
   @override
   OrgDocument fromChildren(List<OrgNode> children) {
+    if (children.isEmpty) {
+      return copyWith(content: null, sections: []);
+    }
     final content =
         children.first is OrgContent ? children.first as OrgContent : null;
     final sections = content == null ? children : children.skip(1);
@@ -338,7 +341,7 @@ class OrgHeadline extends OrgParentNode {
 
   @override
   OrgHeadline fromChildren(List<OrgNode> children) =>
-      copyWith(title: children.single as OrgContent);
+      copyWith(title: children.firstOrNull as OrgContent?);
 
   OrgHeadline cycleTodo() => switch (keyword) {
         (value: 'TODO', :var trailing) =>
@@ -436,6 +439,9 @@ class OrgSection extends OrgTree {
   @override
   OrgSection fromChildren(List<OrgNode> children) {
     final headline = children.first as OrgHeadline;
+    if (children.length < 2) {
+      return copyWith(headline: headline);
+    }
     final content =
         children[1] is OrgContent ? children[1] as OrgContent : null;
     final sections = content == null ? children.skip(1) : children.skip(2);
