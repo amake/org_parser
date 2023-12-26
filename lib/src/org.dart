@@ -1868,6 +1868,14 @@ class OrgDecryptedContent extends OrgTree {
   @override
   void _toMarkupImpl(StringBuffer buf) => buf.write(serializer.toMarkup(this));
 
+  String toCleartextMarkup() {
+    final buf = StringBuffer();
+    for (final child in children) {
+      child._toMarkupImpl(buf);
+    }
+    return buf.toString();
+  }
+
   @override
   String toString() => 'OrgDecryptedContent';
 
