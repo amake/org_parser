@@ -1837,24 +1837,36 @@ class OrgPgpBlock extends OrgLeafNode with IndentedElement {
       toMarkup().trim().replaceAll(RegExp('^[ \t]*', multiLine: true), '');
 }
 
+// This is an abstract class so that it can be sent to an isolate for processing
+abstract class DecryptedContentSerializer {
+  String toMarkup(OrgDecryptedContent content);
+}
+
 class OrgDecryptedContent extends OrgTree {
   static OrgDecryptedContent fromDecryptedResult(
-      OrgPgpBlock cyphertext, String plaintext) {
-    final parsed = OrgDocument.parse(plaintext);
+    String cleartext,
+    DecryptedContentSerializer serializer,
+  ) {
+    final parsed = OrgDocument.parse(cleartext);
     return OrgDecryptedContent(
-      cyphertext,
+      serializer,
       parsed.content,
       parsed.sections,
       parsed.id,
     );
   }
 
-  OrgDecryptedContent(this.cyphertext, super.content, super.sections, super.id);
+  OrgDecryptedContent(
+    this.serializer,
+    super.content,
+    super.sections,
+    super.id,
+  );
 
-  final OrgPgpBlock cyphertext;
+  final DecryptedContentSerializer serializer;
 
   @override
-  void _toMarkupImpl(StringBuffer buf) => cyphertext._toMarkupImpl(buf);
+  void _toMarkupImpl(StringBuffer buf) => buf.write(serializer.toMarkup(this));
 
   @override
   String toString() => 'OrgDecryptedContent';
@@ -1871,13 +1883,13 @@ class OrgDecryptedContent extends OrgTree {
   }
 
   OrgDecryptedContent copyWith({
-    OrgPgpBlock? cyphertext,
+    DecryptedContentSerializer? serializer,
     OrgContent? content,
     Iterable<OrgSection>? sections,
     String? id,
   }) =>
       OrgDecryptedContent(
-        cyphertext ?? this.cyphertext,
+        serializer ?? this.serializer,
         content ?? this.content,
         sections ?? this.sections,
         id ?? this.id,
