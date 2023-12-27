@@ -809,6 +809,30 @@ content''');
         expect(doc.attachDir, '/bar/');
       });
     });
+    group('decrypted content', () {
+      test('verbatim', () {
+        final cleartext = '''foo
+* bar
+baz''';
+        final content = OrgDecryptedContent.fromDecryptedResult(
+          cleartext,
+          _TestSerializer((c) => c.toCleartextMarkup()),
+        );
+        expect(content.toCleartextMarkup(), cleartext);
+        expect(content.toMarkup(), cleartext);
+      });
+      test('custom', () {
+        final cleartext = '''foo
+* bar
+baz''';
+        final content = OrgDecryptedContent.fromDecryptedResult(
+          cleartext,
+          _TestSerializer((c) => 'bazinga'),
+        );
+        expect(content.toCleartextMarkup(), cleartext);
+        expect(content.toMarkup(), 'bazinga');
+      });
+    });
   });
   group('file link', () {
     test('file: relative', () {
@@ -836,4 +860,13 @@ content''');
       expect(link.extra, isNull);
     });
   });
+}
+
+class _TestSerializer extends DecryptedContentSerializer {
+  _TestSerializer(this._toMarkup);
+
+  final String Function(OrgDecryptedContent) _toMarkup;
+
+  @override
+  String toMarkup(OrgDecryptedContent content) => _toMarkup(content);
 }
