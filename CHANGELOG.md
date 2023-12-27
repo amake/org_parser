@@ -1,3 +1,8 @@
+## [5.5.0]
+* Adjust `OrgDecryptedContent` to allow serializing to encrypted form
+  * Supply an appropriate `DecryptedContentSerializer`
+  * See `OrgDecryptedContent.toCleartextMarkup` to obtain the unencrypted form
+
 ## [5.4.0]
 * Parse PGP encrypted blocks, add representation for decrypted content
 * Parse comment lines
