@@ -1,4 +1,3 @@
-import 'package:org_parser/src/org.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
@@ -83,23 +82,6 @@ void main() {
     result = parser.parse('');
     expect(result is Success, true);
     expect(result.value, null);
-  });
-  test('local section url parser', () {
-    expect(true, isOrgLocalSectionUrl('*foo'));
-    expect(false, isOrgLocalSectionUrl('foo'));
-    expect('foo bar', parseOrgLocalSectionUrl('*foo bar'));
-    expect('foo bar', parseOrgLocalSectionUrl('''*foo
-  bar'''));
-  });
-  test('custom ID url parser', () {
-    expect(true, isOrgCustomIdUrl('#foo'));
-    expect(false, isOrgCustomIdUrl('foo'));
-    expect('foo bar', parseOrgCustomIdUrl('#foo bar'));
-  });
-  test('ID url parser', () {
-    expect(true, isOrgIdUrl('id:foo'));
-    expect(false, isOrgIdUrl('foo'));
-    expect('foo bar', parseOrgIdUrl('id:foo bar'));
   });
   test('block parser', () {
     final parser = blockParser();

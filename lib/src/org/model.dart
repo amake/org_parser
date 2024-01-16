@@ -3,41 +3,6 @@ import 'dart:math';
 import 'package:functional_zipper/functional_zipper.dart';
 import 'package:org_parser/org_parser.dart';
 
-/// Identify URLs that point to a section within the current document (starting
-/// with '*')
-bool isOrgLocalSectionUrl(String url) => url.startsWith('*');
-
-/// Return the title of the section pointed to by the URL. The URL must be one
-/// for which [isOrgLocalSectionUrl] returns true.
-String parseOrgLocalSectionUrl(String url) {
-  assert(isOrgLocalSectionUrl(url));
-  return url.substring(1).replaceAll(RegExp('[ \t]*\r?\n[ \t]*'), ' ');
-}
-
-/// Identify URLs that point to a custom ID (starting with '#').
-///
-/// Note that "custom IDs" are distinct from "IDs"; see [isOrgIdUrl].
-bool isOrgCustomIdUrl(String url) => url.startsWith('#');
-
-/// Return the CUSTOM_ID of the section pointed to by the URL. The URL must be
-/// one for which [isOrgCustomIdUrl] returns true.
-String parseOrgCustomIdUrl(String url) {
-  assert(isOrgCustomIdUrl(url));
-  return url.substring(1);
-}
-
-/// Identify URLs that point to IDs (starting with 'id:').
-///
-/// Note that "IDs" are distinct from "custom IDs"; see [isOrgCustomIdUrl].
-bool isOrgIdUrl(String url) => url.startsWith('id:');
-
-/// Return the ID of the section pointed to by the URL. The URL must be one
-/// for which [isOrgCustomIdUrl] returns true.
-String parseOrgIdUrl(String url) {
-  assert(isOrgIdUrl(url));
-  return url.substring(3);
-}
-
 typedef OrgPath = List<OrgNode>;
 
 /// The base type of all Org AST objects
@@ -1924,35 +1889,4 @@ class OrgComment extends OrgLeafNode {
       ..write(start)
       ..write(content);
   }
-}
-
-/// A link to a file, like
-/// ```
-/// file:/foo/bar.org::#custom-id
-/// ```
-class OrgFileLink {
-  factory OrgFileLink.parse(String text) =>
-      orgFileLink.parse(text).value as OrgFileLink;
-
-  OrgFileLink(this.scheme, this.body, this.extra);
-  final String? scheme;
-  final String body;
-  final String? extra;
-
-  /// Whether the file linked to is indicated by a relative path (as opposed to
-  /// an absolute path). Also true for local links.
-  bool get isRelative =>
-      isLocal ||
-      body.startsWith('.') ||
-      scheme != null && !body.startsWith('/');
-
-  /// Whether this link points to a section within the current document.
-  bool get isLocal => body.isEmpty && extra != null;
-
-  OrgFileLink copyWith({String? scheme, String? body, String? extra}) =>
-      OrgFileLink(
-        scheme ?? this.scheme,
-        body ?? this.body,
-        extra ?? this.extra,
-      );
 }

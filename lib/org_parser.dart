@@ -1,6 +1,6 @@
 library org_parser;
 
-export 'src/grammar.dart';
-export 'src/org.dart';
-export 'src/parser.dart';
+export 'src/file_link/file_link.dart';
+export 'src/org/org.dart';
+export 'src/url.dart';
 export 'src/util/zipper.dart';
