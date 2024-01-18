@@ -137,16 +137,18 @@ sealed class OrgTree extends OrgParentNode {
   OrgZipper? editNode(OrgNode node) => edit().find(node);
 
   /// Get the ID properties from this section's PROPERTIES drawer, if any.
-  List<String> get ids => _getProperties(':ID:');
+  List<String> get ids => getProperties(':ID:');
 
   /// Get the CUSTOM_ID properties from this section's PROPERTIES drawer, if
   /// any.
-  List<String> get customIds => _getProperties(':CUSTOM_ID:');
+  List<String> get customIds => getProperties(':CUSTOM_ID:');
 
   /// Get the DIR properties from this section's PROPERTIES drawer, if any.
-  List<String> get dirs => _getProperties(':DIR:');
+  List<String> get dirs => getProperties(':DIR:');
 
-  List<String> _getProperties(String key) =>
+  /// Get the properties corresponding to [key] from this section's PROPERTIES
+  /// drawer, if any.
+  List<String> getProperties(String key) =>
       _propertiesDrawer
           ?.properties(key: key)
           .map<String>((prop) => prop.value.trim())
