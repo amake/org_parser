@@ -66,7 +66,7 @@ void main() {
         'Title foo bar',
         [
           ' :',
-          isSeparatedList(elements: [
+          isSeparatedList<dynamic, String>(elements: [
             'biz',
             'baz',
           ], separators: [
