@@ -1,3 +1,10 @@
+## [5.6.0]
+* Add parser, AST for the Org query language described in the [Matching tags and
+  properties](https://orgmode.org/manual/Matching-tags-and-properties.html)
+  section of the Org manual
+* Make `OrgTree.getProperties` public
+* Reorganize code
+
 ## [5.5.0]
 * Adjust `OrgDecryptedContent` to allow serializing to encrypted form
   * Supply an appropriate `DecryptedContentSerializer`
