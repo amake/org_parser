@@ -1,3 +1,6 @@
+## [5.6.1]
+* Bug fixes
+
 ## [5.6.0]
 * Add parser, AST for the Org query language described in the [Matching tags and
   properties](https://orgmode.org/manual/Matching-tags-and-properties.html)
