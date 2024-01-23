@@ -29,7 +29,7 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
   Parser continuingImplicitAnd() =>
       ref0(continuingSimpleSelection) & ref0(continuingSelection);
 
-  Parser simpleSelection() => ref0(include) | ref0(exclude);
+  Parser simpleSelection() => ref0(exclude) | ref0(include);
 
   Parser continuingSimpleSelection() => ref0(explicitInclude) | ref0(exclude);
 

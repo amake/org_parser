@@ -207,5 +207,33 @@ void main() {
         ),
       );
     });
+    test('multiple', () {
+      expect(
+        orgQuery.parse('LEVEL>2-foo').value,
+        OrgQueryAndMatcher([
+          OrgQueryPropertyMatcher(
+            property: 'LEVEL',
+            operator: '>',
+            value: 2,
+          ),
+          OrgQueryNotMatcher(OrgQueryTagMatcher('foo')),
+        ]),
+      );
+      expect(
+        orgQuery.parse('-LEVEL>2+PRIORITY="C"').value,
+        OrgQueryAndMatcher([
+          OrgQueryNotMatcher(OrgQueryPropertyMatcher(
+            property: 'LEVEL',
+            operator: '>',
+            value: 2,
+          )),
+          OrgQueryPropertyMatcher(
+            property: 'PRIORITY',
+            operator: '=',
+            value: 'C',
+          ),
+        ]),
+      );
+    });
   });
 }
