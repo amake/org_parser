@@ -64,14 +64,14 @@ class OrgQueryPropertyMatcher extends OrgQueryMatcher {
               value,
             );
       default:
-        final actual = section.getProperties(property).firstOrNull;
+        final actual = section.getProperties(':$property:').firstOrNull;
         if (value is String) {
           return evaluateString(actual, operator, value);
         } else if (actual != null && value is num) {
           return evaluateNumber(num.parse(actual), operator, value);
         }
     }
-    throw UnimplementedError();
+    return false;
   }
 
   bool evaluateString(String? left, String operator, String right) {

@@ -115,6 +115,38 @@ void main() {
         rejectsSection('* [#A] blah'),
       );
     });
+    test('other', () {
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '=',
+          value: 'ipsum',
+        ),
+        acceptsSection('''* blah
+:PROPERTIES:
+:lorem: ipsum
+:END:'''),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '=',
+          value: 'foobar',
+        ),
+        rejectsSection('''* blah
+:PROPERTIES:
+:lorem: ipsum
+:END:'''),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '=',
+          value: 1,
+        ),
+        rejectsSection('* blah'),
+      );
+    });
     test('case-insensitive key', () {
       expect(
         OrgQueryPropertyMatcher(property: 'todo', operator: '=', value: 'DONE'),
