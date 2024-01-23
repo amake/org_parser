@@ -142,6 +142,9 @@ class OrgQueryNotMatcher extends OrgQueryMatcher {
 
   @override
   int get hashCode => child.hashCode;
+
+  @override
+  String toString() => 'OrgQueryNotMatcher[$child]';
 }
 
 class OrgQueryAndMatcher extends OrgQueryMatcher {
@@ -166,6 +169,9 @@ class OrgQueryAndMatcher extends OrgQueryMatcher {
 
   @override
   int get hashCode => Object.hashAll(children);
+
+  @override
+  String toString() => 'OrgQueryAndMatcher[${children.join('&')}]';
 }
 
 class OrgQueryOrMatcher extends OrgQueryMatcher {
@@ -190,4 +196,7 @@ class OrgQueryOrMatcher extends OrgQueryMatcher {
 
   @override
   int get hashCode => Object.hashAll(children);
+
+  @override
+  String toString() => 'OrgQueryOrMatcher[${children.join('|')}]';
 }
