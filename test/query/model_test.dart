@@ -19,6 +19,9 @@ void main() {
       expect(OrgQueryTagMatcher('foo'), acceptsSection('* blah :foo:'));
       expect(OrgQueryTagMatcher('foo'), rejectsSection('* blah :bar:'));
     });
+    test('case-sensitive', () {
+      expect(OrgQueryTagMatcher('FOO'), rejectsSection('* blah :foo:'));
+    });
     test('single excluded tag', () {
       expect(
         OrgQueryNotMatcher(OrgQueryTagMatcher('foo')),
@@ -108,6 +111,34 @@ void main() {
           property: 'PRIORITY',
           operator: '=',
           value: 'B',
+        ),
+        rejectsSection('* [#A] blah'),
+      );
+    });
+    test('case-insensitive key', () {
+      expect(
+        OrgQueryPropertyMatcher(property: 'todo', operator: '=', value: 'DONE'),
+        acceptsSection('* DONE blah'),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'Priority',
+          operator: '=',
+          value: 'A',
+        ),
+        acceptsSection('* [#A] blah'),
+      );
+    });
+    test('case-sensitive value', () {
+      expect(
+        OrgQueryPropertyMatcher(property: 'TODO', operator: '=', value: 'Done'),
+        rejectsSection('* DONE blah'),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'PRIORITY',
+          operator: '=',
+          value: 'a',
         ),
         rejectsSection('* [#A] blah'),
       );

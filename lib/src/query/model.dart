@@ -47,7 +47,7 @@ class OrgQueryPropertyMatcher extends OrgQueryMatcher {
   @override
   bool matches(OrgSection section) {
     final value = this.value;
-    switch (property) {
+    switch (property.toUpperCase()) {
       case 'TODO':
         return value is String &&
             evaluateString(section.headline.keyword?.value, operator, value);
