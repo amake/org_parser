@@ -3,6 +3,9 @@ library org_parser;
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
+/// Equivalent to `org-todo-keywords`
+const defaultTodoKeywords = ['TODO', 'DONE'];
+
 // See https://orgmode.org/worg/dev/org-syntax.html
 
 /// Top-level grammar definition
@@ -18,6 +21,13 @@ import 'package:petitparser/petitparser.dart';
 /// The structure and the content turned out to be hard to define together, so
 /// the content rules are defined separately in [OrgContentGrammarDefinition].
 class OrgGrammarDefinition extends GrammarDefinition {
+  const OrgGrammarDefinition({this.todoKeywords});
+
+  /// Equivalent to `org-todo-keywords`. If not provided, defaults to
+  /// [defaultTodoKeywords].
+  final List<String>? todoKeywords;
+  List<String> get _todoKeywords => todoKeywords ?? defaultTodoKeywords;
+
   @override
   Parser start() => ref0(document).end();
 
@@ -37,7 +47,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser stars() => char('*').plusString() & char(' ').plusString();
 
   Parser todoKeyword() =>
-      (string('TODO') | string('DONE')) & char(' ').starString();
+      _todoKeywords.map(string).toChoiceParser() & char(' ').starString();
 
   Parser priority() =>
       string('[#') &

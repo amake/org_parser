@@ -651,4 +651,20 @@ bazoonga''');
       expect(doc.sections[0].headline.keyword?.value, 'TODO');
     });
   });
+  group('custom parser', () {
+    test('todo keywords', () {
+      final parser = OrgParserDefinition(todoKeywords: ['FOO', 'BAR']).build();
+      {
+        final doc = parser.parse('''* FOO [#A] foo bar
+        baz buzz''').value as OrgDocument;
+        expect(doc.sections[0].headline.keyword?.value, 'FOO');
+      }
+      {
+        final doc = parser.parse('''* TODO [#A] foo bar
+        baz buzz''').value as OrgDocument;
+        expect(doc.sections[0].headline.keyword?.value, isNull);
+        expect(doc.sections[0].headline.rawTitle, 'TODO [#A] foo bar');
+      }
+    });
+  });
 }
