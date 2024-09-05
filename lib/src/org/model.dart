@@ -5,6 +5,19 @@ import 'package:org_parser/org_parser.dart';
 
 typedef OrgPath = List<OrgNode>;
 
+/// A class for serializing Org AST objects to Org Mode markup. Subclass and
+/// supply to [OrgNode.toMarkup] to customize serialization.
+class OrgSerializer {
+  final _buf = StringBuffer();
+
+  void visit(OrgNode node) => node._toMarkupImpl(this);
+
+  void write(String str) => _buf.write(str);
+
+  @override
+  String toString() => _buf.toString();
+}
+
 /// The base type of all Org AST objects
 abstract class OrgNode {
   /// The children of this node. May be empty (no children) or null (an object
@@ -60,13 +73,13 @@ abstract class OrgNode {
     return null;
   }
 
-  String toMarkup() {
-    final buf = StringBuffer();
-    _toMarkupImpl(buf);
-    return buf.toString();
+  String toMarkup({OrgSerializer? serializer}) {
+    serializer ??= OrgSerializer();
+    _toMarkupImpl(serializer);
+    return serializer.toString();
   }
 
-  void _toMarkupImpl(StringBuffer buf);
+  void _toMarkupImpl(OrgSerializer buf);
 }
 
 sealed class OrgLeafNode extends OrgNode {
@@ -208,9 +221,9 @@ sealed class OrgTree extends OrgParentNode {
   String toString() => runtimeType.toString();
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     for (final child in children) {
-      child._toMarkupImpl(buf);
+      buf.visit(child);
     }
   }
 }
@@ -325,7 +338,7 @@ class OrgHeadline extends OrgParentNode {
   String toString() => 'OrgHeadline';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(stars.value)
       ..write(stars.trailing);
@@ -340,7 +353,7 @@ class OrgHeadline extends OrgParentNode {
         ..write(priority!.value)
         ..write(priority!.trailing);
     }
-    title?._toMarkupImpl(buf);
+    if (title != null) buf.visit(title!);
     if (tags?.values.isNotEmpty == true) {
       buf.write(tags!.leading);
       for (final (i, tag) in tags!.values.indexed) {
@@ -444,7 +457,9 @@ mixin SingleContentElement {
 
   bool contains(Pattern pattern) => content.contains(pattern);
 
-  void _toMarkupImpl(StringBuffer buf) {
+  // FIXME(aaron): This appears to be a false positive
+  // ignore: unused_element
+  void _toMarkupImpl(OrgSerializer buf) {
     buf.write(content);
   }
 }
@@ -479,9 +494,9 @@ class OrgContent extends OrgParentNode {
   String toString() => 'OrgContent';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     for (final child in children) {
-      child._toMarkupImpl(buf);
+      buf.visit(child);
     }
   }
 
@@ -519,7 +534,7 @@ class OrgLink extends OrgLeafNode {
   String toString() => 'OrgLink';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf.write(location);
   }
 }
@@ -548,7 +563,7 @@ class OrgBracketLink extends OrgLink {
   String toString() => 'OrgLink';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write('[[')
       ..write(location
@@ -603,7 +618,7 @@ class OrgMarkup extends OrgLeafNode {
       trailingDecoration.contains(pattern);
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leadingDecoration)
       ..write(content)
@@ -661,7 +676,7 @@ class OrgMeta extends OrgLeafNode with IndentedElement {
   String toString() => 'OrgMeta';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(keyword)
@@ -712,12 +727,11 @@ class OrgBlock extends OrgParentNode with IndentedElement {
   String toString() => 'OrgBlock';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
-      ..write(header);
-    body._toMarkupImpl(buf);
-    buf
+      ..write(header)
+      ..visit(body)
       ..write(footer)
       ..write(trailing);
   }
@@ -819,9 +833,9 @@ class OrgTable extends OrgParentNode with IndentedElement {
   String toString() => 'OrgTable';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     for (final row in rows) {
-      row._toMarkupImpl(buf);
+      buf.visit(row);
     }
     buf.write(trailing);
   }
@@ -869,7 +883,7 @@ class OrgTableDividerRow extends OrgTableRow {
   String toString() => 'OrgTableDividerRow';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(content)
@@ -917,11 +931,12 @@ class OrgTableCellRow extends OrgTableRow {
   String toString() => 'OrgTableCellRow';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
-    buf.write(indent);
-    buf.write('|');
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(indent)
+      ..write('|');
     for (final cell in cells) {
-      cell._toMarkupImpl(buf);
+      buf.visit(cell);
     }
     buf.write(trailing);
   }
@@ -972,10 +987,11 @@ class OrgTableCell extends OrgParentNode {
   }
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
-    buf.write(leading);
-    content._toMarkupImpl(buf);
-    buf.write(trailing);
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..visit(content)
+      ..write(trailing);
   }
 
   @override
@@ -1074,11 +1090,12 @@ class OrgPlanningLine extends OrgParentNode with IndentedElement {
   String toString() => 'OrgPlanningLine';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
-    buf.write(indent);
-    keyword._toMarkupImpl(buf);
-    body._toMarkupImpl(buf);
-    buf.write(trailing);
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(indent)
+      ..visit(keyword)
+      ..visit(body)
+      ..write(trailing);
   }
 
   OrgPlanningLine copyWith({
@@ -1120,7 +1137,7 @@ class OrgFixedWidthArea extends OrgLeafNode with IndentedElement {
   String toString() => 'OrgFixedWidthArea';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(content)
@@ -1158,9 +1175,9 @@ class OrgList extends OrgParentNode with IndentedElement {
   String toString() => 'OrgList';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     for (final item in items) {
-      item._toMarkupImpl(buf);
+      buf.visit(item);
     }
     buf.write(trailing);
   }
@@ -1260,21 +1277,22 @@ class OrgListUnorderedItem extends OrgListItem {
   String toString() => 'OrgListUnorderedItem';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(bullet);
     // TODO(aaron): Retain actual separating white space
     if (checkbox != null) {
       buf
-        ..write(checkbox)
+        ..write(checkbox!)
         ..write(' ');
     }
     if (tag != null) {
-      tag!.value._toMarkupImpl(buf);
-      buf.write(tag!.delimiter);
+      buf
+        ..visit(tag!.value)
+        ..write(tag!.delimiter);
     }
-    body?._toMarkupImpl(buf);
+    if (body != null) buf.visit(body!);
   }
 
   OrgListUnorderedItem copyWith({
@@ -1325,22 +1343,22 @@ class OrgListOrderedItem extends OrgListItem {
   @override
   String toString() => 'OrgListOrderedItem';
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(bullet);
     // TODO(aaron): Retain actual separating white space
     if (counterSet != null) {
       buf
-        ..write(counterSet)
+        ..write(counterSet!)
         ..write(' ');
     }
     if (checkbox != null) {
       buf
-        ..write(checkbox)
+        ..write(checkbox!)
         ..write(' ');
     }
-    body?._toMarkupImpl(buf);
+    if (body != null) buf.visit(body!);
   }
 
   OrgListOrderedItem copyWith({
@@ -1382,9 +1400,10 @@ class OrgParagraph extends OrgParentNode {
   String toString() => 'OrgParagraph';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
-    buf.write(indent);
-    body._toMarkupImpl(buf);
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(indent)
+      ..visit(body);
   }
 
   OrgParagraph copyWith({
@@ -1455,12 +1474,11 @@ class OrgDrawer extends OrgParentNode with IndentedElement {
   String toString() => 'OrgDrawer';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
-      ..write(header);
-    body._toMarkupImpl(buf);
-    buf
+      ..write(header)
+      ..visit(body)
       ..write(footer)
       ..write(trailing);
   }
@@ -1505,7 +1523,7 @@ class OrgProperty extends OrgLeafNode with IndentedElement {
   String toString() => 'OrgProperty';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(key)
@@ -1541,9 +1559,10 @@ class OrgFootnote extends OrgParentNode {
   String toString() => 'OrgFootnote';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
-    marker._toMarkupImpl(buf);
-    content._toMarkupImpl(buf);
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..visit(marker)
+      ..visit(content);
   }
 
   OrgFootnote copyWith({
@@ -1608,12 +1627,12 @@ class OrgFootnoteReference extends OrgParentNode {
   String toString() => 'OrgFootnoteReference';
 
   @override
-  void _toMarkupImpl(StringBuffer buf) {
+  void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leading)
       ..write(name ?? '')
       ..write(definition?.delimiter ?? '');
-    definition?.value._toMarkupImpl(buf);
+    if (definition != null) buf.visit(definition!.value);
     buf.write(trailing);
   }
 
@@ -1671,7 +1690,7 @@ class OrgLatexBlock extends OrgLeafNode {
   String toString() => 'OrgLatexBlock';
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leading)
       ..write(begin)
@@ -1703,7 +1722,7 @@ class OrgLatexInline extends OrgLeafNode {
       trailingDecoration.contains(pattern);
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leadingDecoration)
       ..write(content)
@@ -1726,7 +1745,7 @@ class OrgEntity extends OrgLeafNode {
       trailing.contains(pattern);
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leading)
       ..write(name)
@@ -1754,7 +1773,7 @@ class OrgLocalVariables extends OrgLeafNode {
       end.contains(pattern);
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf.write(start);
     for (final entry in entries) {
       buf
@@ -1786,7 +1805,7 @@ class OrgPgpBlock extends OrgLeafNode with IndentedElement {
       trailing.contains(pattern);
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(header)
@@ -1833,14 +1852,14 @@ class OrgDecryptedContent extends OrgTree {
   final DecryptedContentSerializer serializer;
 
   @override
-  void _toMarkupImpl(StringBuffer buf) => buf.write(serializer.toMarkup(this));
+  void _toMarkupImpl(OrgSerializer buf) => buf.write(serializer.toMarkup(this));
 
-  String toCleartextMarkup() {
-    final buf = StringBuffer();
+  String toCleartextMarkup({OrgSerializer? serializer}) {
+    serializer ??= OrgSerializer();
     for (final child in children) {
-      child._toMarkupImpl(buf);
+      serializer.visit(child);
     }
-    return buf.toString();
+    return serializer.toString();
   }
 
   @override
@@ -1885,7 +1904,7 @@ class OrgComment extends OrgLeafNode {
       content.contains(pattern);
 
   @override
-  _toMarkupImpl(StringBuffer buf) {
+  _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(start)
