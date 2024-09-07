@@ -406,6 +406,9 @@ class OrgSection extends OrgTree {
   ]);
   final OrgHeadline headline;
 
+  /// The section's tags. Convenience accessor for tags of [headline].
+  List<String> get tags => headline.tags?.values ?? const [];
+
   @override
   List<OrgNode> get children => [headline, ...super.children];
 
