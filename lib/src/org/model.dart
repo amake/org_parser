@@ -186,11 +186,16 @@ sealed class OrgTree extends OrgParentNode {
 
   /// Find the immediate parent [OrgSection] or [OrgDocument] of the specified
   /// [node].
-  OrgTree? findContainingTree<T extends OrgNode>(T node) {
+  OrgTree? findContainingTree<T extends OrgNode>(T node,
+      {bool Function(OrgTree)? where}) {
+    where ??= (_) => true;
     final found = find<T>((n) => identical(node, n));
     if (found == null) return null;
     final (node: _, path: path) = found;
-    return path.reversed.firstWhere((node) => node is OrgTree) as OrgTree;
+    for (final node in path.reversed) {
+      if (node is OrgTree && where(node)) return node;
+    }
+    return null;
   }
 
   /// Get the directory in which attachments are expected to be found for this
