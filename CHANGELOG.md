@@ -1,3 +1,9 @@
+## [5.7.0]
+- Introduce `OrgSerializer`: supply a subclass to `OrgNode.toMarkup` to
+  customize how a tree is serialized.
+- Add `OrgSection.tags`
+- Add optional `where` predicate to `OrgTree.findContainingTree`
+
 ## [5.6.1]
 * Bug fixes
 
