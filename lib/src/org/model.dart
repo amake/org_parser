@@ -191,7 +191,7 @@ sealed class OrgTree extends OrgParentNode {
     where ??= (_) => true;
     final found = find<T>((n) => identical(node, n));
     if (found == null) return null;
-    final (node: _, path: path) = found;
+    final (node: _, :path) = found;
     for (final node in path.reversed) {
       if (node is OrgTree && where(node)) return node;
     }
