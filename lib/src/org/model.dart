@@ -245,13 +245,9 @@ class OrgDocument extends OrgTree {
     var parsed = org.parse(text).value as OrgDocument;
 
     if (interpretEmbeddedSettings) {
-      final localTodoSettings = extractTodoSettings(parsed)
-          .where((s) => s.isNotEmpty)
-          .toList(growable: false);
-
-      if (localTodoSettings.any((s) => s != defaultTodoStates)) {
-        final parser =
-            OrgParserDefinition(todoStates: localTodoSettings).build();
+      final todoSettings = extractTodoSettings(parsed);
+      if (todoSettings.any((s) => s != defaultTodoStates)) {
+        final parser = OrgParserDefinition(todoStates: todoSettings).build();
         parsed = parser.parse(text).value as OrgDocument;
       }
     }

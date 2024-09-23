@@ -14,7 +14,6 @@ List<OrgTodoStates> extractTodoSettings(
   tree.visit<OrgMeta>((meta) {
     if (_todoMetaKeywords.contains(meta.keyword.toUpperCase())) {
       final trailing = meta.trailing.trim();
-      if (trailing.isEmpty) return true;
       final parsed = orgTodo.parse(trailing);
       if (parsed is Failure) {
         return true;

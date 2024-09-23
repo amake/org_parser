@@ -883,6 +883,13 @@ baz''';
           throwsA(isA<ArgumentError>()),
         );
       });
+      test('empty state', () {
+        final todoSettings = [OrgTodoStates()];
+        final a = headline.cycleTodo(todoSettings);
+        expect(a.toMarkup(), '* foo');
+        final a2 = a.cycleTodo(todoSettings);
+        expect(a2.toMarkup(), '* foo');
+      });
     });
   });
   group('model entrypoint', () {

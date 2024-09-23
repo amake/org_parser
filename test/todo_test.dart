@@ -297,7 +297,7 @@ void main() {
     test('empty', () {
       final doc = OrgDocument.parse('''#+TODO:  ''');
       final result = extractTodoSettings(doc);
-      expect(result, <OrgTodoStates>[]);
+      expect(result, [OrgTodoStates()]);
     });
   });
 }

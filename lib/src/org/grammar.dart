@@ -21,7 +21,7 @@ import 'package:petitparser/petitparser.dart';
 class OrgGrammarDefinition extends GrammarDefinition {
   const OrgGrammarDefinition({this.todoStates});
 
-  /// Equivalent to `org-todo-keywords`. If not provided, defaults to
+  /// Equivalent to `org-todo-keywords`. If not provided (null), defaults to
   /// [defaultTodoStates].
   final List<OrgTodoStates>? todoStates;
   List<OrgTodoStates> get effectiveTodoStates =>
@@ -45,13 +45,17 @@ class OrgGrammarDefinition extends GrammarDefinition {
 
   Parser stars() => char('*').plusString() & char(' ').plusString();
 
-  Parser todoKeyword() =>
-      effectiveTodoStates.fold(
-          <Parser>[],
-          (acc, e) => acc
-            ..addAll(e.todo.map(string))
-            ..addAll(e.done.map(string))).toChoiceParser() &
-      char(' ').starString();
+  Parser todoKeyword() {
+    final choices = effectiveTodoStates.fold(
+      <Parser>[],
+      (acc, e) => acc
+        ..addAll(e.todo.map(string))
+        ..addAll(e.done.map(string)),
+    );
+    return choices.isNotEmpty
+        ? choices.toChoiceParser() & char(' ').starString()
+        : failure();
+  }
 
   Parser priority() =>
       string('[#') &
