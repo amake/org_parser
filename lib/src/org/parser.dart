@@ -63,7 +63,14 @@ class OrgParserDefinition extends OrgGrammarDefinition {
         ] = items;
         return OrgHeadline(
             (value: stars[0], trailing: stars[1]),
-            keyword == null ? null : (value: keyword[0], trailing: keyword[1]),
+            keyword == null
+                ? null
+                : (
+                    value: keyword[0],
+                    done: effectiveTodoStates
+                        .any((e) => e.done.contains(keyword[0])),
+                    trailing: keyword[1]
+                  ),
             priority == null
                 ? null
                 : (

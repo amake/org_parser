@@ -655,12 +655,18 @@ bazoonga''');
   group('custom parser', () {
     test('todo keywords', () {
       final parser = OrgParserDefinition(todoStates: [
-        OrgTodoStates(todo: ['FOO', 'BAR'])
+        OrgTodoStates(todo: ['FOO'], done: ['BAR'])
       ]).build();
       {
-        final doc = parser.parse('''* FOO [#A] foo bar
-        baz buzz''').value as OrgDocument;
+        final doc = parser.parse('''
+* FOO [#A] foo bar
+  buzz baz
+* BAR [#B] bar foo
+  baz buzz''').value as OrgDocument;
         expect(doc.sections[0].headline.keyword?.value, 'FOO');
+        expect(doc.sections[0].headline.keyword?.done, isFalse);
+        expect(doc.sections[1].headline.keyword?.value, 'BAR');
+        expect(doc.sections[1].headline.keyword?.done, isTrue);
       }
       {
         final doc = parser.parse('''* TODO [#A] foo bar

@@ -897,11 +897,12 @@ baz''';
     });
     test('parse with interpreting settings', () {
       final doc = OrgDocument.parse('''
-#+TODO: FOO
+#+TODO: FOO BAR
 * FOO bar''', interpretEmbeddedSettings: true);
       final section = doc.sections[0];
       final headline = section.headline;
       expect(headline.keyword?.value, 'FOO');
+      expect(headline.keyword?.done, isFalse);
       expect(headline.rawTitle, 'bar');
     });
   });

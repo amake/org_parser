@@ -313,10 +313,10 @@ class OrgHeadline extends OrgParentNode {
   /// Headline stars, like `*** `. Includes trailing spaces.
   final ({String value, String trailing}) stars;
 
-  /// Headline keyword, like `TODO`. Whether the keyword represents an
-  /// in-progress state or a done state (as in `org-done-keywords`) is not
-  /// encoded in the AST. See [OrgTodoStates].
-  final ({String value, String trailing})? keyword;
+  /// Headline keyword, like `TODO`. [done] indicates whether the keyword
+  /// represents an in-progress state or a done state (as in
+  /// `org-done-keywords`). See also [OrgTodoStates].
+  final ({String value, bool done, String trailing})? keyword;
 
   /// Headline priority, like `A`
   final ({String leading, String value, String trailing})? priority;
@@ -349,21 +349,14 @@ class OrgHeadline extends OrgParentNode {
   OrgHeadline cycleTodo([List<OrgTodoStates>? todoStates]) {
     todoStates ??= [defaultTodoStates];
 
-    if (keyword == null) {
-      final workflow = todoStates.first;
-      return copyWith(keyword: (
-        value: workflow.todo.firstOrNull ?? workflow.done.first,
-        trailing: ' ',
-      ));
-    }
-
     final allStates = todoStates.fold(
         <String>[],
         (acc, e) => acc
           ..addAll(e.todo)
           ..addAll(e.done));
-    final currStateIdx = allStates.indexOf(keyword!.value);
-    if (currStateIdx == -1) {
+    final currStateIdx =
+        keyword == null ? -1 : allStates.indexOf(keyword!.value);
+    if (keyword != null && currStateIdx == -1) {
       throw ArgumentError(
           'current keyword ${keyword!.value} not in todo settings');
     }
@@ -372,7 +365,11 @@ class OrgHeadline extends OrgParentNode {
           stars, null, priority, title, rawTitle, tags, trailing, id);
     }
     final nextState = allStates[currStateIdx + 1];
-    return copyWith(keyword: (value: nextState, trailing: keyword!.trailing));
+    return copyWith(keyword: (
+      value: nextState,
+      done: todoStates.any((e) => e.done.contains(nextState)),
+      trailing: keyword?.trailing ?? ' '
+    ));
   }
 
   @override
@@ -419,7 +416,7 @@ class OrgHeadline extends OrgParentNode {
 
   OrgHeadline copyWith({
     ({String value, String trailing})? stars,
-    ({String value, String trailing})? keyword,
+    ({String value, bool done, String trailing})? keyword,
     ({String leading, String value, String trailing})? priority,
     OrgContent? title,
     String? rawTitle,

@@ -24,7 +24,8 @@ class OrgGrammarDefinition extends GrammarDefinition {
   /// Equivalent to `org-todo-keywords`. If not provided, defaults to
   /// [defaultTodoStates].
   final List<OrgTodoStates>? todoStates;
-  List<OrgTodoStates> get _todoStates => todoStates ?? [defaultTodoStates];
+  List<OrgTodoStates> get effectiveTodoStates =>
+      todoStates ?? [defaultTodoStates];
 
   @override
   Parser start() => ref0(document).end();
@@ -45,7 +46,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser stars() => char('*').plusString() & char(' ').plusString();
 
   Parser todoKeyword() =>
-      _todoStates.fold(
+      effectiveTodoStates.fold(
           <Parser>[],
           (acc, e) => acc
             ..addAll(e.todo.map(string))
