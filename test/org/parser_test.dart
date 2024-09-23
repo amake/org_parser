@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:org_parser/src/org/org.dart';
+import 'package:org_parser/src/todo/todo.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
@@ -653,7 +654,9 @@ bazoonga''');
   });
   group('custom parser', () {
     test('todo keywords', () {
-      final parser = OrgParserDefinition(todoKeywords: ['FOO', 'BAR']).build();
+      final parser = OrgParserDefinition(todoStates: [
+        OrgTodoStates(todo: ['FOO', 'BAR'])
+      ]).build();
       {
         final doc = parser.parse('''* FOO [#A] foo bar
         baz buzz''').value as OrgDocument;

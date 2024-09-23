@@ -235,9 +235,29 @@ sealed class OrgTree extends OrgParentNode {
 
 /// The top-level node representing a full Org document
 class OrgDocument extends OrgTree {
-  /// Parse an Org document in string form into an AST
-  factory OrgDocument.parse(String text) =>
-      org.parse(text).value as OrgDocument;
+  /// Parse an Org document in string form into an AST. If
+  /// [interpretEmbeddedSettings] is true, the document may be parsed a second
+  /// time in order to apply detected settings.
+  factory OrgDocument.parse(
+    String text, {
+    bool interpretEmbeddedSettings = false,
+  }) {
+    var parsed = org.parse(text).value as OrgDocument;
+
+    if (interpretEmbeddedSettings) {
+      final localTodoSettings = extractTodoSettings(parsed)
+          .where((s) => s.isNotEmpty)
+          .toList(growable: false);
+
+      if (localTodoSettings.any((s) => s != defaultTodoStates)) {
+        final parser =
+            OrgParserDefinition(todoStates: localTodoSettings).build();
+        parsed = parser.parse(text).value as OrgDocument;
+      }
+    }
+
+    return parsed;
+  }
 
   OrgDocument(super.content, super.sections, [super.id]);
 
@@ -293,7 +313,9 @@ class OrgHeadline extends OrgParentNode {
   /// Headline stars, like `*** `. Includes trailing spaces.
   final ({String value, String trailing}) stars;
 
-  /// Headline keyword, like `TODO`
+  /// Headline keyword, like `TODO`. Whether the keyword represents an
+  /// in-progress state or a done state (as in `org-done-keywords`) is not
+  /// encoded in the AST. See [OrgTodoStates].
   final ({String value, String trailing})? keyword;
 
   /// Headline priority, like `A`
@@ -321,14 +343,37 @@ class OrgHeadline extends OrgParentNode {
   OrgHeadline fromChildren(List<OrgNode> children) =>
       copyWith(title: children.firstOrNull as OrgContent?);
 
-  OrgHeadline cycleTodo() => switch (keyword) {
-        (value: 'TODO', :var trailing) =>
-          copyWith(keyword: (value: 'DONE', trailing: trailing)),
-        (value: 'DONE', trailing: _) => OrgHeadline(
-            stars, null, priority, title, rawTitle, tags, trailing, id),
-        null => copyWith(keyword: (value: 'TODO', trailing: ' ')),
-        _ => this,
-      };
+  /// Cycle todo state like (null) -> TODO -> DONE -> (null). Uses
+  /// [defaultTodoStates] if none provided. If the [keyword] value is not found
+  /// in the states then will throw [ArgumentError].
+  OrgHeadline cycleTodo([List<OrgTodoStates>? todoStates]) {
+    todoStates ??= [defaultTodoStates];
+
+    if (keyword == null) {
+      final workflow = todoStates.first;
+      return copyWith(keyword: (
+        value: workflow.todo.firstOrNull ?? workflow.done.first,
+        trailing: ' ',
+      ));
+    }
+
+    final allStates = todoStates.fold(
+        <String>[],
+        (acc, e) => acc
+          ..addAll(e.todo)
+          ..addAll(e.done));
+    final currStateIdx = allStates.indexOf(keyword!.value);
+    if (currStateIdx == -1) {
+      throw ArgumentError(
+          'current keyword ${keyword!.value} not in todo settings');
+    }
+    if (currStateIdx == allStates.length - 1) {
+      return OrgHeadline(
+          stars, null, priority, title, rawTitle, tags, trailing, id);
+    }
+    final nextState = allStates[currStateIdx + 1];
+    return copyWith(keyword: (value: nextState, trailing: keyword!.trailing));
+  }
 
   @override
   bool contains(Pattern pattern) {

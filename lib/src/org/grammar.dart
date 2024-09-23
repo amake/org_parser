@@ -1,10 +1,8 @@
 library org_parser;
 
+import 'package:org_parser/src/todo/model.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
-
-/// Equivalent to `org-todo-keywords`
-const defaultTodoKeywords = ['TODO', 'DONE'];
 
 // See https://orgmode.org/worg/dev/org-syntax.html
 
@@ -21,12 +19,12 @@ const defaultTodoKeywords = ['TODO', 'DONE'];
 /// The structure and the content turned out to be hard to define together, so
 /// the content rules are defined separately in [OrgContentGrammarDefinition].
 class OrgGrammarDefinition extends GrammarDefinition {
-  const OrgGrammarDefinition({this.todoKeywords});
+  const OrgGrammarDefinition({this.todoStates});
 
   /// Equivalent to `org-todo-keywords`. If not provided, defaults to
-  /// [defaultTodoKeywords].
-  final List<String>? todoKeywords;
-  List<String> get _todoKeywords => todoKeywords ?? defaultTodoKeywords;
+  /// [defaultTodoStates].
+  final List<OrgTodoStates>? todoStates;
+  List<OrgTodoStates> get _todoStates => todoStates ?? [defaultTodoStates];
 
   @override
   Parser start() => ref0(document).end();
@@ -47,7 +45,12 @@ class OrgGrammarDefinition extends GrammarDefinition {
   Parser stars() => char('*').plusString() & char(' ').plusString();
 
   Parser todoKeyword() =>
-      _todoKeywords.map(string).toChoiceParser() & char(' ').starString();
+      _todoStates.fold(
+          <Parser>[],
+          (acc, e) => acc
+            ..addAll(e.todo.map(string))
+            ..addAll(e.done.map(string))).toChoiceParser() &
+      char(' ').starString();
 
   Parser priority() =>
       string('[#') &

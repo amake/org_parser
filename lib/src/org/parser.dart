@@ -6,7 +6,7 @@ final org = OrgParserDefinition().build();
 
 /// Top-level parser definitions
 class OrgParserDefinition extends OrgGrammarDefinition {
-  const OrgParserDefinition({super.todoKeywords});
+  const OrgParserDefinition({super.todoStates});
 
   @override
   Parser start() => super.start().map((items) {
