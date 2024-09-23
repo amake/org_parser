@@ -1,3 +1,12 @@
+## [6.0.0]
+- Add `orgTodo` parser and `OrgTodoStates` model
+- `OrgHeadline.keyword.done` now indicates whether a keyword is considered
+  "in-progress" or "done"
+- Add `interpretEmbeddedSettings` arg to `OrgDocument.parse`. Pass `true` to
+  allow detecting TODO keywords from `#+TODO:` (and related) meta lines.
+- `OrgParserDefinition` and `OrgGrammarDefinition` constructors now take a list
+  of `OrgTodoStates` rather than string lists
+
 ## [5.7.0]
 - Introduce `OrgSerializer`: supply a subclass to `OrgNode.toMarkup` to
   customize how a tree is serialized.
