@@ -126,6 +126,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(keyword) |
       ref0(macroReference) |
       ref0(footnoteReference) |
+      ref0(citation) |
       ref0(latexInline);
 
   Parser plainText([Parser? limit]) {
@@ -674,6 +675,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
         newline().repeat(3);
     return ref1(textRun, end).plusLazy(end);
   }
+
+  Parser citation() =>
+      string('[cite') &
+      ref0(citationStyle).optional() &
+      char(':') &
+      ref0(citationBody) &
+      char(']');
+
+  Parser citationStyle() =>
+      char('/') & char(':').neg().plusString('Citation style expected');
+
+  Parser citationBody() => char(']')
+      .neg()
+      .plusString('Citation body expected')
+      .where((val) => val.contains('@'));
 
   Parser latexBlock() => indented(LatexBlockParser());
 

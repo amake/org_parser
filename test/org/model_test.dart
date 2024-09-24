@@ -457,6 +457,38 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
         expect(comment.toMarkup(), markup);
       });
     });
+    group('Citations', () {
+      final parser = buildSpecific(parserDefinition.citation);
+      test('simple', () {
+        final markup = '[cite:@foo]';
+        final result = parser.parse(markup);
+        final citation = result.value as OrgCitation;
+        expect(citation.body, '@foo');
+        expect(citation.getKeys(), ['foo']);
+        expect(citation.toMarkup(), markup);
+      });
+      test('multiple keys', () {
+        final markup = '[cite:@foo;@bar;@foo]';
+        final result = parser.parse(markup);
+        final citation = result.value as OrgCitation;
+        expect(citation.body, '@foo;@bar;@foo');
+        expect(citation.getKeys(), ['foo', 'bar', 'foo']);
+        expect(citation.toMarkup(), markup);
+      });
+      test('prefix and suffix', () {
+        final markup = '[cite/style:pre;pre2@bar suff;suff2]';
+        final result = parser.parse(markup);
+        final citation = result.value as OrgCitation;
+        expect(citation.body, 'pre;pre2@bar suff;suff2');
+        expect(citation.getKeys(), ['bar']);
+        expect(citation.toMarkup(), markup);
+      });
+      test('invalid', () {
+        final markup = '[cite:foo]';
+        final result = parser.parse(markup);
+        expect(result, isA<Failure>());
+      });
+    });
   });
   group('document parser parts', () {
     final parserDefinition = OrgParserDefinition();

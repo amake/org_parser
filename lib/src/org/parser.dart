@@ -535,6 +535,21 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
+  Parser citation() => super.citation().map((values) {
+        final leading = values[0] as String;
+        final style = values[1] as List?;
+        final delimiter = values[2] as String;
+        final body = values[3] as String;
+        final trailing = values[4] as String;
+        return OrgCitation(
+            leading,
+            style == null ? null : (leading: style[0], value: style[1]),
+            delimiter,
+            body,
+            trailing);
+      });
+
+  @override
   Parser latexBlock() => super.latexBlock().map((values) {
         final leading = values[0] as String;
         final body = values[1] as List;

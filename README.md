@@ -125,3 +125,9 @@ applications.
     ```org
     a\leftrightarrow{}b conversion
     ```
+
+- Citations
+
+    ```org
+    [cite:@key]
+    ```
