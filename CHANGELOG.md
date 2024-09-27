@@ -1,3 +1,6 @@
+## [6.1.0]
+- Parse Org Cite citations
+
 ## [6.0.0]
 - Add `orgTodo` parser and `OrgTodoStates` model
 - `OrgHeadline.keyword.done` now indicates whether a keyword is considered
