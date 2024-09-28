@@ -1,3 +1,6 @@
+## [6.1.1]
+- Allow `OrgMeta` nodes to be recognized inside text runs
+
 ## [6.1.0]
 - Parse Org Cite citations
 
