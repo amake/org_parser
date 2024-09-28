@@ -127,7 +127,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(macroReference) |
       ref0(footnoteReference) |
       ref0(citation) |
-      ref0(latexInline);
+      ref0(latexInline) |
+      ref0(affiliatedKeyword);
 
   Parser plainText([Parser? limit]) {
     var fullLimit = ref0(object) | endOfInput();

@@ -640,6 +640,19 @@ bazoonga''');
       final paragraphBody = paragraph.body.children[0] as OrgPlainText;
       expect(paragraphBody.content, 'bazoonga');
     });
+    test('footnotes containing meta lines', () {
+      final parser = org;
+      final result = parser.parse('''[fn:1] foo bar
+
+#+bibliography: baz.bib''');
+      expect(result, isA<Success<dynamic>>());
+      final document = result.value as OrgDocument;
+      final footnote = document.content!.children[0] as OrgFootnote;
+      final footnoteBody0 = footnote.content.children[0] as OrgPlainText;
+      expect(footnoteBody0.content, ' foo bar\n\n');
+      final footnoteBody1 = footnote.content.children[1] as OrgMeta;
+      expect(footnoteBody1.keyword, '#+bibliography:');
+    });
     group('https://github.com/amake/orgro/issues/16', () {
       test('case 1', () {
         final result = parser.parse('* AB:CD: foo');
