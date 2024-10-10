@@ -1,5 +1,3 @@
-library org_parser;
-
 import 'package:org_parser/src/todo/model.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
