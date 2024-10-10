@@ -1729,3 +1729,8 @@ bar
     });
   });
 }
+
+/*
+Make Emacs ignore the local variables declarations above:
+
+*/
