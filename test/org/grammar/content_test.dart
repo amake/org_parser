@@ -463,6 +463,139 @@ I am''');
         ]);
       });
     });
+    group('superscript', () {
+      test('simple', () {
+        final result = parser.parse(r'I think there^4 I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '4'],
+              ' I am'
+            ]
+          ]
+        ]);
+      });
+      test('before line break', () {
+        final result = parser.parse(r'''I think there^4
+I am''');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '4'],
+              '\nI am'
+            ]
+          ]
+        ]);
+      });
+      test('at end of input', () {
+        final result = parser.parse(r'I think there^4');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '4'],
+            ]
+          ]
+        ]);
+      });
+      test('with delimiters', () {
+        final result = parser.parse(r'I think there^{4}');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '{4}'],
+            ]
+          ]
+        ]);
+      });
+      test('with delimiters abutting text', () {
+        final result = parser.parse(r'I think there^{4}I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '{4}'],
+              'I am'
+            ]
+          ]
+        ]);
+      });
+      test('with sexp', () {
+        final result = parser.parse(r'I think there^(4 + 4)I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '(4 + 4)'],
+              'I am'
+            ]
+          ]
+        ]);
+      });
+      test('with multiple undelimited chars', () {
+        final result = parser.parse(r'I think there^four I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', 'four'],
+              ' I am'
+            ]
+          ]
+        ]);
+      });
+      test('with asterisk', () {
+        final result = parser.parse(r'I think there^*I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '*'],
+              'I am'
+            ]
+          ]
+        ]);
+      });
+      test('with trailing subscript', () {
+        final result = parser.parse(r'I think there^4_I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['^', '4'],
+              ['_', 'I'],
+              ' am'
+            ]
+          ]
+        ]);
+      });
+      test('with leading subscript', () {
+        final result = parser.parse(r'I think there_4^I am');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I think there',
+              ['_', '4'],
+              ['^', 'I'],
+              ' am'
+            ]
+          ]
+        ]);
+      });
+    });
     test('local variables', () {
       final result = parser.parse('''foo
   # Local Variables:

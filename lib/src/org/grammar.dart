@@ -120,6 +120,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(link) |
       ref0(markups) |
       ref0(entity) |
+      ref0(subscript) |
+      ref0(superscript) |
       ref0(timestamp) |
       ref0(keyword) |
       ref0(macroReference) |
@@ -288,6 +290,35 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser entityEnd() =>
       // TODO(aaron): PetitParser's letter() is not the same as Emacs's [:alpha:]
       lineEnd().and() | string('{}') | (letter() | char('\n')).not();
+
+  Parser subscript() => (was(whitespace().neg()) &
+          char('_') &
+          ref0(subSuperscriptBody).flatten('Subscript body expected'))
+      .drop1(0);
+
+  Parser superscript() => (was(whitespace().neg()) &
+          char('^') &
+          ref0(subSuperscriptBody).flatten('Superscript body expected'))
+      .drop1(0);
+
+  // "Reverse ID" is not an Org concept; it's the reverse of the identifier
+  // example parser in the PetitParser readme; see
+  // https://github.com/petitparser/dart-petitparser/discussions/178
+  Parser reverseId(Parser inner, Parser terminator) =>
+      (inner | terminator).starLazy(terminator & inner.not()) & terminator;
+
+  // See `org-match-substring-regexp`
+  Parser subSuperscriptBody() =>
+      ref1(sexpList, '{}') |
+      ref0(sexpList) |
+      char('*') |
+      (anyOf('+-').optional() &
+          reverseId(ref0(alnum) | anyOf(r'.,\'), ref0(alnum)));
+
+  // TODO(aaron): Emacs's [:alnum:] matches any Unicode character with
+  // "alphabetic" or "decimal number" General Category (presumably Letter or
+  // Number). Our pattern here only matches ASCII.
+  Parser alnum() => pattern('a-zA-Z0-9');
 
   Parser macroReference() =>
       string('{{{') &
@@ -460,12 +491,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser timestampDiary() => string('<%%') & ref0(sexp) & char('>');
 
   // TODO(aaron): Bother with a real Elisp parser here?
-  Parser sexp() => ref0(sexpAtom) | ref0(sexpList);
+  Parser sexp([String delimiters = '()']) =>
+      ref1(sexpAtom, delimiters) | ref1(sexpList, delimiters);
 
-  Parser sexpAtom() =>
-      (anyOf('()') | whitespace()).neg().plusString('Expected atom');
+  Parser sexpAtom([String delimiters = '()']) =>
+      (anyOf(delimiters) | whitespace()).neg().plusString('Expected atom');
 
-  Parser sexpList() => char('(') & ref0(sexp).trim().star() & char(')');
+  Parser sexpList([String delimiters = '()']) =>
+      char(delimiters[0]) &
+      ref1(sexp, delimiters).trim().star() &
+      char(delimiters[1]);
 
   Parser timestampSimple(bool active) =>
       (active ? char('<') : char('[')) &

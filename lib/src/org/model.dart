@@ -1861,6 +1861,42 @@ class OrgEntity extends OrgLeafNode {
   }
 }
 
+class OrgSubscript extends OrgLeafNode {
+  OrgSubscript(this.leading, this.body);
+
+  final String leading;
+  final String body;
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) || body.contains(pattern);
+
+  @override
+  _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(body);
+  }
+}
+
+class OrgSuperscript extends OrgLeafNode {
+  OrgSuperscript(this.leading, this.body);
+
+  final String leading;
+  final String body;
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) || body.contains(pattern);
+
+  @override
+  _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(body);
+  }
+}
+
 class OrgLocalVariables extends OrgLeafNode {
   OrgLocalVariables(
     this.start,

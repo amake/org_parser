@@ -185,6 +185,20 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser subscript() => super.subscript().map((values) {
+        final leading = values[0] as String;
+        final body = values[1] as String;
+        return OrgSubscript(leading, body);
+      });
+
+  @override
+  Parser superscript() => super.superscript().map((values) {
+        final leading = values[0] as String;
+        final body = values[1] as String;
+        return OrgSuperscript(leading, body);
+      });
+
+  @override
   Parser macroReference() => super
       .macroReference()
       .flatten('Macro reference expected')
