@@ -1,3 +1,6 @@
+## [6.2.0]
+- Parse subscripts and superscripts
+
 ## [6.1.1]
 - Allow `OrgMeta` nodes to be recognized inside text runs
 
