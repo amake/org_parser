@@ -1,3 +1,4 @@
+export 'alnum.dart';
 export 'block.dart';
 export 'bof.dart';
 export 'drop.dart';

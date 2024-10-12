@@ -19,5 +19,12 @@ void main() {
       final headline = result.value as OrgHeadline;
       expect(headline.toMarkup(), markup);
     });
+    test('non-ASCII tags', () {
+      final markup = '* TODO foo :あ:';
+      final result = parser.parse(markup);
+      final headline = result.value as OrgHeadline;
+      expect(headline.tags!.values, ['あ']);
+      expect(headline.toMarkup(), markup);
+    });
   });
 }

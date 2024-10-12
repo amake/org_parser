@@ -44,7 +44,7 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
   // TODO(aaron): Support regex element: {^boss.*}
   Parser element() => ref0(propertyExpression) | ref0(tag);
 
-  Parser tag() => pattern('a-zA-Z0-9_@#%').plusString('Tag expected');
+  Parser tag() => (alnum() | anyOf('_@#%')).plus().flatten('Tag expected');
 
   Parser propertyExpression() =>
       ref0(propertyName) & ref0(op) & ref0(propertyValue);

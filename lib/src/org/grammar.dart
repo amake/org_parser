@@ -1,4 +1,3 @@
-import 'package:more/char_matcher.dart';
 import 'package:org_parser/src/todo/model.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
@@ -73,7 +72,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
       char(':') &
       lineEnd().and();
 
-  Parser tag() => pattern('a-zA-Z0-9_@#%').plusString('Tags expected');
+  Parser tag() => (alnum() | anyOf('_@#%')).plus().flatten('Tags expected');
 
   Parser content() => ref0(_content).flatten('Content expected');
 
@@ -313,14 +312,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref1(sexpList, '{}') |
       ref0(sexpList) |
       char('*') |
-      (anyOf('+-').optional() &
-          reverseId(ref0(alnum) | anyOf(r'.,\'), ref0(alnum)));
-
-  Parser alnum() => any().where((char) {
-        final c = char.codeUnitAt(0);
-        return UnicodeCharMatcher.letter().match(c) ||
-            UnicodeCharMatcher.number().match(c);
-      });
+      (anyOf('+-').optional() & reverseId(alnum() | anyOf(r'.,\'), alnum()));
 
   Parser macroReference() =>
       string('{{{') &

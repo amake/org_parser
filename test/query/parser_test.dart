@@ -13,6 +13,10 @@ void main() {
         OrgQueryNotMatcher(OrgQueryTagMatcher('foo')),
       );
     });
+    test('non-ASCII tag', () {
+      expect(orgQuery.parse('あ').value, OrgQueryTagMatcher('あ'));
+      expect(orgQuery.parse('+あ').value, OrgQueryTagMatcher('あ'));
+    });
     test('implicit and', () {
       expect(
         orgQuery.parse('foo+bar').value,
