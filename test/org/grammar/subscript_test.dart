@@ -80,7 +80,7 @@ void main() {
         'a',
         ['_', 'あ'],
       ]);
-    }, skip: 'TODO(aaron): Support non-ASCII subscripts');
+    });
     test('edge case', () {
       final result = parser.parse('a_a..a');
       expect(result.value, [

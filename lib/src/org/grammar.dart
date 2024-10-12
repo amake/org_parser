@@ -1,3 +1,4 @@
+import 'package:more/char_matcher.dart';
 import 'package:org_parser/src/todo/model.dart';
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
@@ -315,10 +316,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (anyOf('+-').optional() &
           reverseId(ref0(alnum) | anyOf(r'.,\'), ref0(alnum)));
 
-  // TODO(aaron): Emacs's [:alnum:] matches any Unicode character with
-  // "alphabetic" or "decimal number" General Category (presumably Letter or
-  // Number). Our pattern here only matches ASCII.
-  Parser alnum() => pattern('a-zA-Z0-9');
+  Parser alnum() => any().where((char) {
+        final c = char.codeUnitAt(0);
+        return UnicodeCharMatcher.letter().match(c) ||
+            UnicodeCharMatcher.number().match(c);
+      });
 
   Parser macroReference() =>
       string('{{{') &

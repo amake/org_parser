@@ -80,7 +80,7 @@ void main() {
         'a',
         ['^', 'あ'],
       ]);
-    }, skip: 'TODO(aaron): Support non-ASCII superscripts');
+    });
     test('edge case', () {
       final result = parser.parse('a^a..a');
       expect(result.value, [
