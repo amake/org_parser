@@ -1,3 +1,6 @@
+## [6.2.2]
+- Fix lower bound of more dependency
+
 ## [6.2.1]
 - Restore compatibility with Flutter 3.24
 
