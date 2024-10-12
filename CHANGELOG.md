@@ -1,3 +1,6 @@
+## [6.2.1]
+- Restore compatibility with Flutter 3.24
+
 ## [6.2.0]
 - Parse subscripts and superscripts
 

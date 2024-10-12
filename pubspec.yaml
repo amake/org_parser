@@ -1,6 +1,6 @@
 name: org_parser
 description: A pure-Dart parser for Emacs Org Mode (https://orgmode.org) markup
-version: 6.2.0
+version: 6.2.1
 homepage: https://github.com/amake/org_parser
 
 environment:
