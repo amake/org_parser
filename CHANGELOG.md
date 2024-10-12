@@ -1,3 +1,6 @@
+## [6.3.0]
+- Support non-ASCII headline tags
+
 ## [6.2.2]
 - Fix lower bound of more dependency
 
