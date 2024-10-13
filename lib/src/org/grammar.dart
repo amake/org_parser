@@ -66,11 +66,12 @@ class OrgGrammarDefinition extends GrammarDefinition {
     return newline().neg().plusLazy(limit).flatten('Title expected');
   }
 
-  Parser tags() =>
-      string(' :') &
-      ref0(tag).plusSeparated(char(':')) &
-      char(':') &
-      lineEnd().and();
+  Parser tags() => (was(char(' ')) &
+          string(':') &
+          ref0(tag).plusSeparated(char(':')) &
+          char(':') &
+          lineEnd().and())
+      .drop1(0);
 
   Parser tag() => (alnum() | anyOf('_@#%')).plus().flatten('Tags expected');
 

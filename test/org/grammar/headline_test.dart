@@ -60,9 +60,9 @@ void main() {
         ['**', ' '],
         ['TODO', ' '],
         ['[#', 'A', '] '],
-        'Title foo bar',
+        'Title foo bar ',
         [
-          ' :',
+          ':',
           isSeparatedList<dynamic, String>(elements: [
             'biz',
             'baz',
