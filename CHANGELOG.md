@@ -1,3 +1,6 @@
+## [6.4.1]
+- Minor optimization
+
 ## [6.4.0]
 - Support entities in subscripts and superscripts
 
