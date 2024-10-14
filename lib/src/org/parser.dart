@@ -186,17 +186,42 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser subscript() => super.subscript().map((values) {
-        final leading = values[0] as String;
-        final body = values[1] as String;
-        return OrgSubscript(leading, body);
+        var leading = values[0] as String;
+        var trailing = '';
+        var body = values[1] as String;
+        if (body.startsWith('{') && body.endsWith('}')) {
+          leading += '{';
+          trailing += '}';
+          body = body.substring(1, body.length - 1);
+        }
+        final content = buildFrom(_subSuperscriptRichBody())
+            .castList<OrgNode>()
+            .end()
+            .parse(body)
+            .value;
+        return OrgSubscript(leading, OrgContent(content), trailing);
       });
 
   @override
   Parser superscript() => super.superscript().map((values) {
-        final leading = values[0] as String;
-        final body = values[1] as String;
-        return OrgSuperscript(leading, body);
+        var leading = values[0] as String;
+        var trailing = '';
+        var body = values[1] as String;
+        if (body.startsWith('{') && body.endsWith('}')) {
+          leading += '{';
+          trailing += '}';
+          body = body.substring(1, body.length - 1);
+        }
+        final content = buildFrom(_subSuperscriptRichBody())
+            .castList<OrgNode>()
+            .end()
+            .parse(body)
+            .value;
+        return OrgSuperscript(leading, OrgContent(content), trailing);
       });
+
+  /// Only used on this layer to parse subscript and superscript content
+  Parser _subSuperscriptRichBody() => (ref0(entity) | ref0(plainText)).star();
 
   @override
   Parser macroReference() => super

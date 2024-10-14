@@ -7,6 +7,13 @@ void main() {
     final definition = OrgContentParserDefinition();
     final parser =
         seq2(letter(), definition.buildFrom(definition.subscript())).end();
+    test('with entity', () {
+      final result = parser.parse(r'a_\alpha');
+      final (_, OrgSubscript sup) = result.value;
+      expect(sup.contains('alpha'), isTrue);
+      expect(sup.contains(r'\alpha'), isFalse);
+      expect(sup.toMarkup(), r'_\alpha');
+    });
     test('nested bracketed expression', () {
       final result = parser.parse('a_{a1 {b2}}');
       final (_, OrgSubscript sup) = result.value;

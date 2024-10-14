@@ -7,11 +7,39 @@ void main() {
     final definition = OrgContentParserDefinition();
     final parser =
         seq2(letter(), definition.buildFrom(definition.subscript())).end();
+    test('with entity', () {
+      final result = parser.parse(r'a_\alpha');
+      final (_, OrgSubscript sup) = result.value;
+      expect(sup.leading, '_');
+      final body = sup.body.children.single as OrgEntity;
+      expect(body.name, 'alpha');
+      expect(sup.trailing, '');
+    });
+    test('with text and entity', () {
+      final result = parser.parse(r'a_{1 + \alpha}');
+      final (_, OrgSubscript sup) = result.value;
+      expect(sup.leading, '_{');
+      final body1 = sup.body.children[0] as OrgPlainText;
+      expect(body1.content, '1 + ');
+      final body2 = sup.body.children[1] as OrgEntity;
+      expect(body2.name, 'alpha');
+      expect(sup.trailing, '}');
+    });
     test('nested bracketed expression', () {
       final result = parser.parse('a_{a1 {b2}}');
       final (_, OrgSubscript sup) = result.value;
+      expect(sup.leading, '_{');
+      final body = sup.body.children.single as OrgPlainText;
+      expect(body.content, 'a1 {b2}');
+      expect(sup.trailing, '}');
+    });
+    test('nested sexp', () {
+      final result = parser.parse('a_(a1 (b2))');
+      final (_, OrgSubscript sup) = result.value;
       expect(sup.leading, '_');
-      expect(sup.body, '{a1 {b2}}');
+      final body = sup.body.children.single as OrgPlainText;
+      expect(body.content, '(a1 (b2))');
+      expect(sup.trailing, '');
     });
   });
 }
