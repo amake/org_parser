@@ -7,6 +7,14 @@ void main() {
     final definition = OrgContentParserDefinition();
     final parser =
         seq2(letter(), definition.buildFrom(definition.subscript())).end();
+    test('H2O', () {
+      final result = parser.parse(r'H_2O');
+      final (_, OrgSubscript sup) = result.value;
+      expect(sup.leading, '_');
+      final body = sup.body.children.single as OrgPlainText;
+      expect(body.content, '2O');
+      expect(sup.trailing, '');
+    });
     test('with entity', () {
       final result = parser.parse(r'a_\alpha');
       final (_, OrgSubscript sup) = result.value;

@@ -477,6 +477,24 @@ I am''');
           ]
         ]);
       });
+      test('trailing comma', () {
+        final result = parser.parse(r'I drink H_2O, OK?');
+        expect(result.value, [
+          [
+            '',
+            [
+              'I drink H',
+              ['_', '2O'],
+              ', OK?'
+            ]
+          ]
+        ]);
+        // This fails because the "reverseId" formulation fails when it sees the
+        // trailing comma (which is an "inner" character), and we can't
+        // backtrack. Org Mode handles this correctly because it uses regex and
+        // can backtrack. Tweaking reverseId to handle this case breaks the
+        // "edge case" subscript grammar test.
+      }, skip: 'TODO(aaron): Fix subscript edge case');
       test('before line break', () {
         final result = parser.parse(r'''I think there^4
 I am''');
