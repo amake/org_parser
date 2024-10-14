@@ -306,7 +306,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   // example parser in the PetitParser readme; see
   // https://github.com/petitparser/dart-petitparser/discussions/178
   Parser reverseId(Parser inner, Parser terminator) =>
-      (inner | terminator).starLazy(terminator & inner.not()) & terminator;
+      inner.starLazy(terminator & inner.not()) & terminator;
 
   // See `org-match-substring-regexp`
   Parser subSuperscriptBody() =>
