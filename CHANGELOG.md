@@ -1,3 +1,6 @@
+## [6.4.0]
+- Support entities in subscripts and superscripts
+
 ## [6.3.0]
 - Support non-ASCII headline tags
 
