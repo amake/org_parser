@@ -11,8 +11,15 @@ void main() {
 biz baz''');
       expect(result.value, [
         '',
-        ['foo bar\nbiz baz']
+        ['foo bar\nbiz baz'],
+        ''
       ]);
+    });
+    test('too many line breaks', () {
+      final result = parser.parse('''foo bar
+
+biz baz''');
+      expect(result, isA<Failure>());
     });
     test('with inline objects', () {
       final result =
@@ -31,7 +38,8 @@ maybe''');
           ' for ',
           ['*', 'fun', '*'],
           ',\nmaybe'
-        ]
+        ],
+        ''
       ]);
     });
   });

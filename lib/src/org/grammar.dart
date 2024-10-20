@@ -108,12 +108,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser paragraph() =>
       ref0(indent).flatten('Paragraph indent expected') &
-      ref1(textRun, ref0(nonParagraphElements)).plusLazy(ref0(paragraphEnd));
+      ref1(textRun, ref0(nonParagraphElements) | newline().repeat(2))
+          .plusLazy(ref0(paragraphEnd)) &
+      ref0(blankLines).optional();
 
   Parser nonParagraphElements() =>
       element()..replace(ref0(paragraph), noOpFail());
 
-  Parser paragraphEnd() => endOfInput() | ref0(nonParagraphElements);
+  Parser paragraphEnd() =>
+      endOfInput() | newline().repeat(2) | ref0(nonParagraphElements);
 
   Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 

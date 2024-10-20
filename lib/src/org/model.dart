@@ -1426,10 +1426,11 @@ class OrgListOrderedItem extends OrgListItem {
 }
 
 class OrgParagraph extends OrgParentNode {
-  OrgParagraph(this.indent, this.body, [super.id]);
+  OrgParagraph(this.indent, this.body, this.trailing, [super.id]);
 
   final String indent;
   final OrgContent body;
+  final String trailing;
 
   @override
   List<OrgNode> get children => [body];
@@ -1440,7 +1441,9 @@ class OrgParagraph extends OrgParentNode {
 
   @override
   bool contains(Pattern pattern) =>
-      indent.contains(pattern) || body.contains(pattern);
+      indent.contains(pattern) ||
+      body.contains(pattern) ||
+      trailing.contains(pattern);
 
   @override
   String toString() => 'OrgParagraph';
@@ -1449,17 +1452,20 @@ class OrgParagraph extends OrgParentNode {
   void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
-      ..visit(body);
+      ..visit(body)
+      ..write(trailing);
   }
 
   OrgParagraph copyWith({
     String? indent,
     OrgContent? body,
+    String? trailing,
     String? id,
   }) =>
       OrgParagraph(
         indent ?? this.indent,
         body ?? this.body,
+        trailing ?? this.trailing,
         id ?? this.id,
       );
 }

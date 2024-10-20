@@ -124,8 +124,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser paragraph() => super.paragraph().map((items) {
         final indent = items[0] as String;
         final bodyElements = items[1] as List;
+        final trailing = items[2] as String;
         final body = OrgContent(bodyElements.cast());
-        return OrgParagraph(indent, body);
+        return OrgParagraph(indent, body, trailing);
       });
 
   @override

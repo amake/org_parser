@@ -24,7 +24,7 @@ void main() {
       final document = parsed.value as OrgDocument;
       final paragraph = document.content!.children[0] as OrgParagraph;
       final text = paragraph.body.children[0] as OrgPlainText;
-      expect(text.content, 'An introduction.\n\n');
+      expect(text.content, 'An introduction.');
       final topSection = document.sections[0];
       final topContent0 =
           topSection.headline.title!.children[0] as OrgPlainText;
