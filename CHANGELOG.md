@@ -1,3 +1,6 @@
+## [6.4.2]
+- `OrgParagraph`s are now split on blank lines like in Emacs
+
 ## [6.4.1]
 - Minor optimization
 
