@@ -1,3 +1,6 @@
+## [6.4.3]
+- Upgrade dependencies
+
 ## [6.4.2]
 - `OrgParagraph`s are now split on blank lines like in Emacs
 
