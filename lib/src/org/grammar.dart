@@ -132,7 +132,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(footnoteReference) |
       ref0(citation) |
       ref0(latexInline) |
-      ref0(affiliatedKeyword);
+      ref0(affiliatedKeyword) |
+      ref0(statsCookie);
 
   Parser plainText([Parser? limit]) {
     var fullLimit = ref0(object) | endOfInput();
@@ -628,6 +629,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemAnyStart() =>
       ref0(indent) & (ref0(listUnorderedBullet) | ref0(listOrderedBullet));
+
+  Parser statsCookie() => ref0(statsCookieFraction) | ref0(statsCookiePercent);
+
+  Parser statsCookieFraction() =>
+      char('[') &
+      pattern('0-9').starString() &
+      char('/') &
+      pattern('0-9').starString() &
+      char(']');
+
+  Parser statsCookiePercent() =>
+      char('[') & pattern('0-9').starString() & char('%') & char(']');
 
   Parser drawer() => indented(
         ref0(drawerStart) & ref0(drawerContent) & ref0(drawerEnd),

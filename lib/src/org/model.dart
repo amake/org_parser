@@ -1470,6 +1470,108 @@ class OrgParagraph extends OrgParentNode {
       );
 }
 
+class OrgStatisticsFractionCookie extends OrgLeafNode {
+  OrgStatisticsFractionCookie(
+    this.leading,
+    this.numerator,
+    this.separator,
+    this.denominator,
+    this.trailing,
+  );
+
+  final String leading;
+  final String numerator;
+  final String separator;
+  final String denominator;
+  final String trailing;
+
+  bool get done => numerator.isNotEmpty && numerator == denominator;
+
+  @override
+  String toString() => 'OrgStatisticsFractionCookie';
+
+  @override
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(numerator)
+      ..write(separator)
+      ..write(denominator)
+      ..write(trailing);
+  }
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      numerator.contains(pattern) ||
+      separator.contains(pattern) ||
+      denominator.contains(pattern) ||
+      trailing.contains(pattern);
+
+  OrgStatisticsFractionCookie copyWith({
+    String? leading,
+    String? numerator,
+    String? separator,
+    String? denominator,
+    String? trailing,
+  }) =>
+      OrgStatisticsFractionCookie(
+        leading ?? this.leading,
+        numerator ?? this.numerator,
+        separator ?? this.separator,
+        denominator ?? this.denominator,
+        trailing ?? this.trailing,
+      );
+}
+
+class OrgStatisticsPercentageCookie extends OrgLeafNode {
+  OrgStatisticsPercentageCookie(
+    this.leading,
+    this.percentage,
+    this.suffix,
+    this.trailing,
+  );
+
+  final String leading;
+  final String percentage;
+  final String suffix;
+  final String trailing;
+
+  bool get done => percentage == '100';
+
+  @override
+  String toString() => 'OrgStatisticsPercentageCookie';
+
+  @override
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(percentage)
+      ..write(suffix)
+      ..write(trailing);
+  }
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      percentage.contains(pattern) ||
+      suffix.contains(pattern) ||
+      trailing.contains(pattern);
+
+  OrgStatisticsPercentageCookie copyWith({
+    String? leading,
+    String? percentage,
+    String? suffix,
+    String? trailing,
+  }) =>
+      OrgStatisticsPercentageCookie(
+        leading ?? this.leading,
+        percentage ?? this.percentage,
+        suffix ?? this.suffix,
+        trailing ?? this.trailing,
+      );
+}
+
 /// A drawer, like
 /// ```
 /// :PROPERTIES:

@@ -491,6 +491,22 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser listCheckBox() => super.listCheckBox().flatten('Check box expected');
 
   @override
+  Parser statsCookieFraction() =>
+      super.statsCookieFraction().castList<String>().map((values) {
+        final [leading, numerator, separator, denominator, trailing] = values;
+        return OrgStatisticsFractionCookie(
+            leading, numerator, separator, denominator, trailing);
+      });
+
+  @override
+  Parser statsCookiePercent() =>
+      super.statsCookiePercent().castList<String>().map((values) {
+        final [leading, percentage, suffix, trailing] = values;
+        return OrgStatisticsPercentageCookie(
+            leading, percentage, suffix, trailing);
+      });
+
+  @override
   Parser drawer() => super.drawer().map((values) {
         final indent = values[0] as String;
         final body = values[1] as List;
