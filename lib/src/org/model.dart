@@ -38,8 +38,9 @@ abstract class OrgNode {
         return false;
       }
     }
+    final children = this.children;
     if (children != null) {
-      for (final child in children!) {
+      for (final child in children) {
         if (!child.visit<T>(visitor)) {
           return false;
         }
@@ -62,8 +63,9 @@ abstract class OrgNode {
     if (self is T && predicate(self)) {
       return (node: self, path: path);
     }
+    final children = this.children;
     if (children != null) {
-      for (final child in children!) {
+      for (final child in children) {
         final result = child.find<T>(predicate, [...path, child]);
         if (result != null) {
           return result;
