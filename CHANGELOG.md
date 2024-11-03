@@ -1,3 +1,7 @@
+## [6.5.0]
+- Parse statistics cookies
+- Minor optimizations
+
 ## [6.4.3]
 - Upgrade dependencies
 
