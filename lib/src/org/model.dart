@@ -1063,7 +1063,7 @@ class OrgTableCell extends OrgParentNode {
 // Default number-detecting regexp from org-mode 20200504, converted with:
 //   (kill-new (rxt-elisp-to-pcre org-table-number-regexp))
 final _orgTableNumberRegexp = RegExp(
-    r'^([><]?[.\^+\-0-9]*[0-9][:%)(xDdEe.\^+\-0-9]*|[><]?[+\-]?0[Xx][.[:xdigit:]]+|[><]?[+\-]?[0-9]+#[.A-Za-z0-9]+|nan|[u+\-]?inf)$');
+    r'^([><]?[.\^+\-0-9]*[0-9][:%)(xDdEe.\^+\-0-9]*|[><]?[+\-]?0[Xx][.[0-9a-fA-F]]+|[><]?[+\-]?[0-9]+#[.A-Za-z0-9]+|nan|[u+\-]?inf)$');
 
 // Default fraction of non-empty cells in a column to make the column
 // right-aligned. From org-mode 20200504.
