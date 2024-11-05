@@ -1,9 +1,7 @@
 part of '../model.dart';
 
-// TODO(aaron): Add sealed superclass
-
-class OrgSubscript extends OrgParentNode {
-  OrgSubscript(this.leading, this.body, this.trailing);
+sealed class OrgSubSuperscript extends OrgParentNode {
+  OrgSubSuperscript(this.leading, this.body, this.trailing);
 
   final String leading;
   final OrgContent body;
@@ -19,15 +17,19 @@ class OrgSubscript extends OrgParentNode {
       trailing.contains(pattern);
 
   @override
-  String toString() => 'OrgSubscript';
-
-  @override
   _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(leading)
       ..visit(body)
       ..write(trailing);
   }
+}
+
+class OrgSubscript extends OrgSubSuperscript {
+  OrgSubscript(super.leading, super.body, super.trailing);
+
+  @override
+  String toString() => 'OrgSubscript';
 
   @override
   OrgSubscript fromChildren(List<OrgNode> children) =>
@@ -45,32 +47,11 @@ class OrgSubscript extends OrgParentNode {
       );
 }
 
-class OrgSuperscript extends OrgParentNode {
-  OrgSuperscript(this.leading, this.body, this.trailing);
-
-  final String leading;
-  final OrgContent body;
-  final String trailing;
-
-  @override
-  List<OrgNode> get children => [body];
-
-  @override
-  bool contains(Pattern pattern) =>
-      leading.contains(pattern) ||
-      body.contains(pattern) ||
-      trailing.contains(pattern);
+class OrgSuperscript extends OrgSubSuperscript {
+  OrgSuperscript(super.leading, super.body, super.trailing);
 
   @override
   String toString() => 'OrgSuperscript';
-
-  @override
-  _toMarkupImpl(OrgSerializer buf) {
-    buf
-      ..write(leading)
-      ..visit(body)
-      ..write(trailing);
-  }
 
   @override
   OrgSuperscript fromChildren(List<OrgNode> children) =>
