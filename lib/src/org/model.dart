@@ -1472,22 +1472,36 @@ class OrgParagraph extends OrgParentNode {
       );
 }
 
-class OrgStatisticsFractionCookie extends OrgLeafNode {
+sealed class OrgStatisticsCookie extends OrgLeafNode {
+  OrgStatisticsCookie(this.leading, this.trailing);
+
+  final String leading;
+  final String trailing;
+
+  bool get done;
+
+  OrgStatisticsCookie update({required int done, required int total});
+}
+
+class OrgStatisticsFractionCookie extends OrgStatisticsCookie {
   OrgStatisticsFractionCookie(
-    this.leading,
+    super.leading,
     this.numerator,
     this.separator,
     this.denominator,
-    this.trailing,
+    super.trailing,
   );
 
-  final String leading;
   final String numerator;
   final String separator;
   final String denominator;
-  final String trailing;
 
+  @override
   bool get done => numerator.isNotEmpty && numerator == denominator;
+
+  @override
+  OrgStatisticsCookie update({required int done, required int total}) =>
+      copyWith(numerator: done.toString(), denominator: total.toString());
 
   @override
   String toString() => 'OrgStatisticsFractionCookie';
@@ -1526,20 +1540,25 @@ class OrgStatisticsFractionCookie extends OrgLeafNode {
       );
 }
 
-class OrgStatisticsPercentageCookie extends OrgLeafNode {
+class OrgStatisticsPercentageCookie extends OrgStatisticsCookie {
   OrgStatisticsPercentageCookie(
-    this.leading,
+    super.leading,
     this.percentage,
     this.suffix,
-    this.trailing,
+    super.trailing,
   );
 
-  final String leading;
   final String percentage;
   final String suffix;
-  final String trailing;
 
+  @override
   bool get done => percentage == '100';
+
+  @override
+  OrgStatisticsCookie update({required int done, required int total}) =>
+      copyWith(
+        percentage: done == 0 ? '0' : (done / total * 100).round().toString(),
+      );
 
   @override
   String toString() => 'OrgStatisticsPercentageCookie';

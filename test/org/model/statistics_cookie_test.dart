@@ -14,6 +14,8 @@ void main() {
         expect(result.toMarkup(), markup);
         expect(result.contains('50'), isTrue);
         expect(result.done, isFalse);
+        final updated = result.update(done: 1, total: 3);
+        expect(updated.toMarkup(), '[33%]');
       });
       test('empty', () {
         final markup = '[%]';
@@ -48,6 +50,8 @@ void main() {
         expect(result.toMarkup(), markup);
         expect(result.contains('1'), isTrue);
         expect(result.done, isFalse);
+        final updated = result.update(done: 2, total: 3);
+        expect(updated.toMarkup(), '[2/3]');
       });
       test('empty', () {
         final markup = '[/]';
