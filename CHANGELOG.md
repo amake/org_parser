@@ -1,3 +1,8 @@
+## [6.6.0]
+- Introduce `OrgStatisticsCookie` parent class
+- Add `OrgStatisticsCookie.update` method
+- Fix identifying numerical table cells
+
 ## [6.5.0]
 - Parse statistics cookies
 - Minor optimizations
