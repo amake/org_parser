@@ -413,10 +413,72 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
-  Parser timestamp() => super
-      .timestamp()
-      .flatten('Timestamp expected')
-      .map((value) => OrgTimestamp(value));
+  Parser timestampDiary() => super
+      .timestampDiary()
+      .flatten('Diary timestamp expected')
+      .map((value) => OrgDiaryTimestamp(value));
+
+  @override
+  Parser timestampSimple(bool active) =>
+      super.timestampSimple(active).castList<dynamic>().map((value) {
+        final [
+          prefix as String,
+          date as OrgDate,
+          time as OrgTime?,
+          repeaterOrDelays as List<dynamic>,
+          suffix as String
+        ] = value;
+        return OrgSimpleTimestamp(
+            prefix, date, time, repeaterOrDelays.cast(), suffix);
+      });
+
+  @override
+  Parser timestampDateRange(bool active) =>
+      super.timestampDateRange(active).castList<dynamic>().map((value) {
+        final [
+          start as OrgSimpleTimestamp,
+          delimiter as String,
+          end as OrgSimpleTimestamp
+        ] = value;
+        return OrgDateRangeTimestamp(start, delimiter, end);
+      });
+
+  @override
+  Parser repeaterOrDelay() =>
+      super.repeaterOrDelay().flatten('Repeater or delay expected');
+
+  @override
+  Parser timestampTimeRange(bool active) =>
+      super.timestampTimeRange(active).castList<dynamic>().map((value) {
+        final [
+          prefix as String,
+          date as OrgDate,
+          range as List<dynamic>,
+          repeaterOrDelays as List<dynamic>,
+          suffix as String
+        ] = value;
+        final [timeStart as OrgTime, _ as String, timeEnd as OrgTime] = range;
+        return OrgTimeRangeTimestamp(
+          prefix,
+          date,
+          timeStart,
+          timeEnd,
+          repeaterOrDelays.cast(),
+          suffix,
+        );
+      });
+
+  @override
+  Parser<OrgDate> date() => super.date().castList<String>().map((value) {
+        final [year, _, month, _, day, dayName] = value;
+        return (year: year, month: month, day: day, dayName: dayName);
+      });
+
+  @override
+  Parser<OrgTime> time() => super.time().castList<String>().map((value) {
+        final [hour, _, minute] = value;
+        return (hour: hour, minute: minute);
+      });
 
   @override
   Parser keyword() =>
