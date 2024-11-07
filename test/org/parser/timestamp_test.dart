@@ -117,8 +117,8 @@ void main() {
     });
     test('sexp', () {
       final result =
-          parser.parse('<%%(what (the (f)))>').value as OrgDiaryTimestamp;
-      expect(result.content, '<%%(what (the (f)))>');
+          parser.parse('<%%(what (the (f))) foo>').value as OrgDiaryTimestamp;
+      expect(result.content, '<%%(what (the (f))) foo>');
     });
   });
 }

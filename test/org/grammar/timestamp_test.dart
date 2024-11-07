@@ -112,7 +112,7 @@ void main() {
       ]);
     });
     test('sexp', () {
-      final result = parser.parse('''<%%(what (the (f)))>''');
+      final result = parser.parse('''<%%(what (the (f))) foo>''');
       expect(result.value, [
         '<%%',
         [
@@ -134,6 +134,7 @@ void main() {
           ],
           ')'
         ],
+        ' foo',
         '>'
       ]);
     });

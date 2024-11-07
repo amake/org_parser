@@ -487,7 +487,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref1(timestampSimple, true) |
       ref1(timestampSimple, false);
 
-  Parser timestampDiary() => string('<%%') & ref0(sexp) & char('>');
+  Parser timestampDiary() =>
+      string('<%%') & ref0(sexp) & char('>').neg().starString() & char('>');
 
   // TODO(aaron): Bother with a real Elisp parser here?
   Parser sexp([String delimiters = '()']) =>
