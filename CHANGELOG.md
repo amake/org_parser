@@ -1,3 +1,6 @@
+## [7.0.1]
+- Fix parsing of diary timestamps
+
 ## [7.0.0]
 - Replace `OrgTimestamp` with specialized classes
   - `OrgDiaryTimestamp`, `OrgSimpleTimestamp`, `OrgTimeRangeTimestamp`,
