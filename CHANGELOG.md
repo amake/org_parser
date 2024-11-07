@@ -1,3 +1,9 @@
+## [7.0.0]
+- Replace `OrgTimestamp` with specialized classes
+  - `OrgDiaryTimestamp`, `OrgSimpleTimestamp`, `OrgTimeRangeTimestamp`,
+    `OrgDateRangeTimestamp`
+- Introduce `OrgSubSuperscript` sealed parent class
+
 ## [6.6.0]
 - Introduce `OrgStatisticsCookie` parent class
 - Add `OrgStatisticsCookie.update` method
