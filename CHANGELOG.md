@@ -1,3 +1,6 @@
+## [7.1.0]
+- Parse horizontal rules to `OrgHorizontalRule`
+
 ## [7.0.1]
 - Fix parsing of diary timestamps
 
