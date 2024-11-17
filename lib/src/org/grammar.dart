@@ -97,6 +97,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(affiliatedKeyword) |
       ref0(fixedWidthArea) |
       ref0(table) |
+      ref0(horizontalRule) |
       ref0(list) |
       ref0(planningLine) |
       ref0(drawer) |
@@ -479,6 +480,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (string('+-') & anyOf('+-').starString())
           .flatten('Table divider expected') &
       ref0(lineTrailing).flatten('Trailing line content expected');
+
+  Parser horizontalRule() => (lineStart() &
+          char('-').repeat(5, unbounded).flatten() &
+          lineTrailingWhitespace().flatten())
+      .drop1(0);
 
   Parser timestamp() =>
       ref0(timestampDiary) |

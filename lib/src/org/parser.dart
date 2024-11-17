@@ -413,6 +413,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
+  Parser horizontalRule() =>
+      super.horizontalRule().castList<dynamic>().map((value) {
+        final [content as String, trailing as String] = value;
+        return OrgHorizontalRule(content, trailing);
+      });
+
+  @override
   Parser timestampDiary() => super
       .timestampDiary()
       .flatten('Diary timestamp expected')

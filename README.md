@@ -131,3 +131,9 @@ applications.
     ```org
     [cite:@key]
     ```
+
+- Horizontal rules
+
+    ```org
+    -----
+    ```

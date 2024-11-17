@@ -13,6 +13,7 @@ part 'model/org_entity.dart';
 part 'model/org_fixed_width_area.dart';
 part 'model/org_footnote.dart';
 part 'model/org_headline.dart';
+part 'model/org_horizontal_rule.dart';
 part 'model/org_latex.dart';
 part 'model/org_link.dart';
 part 'model/org_list.dart';
