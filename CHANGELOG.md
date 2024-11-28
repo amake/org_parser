@@ -1,3 +1,6 @@
+## [7.1.1]
+- Minor optimization
+
 ## [7.1.0]
 - Parse horizontal rules to `OrgHorizontalRule`
 
