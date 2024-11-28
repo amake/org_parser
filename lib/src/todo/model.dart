@@ -1,7 +1,7 @@
 import 'package:org_parser/org_parser.dart';
 import 'package:petitparser/petitparser.dart';
 
-final defaultTodoStates = OrgTodoStates(todo: ['TODO'], done: ['DONE']);
+const defaultTodoStates = OrgTodoStates._(todo: ['TODO'], done: ['DONE']);
 
 const _todoMetaKeywords = ['#+TODO:', '#+SEQ_TODO:', '#+TYP_TODO:'];
 
@@ -34,6 +34,8 @@ class OrgTodoStates {
   OrgTodoStates({Iterable<String>? todo, Iterable<String>? done})
       : todo = List.unmodifiable(todo ?? <String>[]),
         done = List.unmodifiable(done ?? <String>[]);
+
+  const OrgTodoStates._({required this.todo, required this.done});
 
   bool get isEmpty => todo.isEmpty && done.isEmpty;
   bool get isNotEmpty => !isEmpty;
