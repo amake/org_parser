@@ -1,3 +1,6 @@
+## [7.1.2]
+- Fix bugs in `OrgNode.contains`
+
 ## [7.1.1]
 - Minor optimization
 
