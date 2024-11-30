@@ -217,9 +217,7 @@ class OrgTableCell extends OrgParentNode {
   }
 
   @override
-  bool contains(Pattern pattern) {
-    return content.contains(pattern);
-  }
+  bool contains(Pattern pattern) => content.contains(pattern);
 
   @override
   void _toMarkupImpl(OrgSerializer buf) {

@@ -11,9 +11,7 @@ class OrgLink extends OrgLeafNode {
   final String location;
 
   @override
-  bool contains(Pattern pattern) {
-    return location.contains(pattern);
-  }
+  bool contains(Pattern pattern) => location.contains(pattern);
 
   @override
   String toString() => 'OrgLink';

@@ -16,11 +16,10 @@ class OrgMeta extends OrgLeafNode with IndentedElement {
   final String trailing;
 
   @override
-  bool contains(Pattern pattern) {
-    return indent.contains(pattern) ||
-        keyword.contains(pattern) ||
-        trailing.contains(pattern);
-  }
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) ||
+      keyword.contains(pattern) ||
+      trailing.contains(pattern);
 
   @override
   String toString() => 'OrgMeta';
