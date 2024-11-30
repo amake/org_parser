@@ -85,9 +85,9 @@ class OrgFootnoteReference extends OrgParentNode {
     final name = this.name;
     final definition = this.definition;
     return leading.contains(pattern) ||
-        name != null && name.contains(pattern) ||
-        definition != null && definition.delimiter.contains(pattern) ||
-        definition != null && definition.value.contains(pattern) ||
+        name?.contains(pattern) == true ||
+        definition?.delimiter.contains(pattern) == true ||
+        definition?.value.contains(pattern) == true ||
         trailing.contains(pattern);
   }
 

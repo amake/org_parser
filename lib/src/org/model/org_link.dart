@@ -39,10 +39,8 @@ class OrgBracketLink extends OrgLink {
   final String? description;
 
   @override
-  bool contains(Pattern pattern) {
-    return super.contains(pattern) ||
-        description != null && description!.contains(pattern);
-  }
+  bool contains(Pattern pattern) =>
+      super.contains(pattern) || description?.contains(pattern) == true;
 
   @override
   String toString() => 'OrgLink';

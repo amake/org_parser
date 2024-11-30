@@ -61,14 +61,11 @@ sealed class OrgListItem extends OrgParentNode {
   List<OrgNode> get children => body == null ? const [] : [body!];
 
   @override
-  bool contains(Pattern pattern) {
-    final checkbox = this.checkbox;
-    final body = this.body;
-    return indent.contains(pattern) ||
-        bullet.contains(pattern) ||
-        checkbox != null && checkbox.contains(pattern) ||
-        body != null && body.contains(pattern);
-  }
+  bool contains(Pattern pattern) =>
+      indent.contains(pattern) ||
+      bullet.contains(pattern) ||
+      checkbox?.contains(pattern) == true ||
+      body?.contains(pattern) == true;
 
   @override
   String toString() => runtimeType.toString();
@@ -121,12 +118,10 @@ class OrgListUnorderedItem extends OrgListItem {
   }
 
   @override
-  bool contains(Pattern pattern) {
-    final tag = this.tag;
-    return tag != null &&
-            (tag.value.contains(pattern) || tag.delimiter.contains(pattern)) ||
-        super.contains(pattern);
-  }
+  bool contains(Pattern pattern) =>
+      tag?.value.contains(pattern) == true ||
+      tag?.delimiter.contains(pattern) == true ||
+      super.contains(pattern);
 
   @override
   String toString() => 'OrgListUnorderedItem';
