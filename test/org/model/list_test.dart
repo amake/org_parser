@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse(markup);
       final list = result.value as OrgList;
       expect(list.contains('foo'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('multiple lines', () {
@@ -20,6 +21,7 @@ void main() {
       final list = result.value as OrgList;
       expect(list.contains('foo'), isTrue);
       expect(list.contains('bar'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('multiline item', () {
@@ -30,6 +32,7 @@ void main() {
       final list = result.value as OrgList;
       expect(list.contains('foo'), isTrue);
       expect(list.contains('bar'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('multiline item with eol white space', () {
@@ -40,6 +43,7 @@ void main() {
       final list = result.value as OrgList;
       expect(list.contains('foo'), isTrue);
       expect(list.contains('bar'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('complex', () {
@@ -54,6 +58,7 @@ void main() {
       expect(list.contains('baz'), isTrue);
       expect(list.contains('blah'), isTrue);
       expect(list.contains('bazinga'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('item with block', () {
@@ -64,6 +69,7 @@ void main() {
       final result = parser.parse(markup);
       final list = result.value as OrgList;
       expect(list.contains('echo bar'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('with tag', () {
@@ -71,6 +77,7 @@ void main() {
       final result = parser.parse(markup);
       final list = result.value as OrgList;
       expect(list.contains('foo'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
     test('with following meta', () {
@@ -79,6 +86,7 @@ void main() {
       final result = parser.parse(markup);
       final list = result.value as OrgList;
       expect(list.contains('bar'), isTrue);
+      expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
   });

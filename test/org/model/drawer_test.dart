@@ -16,6 +16,7 @@ void main() {
       final result = parser.parse(markup);
       final drawer = result.value as OrgDrawer;
       expect(drawer.contains('foo'), isTrue);
+      expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
     });
     test('simple', () {
@@ -26,6 +27,7 @@ a
       final result = parser.parse(markup);
       final drawer = result.value as OrgDrawer;
       expect(drawer.contains('a'), isTrue);
+      expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
     });
     test('empty', () {
@@ -33,6 +35,8 @@ a
 :END:''';
       final result = parser.parse(markup);
       final drawer = result.value as OrgDrawer;
+      expect(drawer.contains('FOOBAR'), isTrue);
+      expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
     });
   });

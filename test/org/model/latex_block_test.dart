@@ -16,6 +16,7 @@ void main() {
     final result = parser.parse(markup);
     final latex = result.value as OrgLatexBlock;
     expect(latex.contains(r'\begin{matrix}'), isTrue);
+    expect(latex.contains(r'あ'), isFalse);
     expect(latex.toMarkup(), markup);
   });
 }

@@ -11,6 +11,7 @@ void main() {
       var result = parser.parse(markup);
       final footnote = result.value as OrgFootnote;
       expect(footnote.contains('foo'), isTrue);
+      expect(footnote.contains('あ'), isFalse);
       expect(footnote.toMarkup(), markup);
     });
   });

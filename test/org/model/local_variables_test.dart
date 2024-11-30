@@ -13,6 +13,7 @@ void main() {
       final result = parser.parse(markup);
       final lvars = result.value as OrgLocalVariables;
       expect(lvars.contains('foo'), isTrue);
+      expect(lvars.contains('あ'), isFalse);
       expect(lvars.toMarkup(), markup);
     });
     test('with suffix', () {
@@ -22,6 +23,7 @@ void main() {
       final result = parser.parse(markup);
       final lvars = result.value as OrgLocalVariables;
       expect(lvars.contains('foo'), isTrue);
+      expect(lvars.contains('あ'), isFalse);
       expect(lvars.toMarkup(), markup);
     });
   });

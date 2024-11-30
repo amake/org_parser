@@ -13,6 +13,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsPercentageCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('50'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
         final updated = result.update(done: 1, total: 3);
         expect(updated.toMarkup(), '[33%]');
@@ -23,6 +24,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsPercentageCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('%'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
       });
       test('done', () {
@@ -31,6 +33,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsPercentageCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('100'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isTrue);
       });
       test('not done', () {
@@ -39,6 +42,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsPercentageCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('0'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
       });
     });
@@ -49,6 +53,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsFractionCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('1'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
         final updated = result.update(done: 2, total: 3);
         expect(updated.toMarkup(), '[2/3]');
@@ -59,6 +64,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsFractionCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('/'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
       });
       test('vacuous done', () {
@@ -67,6 +73,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsFractionCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('0'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isTrue);
       });
       test('partial', () {
@@ -75,6 +82,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsFractionCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('2'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isFalse);
       });
       test('done', () {
@@ -83,6 +91,7 @@ void main() {
             parser.parse(markup).value as OrgStatisticsFractionCookie;
         expect(result.toMarkup(), markup);
         expect(result.contains('2'), isTrue);
+        expect(result.contains('あ'), isFalse);
         expect(result.done, isTrue);
       });
     });

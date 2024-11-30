@@ -11,6 +11,7 @@ void main() {
       var result = parser.parse(markup);
       var ref = result.value as OrgMacroReference;
       expect(ref.contains('name'), isTrue);
+      expect(ref.contains('あ'), isFalse);
       expect(ref.toMarkup(), markup);
     });
     test('simple', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup);
       final ref = result.value as OrgMacroReference;
       expect(ref.contains('foobar'), isTrue);
+      expect(ref.contains('あ'), isFalse);
       expect(ref.toMarkup(), markup);
     });
   });

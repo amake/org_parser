@@ -11,6 +11,7 @@ void main() {
       var result = parser.parse(markup);
       final named = result.value as OrgFootnoteReference;
       expect(named.contains('1'), isTrue);
+      expect(named.contains('あ'), isFalse);
       expect(named.toMarkup(), markup);
     });
     test('with definition', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup);
       final anonymous = result.value as OrgFootnoteReference;
       expect(anonymous.contains('who'), isTrue);
+      expect(anonymous.contains('あ'), isFalse);
       expect(anonymous.toMarkup(), markup);
     });
     test('with name', () {
@@ -25,6 +27,7 @@ void main() {
       final result = parser.parse(markup);
       final inline = result.value as OrgFootnoteReference;
       expect(inline.contains('abc123'), isTrue);
+      expect(inline.contains('あ'), isFalse);
       expect(inline.toMarkup(), markup);
     });
   });

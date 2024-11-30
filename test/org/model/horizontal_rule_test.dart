@@ -12,6 +12,7 @@ void main() {
       final rule = result.value as OrgHorizontalRule;
       expect(rule.toMarkup(), markup);
       expect(rule.contains('-----'), isTrue);
+      expect(rule.contains('あ'), isFalse);
     });
     test('trailing', () {
       final markup = '''-----${' '}
@@ -20,6 +21,7 @@ void main() {
       final rule = result.value as OrgHorizontalRule;
       expect(rule.toMarkup(), markup);
       expect(rule.contains(' '), isTrue);
+      expect(rule.contains('あ'), isFalse);
     });
   });
 }

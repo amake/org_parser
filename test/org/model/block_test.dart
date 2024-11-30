@@ -15,6 +15,7 @@ void main() {
       final result = parser.parse(markup);
       final block = result.value as OrgBlock;
       expect(block.contains("echo 'foo'"), isTrue);
+      expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
     });
     group('source block', () {
@@ -27,6 +28,7 @@ void main() {
         var result = parser.parse(markup);
         var block = result.value as OrgSrcBlock;
         expect(block.contains("echo 'foo'"), isTrue);
+        expect(block.contains('あ'), isFalse);
         expect(block.toMarkup(), markup);
       });
       test('empty', () {
@@ -34,6 +36,7 @@ void main() {
 #+end_src''';
         final result = parser.parse(markup);
         final block = result.value as OrgSrcBlock;
+        expect(block.contains('あ'), isFalse);
         expect(block.toMarkup(), markup);
       });
     });

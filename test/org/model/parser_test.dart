@@ -25,6 +25,7 @@ void main() {
       final document = parsed.value as OrgDocument;
       expect(document.contains('introduction'), isTrue);
       expect(document.contains('A Headline'), isTrue);
+      expect(document.contains('あ'), isFalse);
       expect(document.toMarkup(), doc);
     });
     test('footnotes', () {
@@ -42,6 +43,7 @@ bazoonga''';
       final document = result.value as OrgDocument;
       expect(document.contains('foo bar'), isTrue);
       expect(document.contains('bazinga'), isTrue);
+      expect(document.contains('あ'), isFalse);
       expect(document.toMarkup(), doc);
     });
     test('complex document', () {

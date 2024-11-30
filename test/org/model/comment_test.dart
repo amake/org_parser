@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse(markup);
       final comment = result.value as OrgComment;
       expect(comment.contains('foo'), isTrue);
+      expect(comment.contains('あ'), isFalse);
       expect(comment.toMarkup(), markup);
     });
   });

@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse('a^{a1 {b2}}');
       final (_, OrgSuperscript sup) = result.value;
       expect(sup.contains('b2'), isTrue);
+      expect(sup.contains('あ'), isFalse);
       expect(sup.toMarkup(), '^{a1 {b2}}');
     });
   });

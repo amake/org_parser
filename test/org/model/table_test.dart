@@ -15,7 +15,7 @@ void main() {
       final table = result.value as OrgTable;
       expect(table.contains('foo'), isTrue);
       expect(table.contains('bar'), isTrue);
-      expect(table.contains('*bar*'), false);
+      expect(table.contains('*bar*'), isFalse);
       expect(table.toMarkup(), markup);
     });
     test('empty', () {

@@ -11,6 +11,7 @@ void main() {
       var result = parser.parse(markup);
       var link = result.value as OrgBracketLink;
       expect(link.contains('what?'), isTrue);
+      expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
     test('link with search option', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup);
       final link = result.value as OrgBracketLink;
       expect(link.contains('foo'), isTrue);
+      expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
     test('quotes in search option', () {
@@ -25,6 +27,7 @@ void main() {
       final result = parser.parse(markup);
       final link = result.value as OrgBracketLink;
       expect(link.contains('foo'), isTrue);
+      expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
     test('no description', () {
@@ -32,6 +35,7 @@ void main() {
       final result = parser.parse(markup);
       final link = result.value as OrgBracketLink;
       expect(link.contains('foo'), isTrue);
+      expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
     test('plain link', () {
@@ -39,6 +43,7 @@ void main() {
       final result = parser.parse(markup);
       final link = result.value as OrgLink;
       expect(link.contains('example'), isTrue);
+      expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
   });

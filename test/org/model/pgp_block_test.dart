@@ -17,6 +17,7 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
       final result = parser.parse(markup);
       final pgp = result.value as OrgPgpBlock;
       expect(pgp.contains('BEGIN PGP MESSAGE'), isTrue);
+      expect(pgp.contains('あ'), isFalse);
       expect(pgp.toMarkup(), markup);
       expect(pgp.toRfc4880(), markup.trim());
     });
@@ -30,7 +31,8 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
 ''';
       final result = parser.parse(markup);
       final pgp = result.value as OrgPgpBlock;
-      expect(pgp.contains('BEGIN PGP MESSAGE'), isTrue);
+      expect(pgp.contains('END PGP MESSAGE'), isTrue);
+      expect(pgp.contains('あ'), isFalse);
       expect(pgp.toMarkup(), markup);
       expect(pgp.toRfc4880(), '''-----BEGIN PGP MESSAGE-----
 

@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse(markup);
       final latex = result.value as OrgLatexInline;
       expect(latex.contains('i'), isTrue);
+      expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
     });
     test(r'double-$ delimiter', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup);
       final latex = result.value as OrgLatexInline;
       expect(latex.contains('a^2'), isTrue);
+      expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
     });
     test('paren delimiter', () {
@@ -25,6 +27,7 @@ void main() {
       final result = parser.parse(markup);
       final latex = result.value as OrgLatexInline;
       expect(latex.contains('foo'), isTrue);
+      expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
     });
     test('bracket delimiter', () {
@@ -32,6 +35,7 @@ void main() {
       final result = parser.parse(markup);
       final latex = result.value as OrgLatexInline;
       expect(latex.contains('bar'), isTrue);
+      expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
     });
   });

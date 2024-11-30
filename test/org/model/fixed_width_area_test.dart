@@ -13,12 +13,15 @@ void main() {
       var result = parser.parse(markup);
       var area = result.value as OrgFixedWidthArea;
       expect(area.contains('foo'), isTrue);
+      expect(area.contains('あ'), isFalse);
       expect(area.toMarkup(), markup);
     });
     test('empty', () {
       final markup = ': ';
       final result = parser.parse(markup);
       final area = result.value as OrgFixedWidthArea;
+      expect(area.contains(':'), isTrue);
+      expect(area.contains('あ'), isFalse);
       expect(area.toMarkup(), markup);
     });
   });

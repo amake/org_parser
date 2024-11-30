@@ -13,6 +13,8 @@ void main() {
       expect(citation.body, '@foo');
       expect(citation.getKeys(), ['foo']);
       expect(citation.toMarkup(), markup);
+      expect(citation.contains('foo'), isTrue);
+      expect(citation.contains('あ'), isFalse);
     });
     test('multiple keys', () {
       final markup = '[cite:@foo;@bar;@foo]';
@@ -21,6 +23,8 @@ void main() {
       expect(citation.body, '@foo;@bar;@foo');
       expect(citation.getKeys(), ['foo', 'bar', 'foo']);
       expect(citation.toMarkup(), markup);
+      expect(citation.contains('foo'), isTrue);
+      expect(citation.contains('あ'), isFalse);
     });
     test('prefix and suffix', () {
       final markup = '[cite/style:pre;pre2@bar suff;suff2]';
@@ -29,6 +33,8 @@ void main() {
       expect(citation.body, 'pre;pre2@bar suff;suff2');
       expect(citation.getKeys(), ['bar']);
       expect(citation.toMarkup(), markup);
+      expect(citation.contains('suff2'), isTrue);
+      expect(citation.contains('あ'), isFalse);
     });
     test('invalid', () {
       final markup = '[cite:foo]';

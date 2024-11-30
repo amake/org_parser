@@ -12,6 +12,7 @@ bar/''';
       var result = parser.parse(markup);
       final markupNode = result.value as OrgMarkup;
       expect(markupNode.contains('foo'), isTrue);
+      expect(markupNode.contains('あ'), isFalse);
       expect(markupNode.toMarkup(), markup);
     });
   });

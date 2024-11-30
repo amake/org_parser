@@ -11,6 +11,7 @@ void main() {
     final result = parser.parse(markup);
     final planningLine = result.value as OrgPlanningLine;
     expect(planningLine.contains('CLOCK'), isTrue);
+    expect(planningLine.contains('あ'), isFalse);
     expect(planningLine.toMarkup(), markup);
   });
 }

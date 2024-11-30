@@ -18,6 +18,7 @@ void main() {
       final result = parser.parse('a_{a1 {b2}}');
       final (_, OrgSubscript sup) = result.value;
       expect(sup.contains('b2'), isTrue);
+      expect(sup.contains('あ'), isFalse);
       expect(sup.toMarkup(), '_{a1 {b2}}');
     });
   });

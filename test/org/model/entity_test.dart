@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse(markup);
       final entity = result.value as OrgEntity;
       expect(entity.contains('frac12'), isTrue);
+      expect(entity.contains('あ'), isFalse);
       expect(entity.toMarkup(), markup);
     });
     test('with terminator', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup);
       final entity = result.value as OrgEntity;
       expect(entity.contains('foobar'), isTrue);
+      expect(entity.contains('あ'), isFalse);
       expect(entity.toMarkup(), markup);
     });
   });

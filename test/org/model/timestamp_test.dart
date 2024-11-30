@@ -11,6 +11,7 @@ void main() {
       final result = parser.parse(markup).value as OrgSimpleTimestamp;
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('date and time', () {
@@ -18,6 +19,7 @@ void main() {
       final result = parser.parse(markup).value as OrgSimpleTimestamp;
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('with repeater', () {
@@ -26,6 +28,7 @@ void main() {
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('+1w'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('with multiple repeaters', () {
@@ -35,6 +38,7 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('+1w'), isTrue);
       expect(result.contains('--2d'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('inactive', () {
@@ -44,6 +48,7 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('time range', () {
@@ -53,6 +58,7 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('date range', () {
@@ -65,12 +71,14 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
     test('sexp', () {
       final markup = '<%%(what (the (f)))>';
       final result = parser.parse(markup).value as OrgDiaryTimestamp;
       expect(result.contains('what'), isTrue);
+      expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
   });

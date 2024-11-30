@@ -14,6 +14,7 @@ void main() {
     final result = parser.parse(markup);
     final block = result.value as OrgBlock;
     expect(block.contains('bizbaz'), isTrue);
+    expect(block.contains('あ'), isFalse);
     expect(block.toMarkup(), markup);
   });
 }
