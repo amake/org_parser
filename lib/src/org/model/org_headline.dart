@@ -86,13 +86,19 @@ class OrgHeadline extends OrgParentNode {
   }
 
   @override
-  bool contains(Pattern pattern) {
-    final keyword = this.keyword;
-    final title = this.title;
-    return keyword != null && keyword.value.contains(pattern) ||
-        title != null && title.contains(pattern) ||
-        tags?.values.any((tag) => tag.contains(pattern)) == true;
-  }
+  bool contains(Pattern pattern) =>
+      stars.value.contains(pattern) ||
+      stars.trailing.contains(pattern) ||
+      keyword?.value.contains(pattern) == true ||
+      keyword?.trailing.contains(pattern) == true ||
+      priority?.leading.contains(pattern) == true ||
+      priority?.value.contains(pattern) == true ||
+      priority?.trailing.contains(pattern) == true ||
+      rawTitle?.contains(pattern) == true ||
+      tags?.leading.contains(pattern) == true ||
+      tags?.values.any((tag) => tag.contains(pattern)) == true ||
+      tags?.trailing.contains(pattern) == true ||
+      trailing?.contains(pattern) == true;
 
   @override
   String toString() => 'OrgHeadline';
