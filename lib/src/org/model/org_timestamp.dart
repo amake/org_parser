@@ -65,8 +65,8 @@ class OrgSimpleTimestamp extends OrgLeafNode {
       date.month.contains(pattern) ||
       date.day.contains(pattern) ||
       date.dayName.contains(pattern) ||
-      (time != null && time!.hour.contains(pattern) ||
-          time!.minute.contains(pattern)) ||
+      time?.hour.contains(pattern) == true ||
+      time?.minute.contains(pattern) == true ||
       repeaterOrDelay.any((item) => item.contains(pattern)) ||
       suffix.contains(pattern);
 
