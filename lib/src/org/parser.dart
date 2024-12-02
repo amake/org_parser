@@ -152,6 +152,18 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.linkDescription().castList<String>().pick(1);
 
   @override
+  Parser linkTarget() => super.linkTarget().castList<String>().map((values) {
+        final [leading, body, trailing] = values;
+        return OrgLinkTarget(leading, body, trailing);
+      });
+
+  @override
+  Parser radioTarget() => super.radioTarget().castList<String>().map((values) {
+        final [leading, body, trailing] = values;
+        return OrgRadioTarget(leading, body, trailing);
+      });
+
+  @override
   Parser bold() => mapMarkup(super.bold(), OrgStyle.bold);
 
   @override

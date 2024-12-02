@@ -123,6 +123,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser object() =>
       ref0(link) |
+      ref0(linkTarget) |
+      ref0(radioTarget) |
       ref0(markups) |
       ref0(entity) |
       ref0(subscript) |
@@ -219,6 +221,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser anyChar() => ref0(escape).castList<String>().pick(0) | any();
 
   Parser escape() => any() & char('\u200b'); // zero-width space
+
+  Parser linkTarget() =>
+      string('<<') &
+      ref0(linkTargetContent).flatten('Target content expected') &
+      string('>>');
+
+  Parser linkTargetContent() =>
+      ref0(linkTargetBorder).and() &
+      anyOf('<>\n\r').neg().starLazy(ref0(linkTargetBorder) & string('>>')) &
+      ref0(linkTargetBorder);
+
+  Parser linkTargetBorder() => anyOf('<>\n\r \t').neg();
+
+  Parser radioTarget() =>
+      string('<<<') &
+      ref0(linkTargetContent).flatten('Target content expected') &
+      string('>>>');
 
   Parser markups() =>
       ref0(bold) |
