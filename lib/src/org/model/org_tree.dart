@@ -13,8 +13,15 @@ class OrgDocument extends OrgTree {
 
     if (interpretEmbeddedSettings) {
       final todoSettings = extractTodoSettings(parsed);
-      if (todoSettings.any((s) => s != defaultTodoStates)) {
-        final parser = OrgParserDefinition(todoStates: todoSettings).build();
+      final haveTodoSettings = todoSettings.any((s) => s != defaultTodoStates);
+      final radioTargets = extractRadioTargets(parsed);
+      final haveRadioTargets = radioTargets.any((t) => t.isNotEmpty);
+      if (haveTodoSettings || haveRadioTargets) {
+        final parser = OrgParserDefinition(
+          todoStates: haveTodoSettings ? todoSettings : null,
+          radioTargets:
+              haveRadioTargets ? radioTargets.toList(growable: false) : null,
+        ).build();
         parsed = parser.parse(text).value as OrgDocument;
       }
     }

@@ -5,6 +5,7 @@ export 'drop.dart';
 export 'indent.dart';
 export 'latex.dart';
 export 'line.dart';
+export 'line_breakable.dart';
 export 'local_variables.dart';
 export 'lookbehind.dart';
 export 'noop.dart';

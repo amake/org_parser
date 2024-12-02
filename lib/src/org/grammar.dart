@@ -86,6 +86,11 @@ class OrgGrammarDefinition extends GrammarDefinition {
 /// These rules cover all "content", as opposed to "structure". See
 /// [OrgGrammarDefinition].
 class OrgContentGrammarDefinition extends GrammarDefinition {
+  const OrgContentGrammarDefinition({this.radioTargets});
+
+  /// Plain-text strings to be linked to a <<<radio target>>>.
+  final List<String>? radioTargets;
+
   @override
   Parser start() => ref0(element).star().end();
 
@@ -125,6 +130,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(link) |
       ref0(linkTarget) |
       ref0(radioTarget) |
+      ref0(radioLink) |
       ref0(markups) |
       ref0(entity) |
       ref0(subscript) |
@@ -238,6 +244,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string('<<<') &
       ref0(linkTargetContent).flatten('Target content expected') &
       string('>>>');
+
+  Parser radioLink() => radioTargets?.isNotEmpty == true
+      ? ref1(radioLinkImpl, radioTargets!)
+      : failure();
+
+  Parser radioLinkImpl(List<String> targets) =>
+      ref0(radioLinkBefore) &
+      targets.map(stringIgnoreCase).toChoiceParser() &
+      ref0(radioLinkAfter);
+
+  Parser radioLinkBefore() =>
+      lineStart() | was(alnum().neg() | lineBreakable());
+
+  Parser radioLinkAfter() =>
+      lineEnd().and() | alnum().not() | lineBreakable().and();
 
   Parser markups() =>
       ref0(bold) |

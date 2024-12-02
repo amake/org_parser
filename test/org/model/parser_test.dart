@@ -423,21 +423,29 @@ baz''';
     test('parse without interpreting settings', () {
       final doc = OrgDocument.parse('''
 #+TODO: FOO
-* FOO bar''');
+* FOO bar
+<<<baz>>>
+baz''');
       final section = doc.sections[0];
       final headline = section.headline;
       expect(headline.keyword, isNull);
       expect(headline.rawTitle, 'FOO bar');
+      final radioLink = doc.find<OrgRadioLink>((_) => true);
+      expect(radioLink, isNull);
     });
     test('parse with interpreting settings', () {
       final doc = OrgDocument.parse('''
 #+TODO: FOO BAR
-* FOO bar''', interpretEmbeddedSettings: true);
+* FOO bar
+<<<baz>>>
+baz''', interpretEmbeddedSettings: true);
       final section = doc.sections[0];
       final headline = section.headline;
       expect(headline.keyword?.value, 'FOO');
       expect(headline.keyword?.done, isFalse);
       expect(headline.rawTitle, 'bar');
+      final radioLink = doc.find<OrgRadioLink>((_) => true);
+      expect(radioLink!.node.content, 'baz');
     });
   });
 }

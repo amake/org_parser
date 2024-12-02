@@ -6,7 +6,16 @@ final org = OrgParserDefinition().build();
 
 /// Top-level parser definitions
 class OrgParserDefinition extends OrgGrammarDefinition {
-  const OrgParserDefinition({super.todoStates});
+  OrgParserDefinition({super.todoStates, List<String>? radioTargets}) {
+    if (radioTargets?.isNotEmpty == true) {
+      final definition = OrgContentParserDefinition(radioTargets: radioTargets);
+      _contentParser = definition.build();
+      _textRunParser = definition.buildFrom(definition.textRun().star());
+    }
+  }
+
+  late Parser _contentParser = _defaultOrgContentParser;
+  late Parser<List<dynamic>> _textRunParser = _defaultTextRunParser;
 
   @override
   Parser start() => super.start().map((items) {
@@ -100,22 +109,24 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser content() => super
       .content()
-      .map((content) => _orgContentParser.parse(content as String).value);
+      .map((content) => _contentParser.parse(content as String).value);
 }
 
-/// The content parser. This is not really intended to be used separately; it is
-/// used by [org] to parse "content" inside sections.
-final _orgContentParser = OrgContentParserDefinition().build();
+/// The default content parser. This is not really intended to be used
+/// separately; it is used by [org] to parse "content" inside sections.
+final _defaultOrgContentParser = OrgContentParserDefinition().build();
 
-/// Text run parser. This is not really intended to be used separately; it is
-/// used by [org] to parse text content in section headers.
-final _textRunParser = (() {
+/// Default text run parser. This is not really intended to be used separately;
+/// it is used by [org] to parse text content in section headers.
+final _defaultTextRunParser = (() {
   final definition = OrgContentParserDefinition();
   return definition.buildFrom(definition.textRun().star());
 })();
 
 /// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
+  const OrgContentParserDefinition({super.radioTargets});
+
   @override
   Parser start() =>
       super.start().castList<OrgNode>().map((elems) => OrgContent(elems));
@@ -161,6 +172,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser radioTarget() => super.radioTarget().castList<String>().map((values) {
         final [leading, body, trailing] = values;
         return OrgRadioTarget(leading, body, trailing);
+      });
+
+  @override
+  Parser radioLinkImpl(List<String> targets) =>
+      super.radioLinkImpl(targets).castList<dynamic>().map((values) {
+        final content = values[1] as String;
+        return OrgRadioLink(content);
       });
 
   @override
