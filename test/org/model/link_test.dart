@@ -8,8 +8,8 @@ void main() {
     final parser = definition.buildFrom(definition.link()).end();
     test('brackets in location', () {
       final markup = '[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]';
-      var result = parser.parse(markup);
-      var link = result.value as OrgBracketLink;
+      final result = parser.parse(markup);
+      final link = result.value as OrgBracketLink;
       expect(link.contains('what?'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
