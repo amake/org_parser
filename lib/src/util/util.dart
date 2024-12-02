@@ -9,4 +9,5 @@ export 'line_breakable.dart';
 export 'local_variables.dart';
 export 'lookbehind.dart';
 export 'noop.dart';
+export 'unicode.dart';
 export 'whitespace.dart';
