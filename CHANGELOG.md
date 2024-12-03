@@ -1,3 +1,9 @@
+## [7.2.0]
+- Parse `<<link targtes>>` and `<<<radio targets>>>`
+- Parse links to radio targets. This requires a second parsing pass; see the
+  `interpretEmbeddedSettings` arg to `OrgDocument.parse`.
+- Improve Unicode handling
+
 ## [7.1.2]
 - Fix bugs in `OrgNode.contains`
 
