@@ -137,3 +137,14 @@ applications.
     ```org
     -----
     ```
+- Radio targets
+
+    ```org
+    <<<foo>>>
+    ```
+
+- Link targets
+
+    ```org
+    <<bar>>
+    ```
