@@ -224,9 +224,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(anyChar).plusLazy(string(']]')).map((items) => items.join()) &
       char(']');
 
-  Parser anyChar() => ref0(escape).castList<String>().pick(0) | any();
+  Parser anyChar() => ref0(escape) | any();
 
-  Parser escape() => any() & char('\u200b'); // zero-width space
+  // zero-width space
+  Parser escape() => seq2(any(), char('\u200b')).map2((c, _) => c);
 
   Parser linkTarget() =>
       string('<<') &
