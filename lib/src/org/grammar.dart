@@ -333,9 +333,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (string('frac') & anyOf('13') & anyOf('24')) |
       pattern('a-zA-Z').plus();
 
-  Parser entityEnd() =>
-      // TODO(aaron): PetitParser's letter() is not the same as Emacs's [:alpha:]
-      lineEnd().and() | string('{}') | (letter() | char('\n')).not();
+  Parser entityEnd() => lineEnd().and() | string('{}') | alpha().not();
 
   Parser subscript() => (was(whitespace().neg()) &
           char('_') &

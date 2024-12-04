@@ -1,7 +1,7 @@
-export 'alnum.dart';
 export 'block.dart';
 export 'bof.dart';
 export 'drop.dart';
+export 'elisp_regexp.dart';
 export 'indent.dart';
 export 'latex.dart';
 export 'line.dart';
