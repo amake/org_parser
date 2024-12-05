@@ -88,5 +88,15 @@ void main() {
         ['_', 'a..a'],
       ]);
     });
+    test('nested', () {
+      final result = parser.parse('a_{a1_{b2}}');
+      expect(
+          result.value,
+          [
+            'a',
+            ['_', '{a1_{b2}}']
+          ],
+          reason: 'body is parsed in separate phase');
+    });
   });
 }

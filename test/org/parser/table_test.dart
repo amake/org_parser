@@ -16,7 +16,9 @@ void main() {
       final row0Cell0 = row0.cells[0].content.children[0] as OrgPlainText;
       expect(row0Cell0.content, 'foo');
       final row0Cell1 = row0.cells[1].content.children[0] as OrgMarkup;
-      expect(row0Cell1.content, 'bar');
+      final row0Cell1Content =
+          row0Cell1.content.children.single as OrgPlainText;
+      expect(row0Cell1Content.content, 'bar');
       expect(row0Cell1.leadingDecoration, '*');
       expect(row0Cell1.trailingDecoration, '*');
       expect(row0.cells.length, 3);

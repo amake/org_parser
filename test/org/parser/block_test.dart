@@ -14,8 +14,9 @@ void main() {
 ''');
       final block = result.value as OrgBlock;
       final body = block.body as OrgMarkup;
+      final bodyContent = body.content.children.single as OrgPlainText;
       expect(block.header, '#+begin_example\n');
-      expect(body.content, '  echo \'foo\'\n  rm bar\n');
+      expect(bodyContent.content, '  echo \'foo\'\n  rm bar\n');
       expect(block.footer, '#+end_example');
       expect(block.trailing, '\n');
     });

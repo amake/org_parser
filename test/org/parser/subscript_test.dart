@@ -49,5 +49,12 @@ void main() {
       expect(body.content, '(a1 (b2))');
       expect(sup.trailing, '');
     });
+    test('nested subscript', () {
+      final result = parser.parse('a_{a1_{b2}}');
+      final (_, OrgSubscript sup) = result.value;
+      final nested =
+          sup.find<OrgSubscript>((node) => node.toMarkup() == '_{b2}');
+      expect(nested, isNotNull);
+    });
   });
 }

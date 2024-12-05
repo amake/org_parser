@@ -88,5 +88,15 @@ void main() {
         ['^', 'a..a'],
       ]);
     });
+    test('nested', () {
+      final result = parser.parse('a^{a1^{b2}}');
+      expect(
+          result.value,
+          [
+            'a',
+            ['^', '{a1^{b2}}']
+          ],
+          reason: 'body is parsed in separate phase');
+    });
   });
 }

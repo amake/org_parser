@@ -41,5 +41,12 @@ void main() {
       expect(body.content, '(a1 (b2))');
       expect(sup.trailing, '');
     });
+    test('nested superscript', () {
+      final result = parser.parse('a^{a1^{b2}}');
+      final (_, OrgSuperscript sup) = result.value;
+      final nested =
+          sup.find<OrgSuperscript>((node) => node.toMarkup() == '^{b2}');
+      expect(nested, isNotNull);
+    });
   });
 }

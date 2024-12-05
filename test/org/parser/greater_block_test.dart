@@ -17,7 +17,8 @@ void main() {
     final child1 = body.children[0] as OrgPlainText;
     expect(child1.content, '  foo ');
     final child2 = body.children[1] as OrgMarkup;
-    expect(child2.content, 'bar');
+    final child2Body = child2.content.children.first as OrgPlainText;
+    expect(child2Body.content, 'bar');
     expect(block.footer, '#+end_center');
     expect(block.trailing, '\n');
   });

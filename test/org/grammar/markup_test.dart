@@ -54,6 +54,11 @@ c/ d''');
 bar+''');
       expect(result.value, ['+', 'foo\nbar', '+']);
     });
+    test('nested markup', () {
+      final result = parser.parse("~foo *bar* baz~");
+      expect(result.value, ['~', 'foo *bar* baz', '~'],
+          reason: 'body is parsed in separate phase');
+    });
     test('too many line breaks', () {
       final result = parser.parse('''+foo
 

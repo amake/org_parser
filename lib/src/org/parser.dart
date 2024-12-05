@@ -10,12 +10,12 @@ class OrgParserDefinition extends OrgGrammarDefinition {
     if (radioTargets?.isNotEmpty == true) {
       final definition = OrgContentParserDefinition(radioTargets: radioTargets);
       _contentParser = definition.build();
-      _textRunParser = definition.buildFrom(definition.textRun().star());
+      _textRunParser = definition.textRunParser;
     }
   }
 
   late Parser _contentParser = _defaultOrgContentParser;
-  late Parser<List<dynamic>> _textRunParser = _defaultTextRunParser;
+  late Parser<List<OrgNode>> _textRunParser = _defaultTextRunParser;
 
   @override
   Parser start() => super.start().map((items) {
@@ -102,7 +102,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
   @override
   Parser title() => super.title().map((title) {
         final nodes = _textRunParser.parse(title as String).value;
-        final value = OrgContent(nodes.cast());
+        final value = OrgContent(nodes);
         return [value, title];
       });
 
@@ -118,14 +118,14 @@ final _defaultOrgContentParser = OrgContentParserDefinition().build();
 
 /// Default text run parser. This is not really intended to be used separately;
 /// it is used by [org] to parse text content in section headers.
-final _defaultTextRunParser = (() {
-  final definition = OrgContentParserDefinition();
-  return definition.buildFrom(definition.textRun().star());
-})();
+final _defaultTextRunParser = OrgContentParserDefinition().textRunParser;
 
 /// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
-  const OrgContentParserDefinition({super.radioTargets});
+  OrgContentParserDefinition({super.radioTargets});
+
+  late Parser<List<OrgNode>> textRunParser =
+      buildFrom(textRun()).star().castList<OrgNode>().end();
 
   @override
   Parser start() =>
@@ -202,9 +202,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   Parser mapMarkup(Parser parser, OrgStyle style) => parser.map((values) {
         final leading = values[0] as String;
-        final content = values[1] as String;
+        final body = values[1] as String;
         final trailing = values[2] as String;
-        return OrgMarkup(leading, content, trailing, style);
+        final content = textRunParser.parse(body).value;
+        return OrgMarkup(leading, OrgContent(content), trailing, style);
       });
 
   @override
@@ -225,11 +226,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           trailing += '}';
           body = body.substring(1, body.length - 1);
         }
-        final content = buildFrom(_subSuperscriptRichBody())
-            .castList<OrgNode>()
-            .end()
-            .parse(body)
-            .value;
+        final content = textRunParser.parse(body).value;
         return OrgSubscript(leading, OrgContent(content), trailing);
       });
 
@@ -243,16 +240,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           trailing += '}';
           body = body.substring(1, body.length - 1);
         }
-        final content = buildFrom(_subSuperscriptRichBody())
-            .castList<OrgNode>()
-            .end()
-            .parse(body)
-            .value;
+        final content = textRunParser.parse(body).value;
         return OrgSuperscript(leading, OrgContent(content), trailing);
       });
-
-  /// Only used on this layer to parse subscript and superscript content
-  Parser _subSuperscriptRichBody() => (ref0(entity) | ref0(plainText)).star();
 
   @override
   Parser macroReference() => super

@@ -12,7 +12,9 @@ void main() {
       final title = headline.title!.children[0] as OrgPlainText;
       expect(title.content, 'Title ');
       final titleEmphasis = headline.title!.children[1] as OrgMarkup;
-      expect(titleEmphasis.content, 'foo');
+      final titleEmphasisContent =
+          titleEmphasis.content.children.single as OrgPlainText;
+      expect(titleEmphasisContent.content, 'foo');
       expect(headline.tags?.values, ['biz', 'baz']);
     });
     test('empty', () {

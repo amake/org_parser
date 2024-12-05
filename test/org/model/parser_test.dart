@@ -131,7 +131,8 @@ content''');
           return node.style == OrgStyle.bold;
         });
         expect(found, isNotNull);
-        expect(found!.node.content, 'blah');
+        final content = found!.node.content.children.single as OrgPlainText;
+        expect(content.content, 'blah');
         expect(visited, 2);
         expect(found.path.map((n) => n.toString()), [
           'OrgDocument',
@@ -150,8 +151,10 @@ content''');
           visited += 1;
           return node.style == OrgStyle.italic;
         });
+
         expect(found, isNotNull);
-        expect(found!.node.content, 'boo');
+        final content = found!.node.content.children.single as OrgPlainText;
+        expect(content.content, 'boo');
         expect(visited, 1);
         expect(found.path.map((n) => n.toString()), [
           'OrgDocument',
@@ -174,16 +177,18 @@ content''');
 *blah*''');
       final doc = result.value as OrgDocument;
       test('root', () {
-        final found = doc.find<OrgMarkup>(
-            (node) => node.style == OrgStyle.code && node.content == 'blah');
+        final found = doc.find<OrgMarkup>((node) =>
+            node.style == OrgStyle.code &&
+            node.content.children.single.toMarkup() == 'blah');
         expect(found, isNotNull);
         final tree = doc.findContainingTree(found!.node);
         expect(tree, isNotNull);
         expect(tree, same(doc));
       });
       test('section', () {
-        final found = doc.find<OrgMarkup>(
-            (node) => node.style == OrgStyle.bold && node.content == 'blah');
+        final found = doc.find<OrgMarkup>((node) =>
+            node.style == OrgStyle.bold &&
+            node.content.children.single.toMarkup() == 'blah');
         expect(found, isNotNull);
         final tree = doc.findContainingTree(found!.node);
         expect(tree, isNotNull);

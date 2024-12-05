@@ -73,7 +73,8 @@ void main() {
       final item = list.items[0] as OrgListUnorderedItem;
       expect(item.tag?.delimiter, ' ::');
       final markup = item.tag?.value.children[0] as OrgMarkup;
-      expect(markup.content, 'foo');
+      final markupContent = markup.content.children.single as OrgPlainText;
+      expect(markupContent.content, 'foo');
     });
     test('with following meta', () {
       final result = parser.parse('''- ~foo~ ::
