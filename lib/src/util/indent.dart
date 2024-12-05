@@ -80,10 +80,9 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
     final startOfLine = buffer.lastIndexOf('\n', position);
     final indent = (startOfLine < 0 ? position : position - startOfLine - 1) +
         indentAdjust;
-    final indentPattern = ' ' * indent;
     var here = _endOfNextNewLineRun(buffer, position);
     while (here >= 0 && here < buffer.length - indent) {
-      if (!buffer.startsWith(indentPattern, here)) {
+      if (!_isIndentedTo(buffer, here, indent)) {
         break;
       }
       here = _endOfNextNewLineRun(buffer, here);
@@ -93,6 +92,15 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
     }
     assert(here >= 0, 'Region detection should never fail');
     return here;
+  }
+
+  bool _isIndentedTo(String buffer, int position, int indent) {
+    for (var i = position; i < position + indent; i++) {
+      if (buffer.codeUnitAt(i) != 0x20) {
+        return false;
+      }
+    }
+    return true;
   }
 
   int _endOfNextNewLineRun(String buffer, int position) {
