@@ -532,25 +532,28 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser listItemOrdered() => super.listItemOrdered().map((values) {
         final indent = values[0] as String;
-        final rest = values[1] as List;
-        final bullet = rest[0] as String;
+        final bullet = values[1] as String;
+        final rest = values[2] as List;
+        final bulletTrailing = rest[0] as String;
         final counterSet = rest[1] as String?;
         final checkBox = rest[2] as String?;
         final body = rest[3] as OrgContent?;
-        return OrgListOrderedItem(indent, bullet, counterSet, checkBox, body);
+        return OrgListOrderedItem(
+            indent, bullet + bulletTrailing, counterSet, checkBox, body);
       });
 
   @override
   Parser listItemUnordered() => super.listItemUnordered().map((values) {
         final indent = values[0] as String;
-        final rest = values[1] as List;
-        final bullet = rest[0] as String;
+        final bullet = values[1] as String;
+        final rest = values[2] as List;
+        final bulletTrailing = rest[0] as String;
         final checkBox = rest[1] as String?;
         final tag = rest[2] as List?;
         final body = rest[3] as OrgContent?;
         return OrgListUnorderedItem(
           indent,
-          bullet,
+          bullet + bulletTrailing,
           checkBox,
           tag == null
               ? null

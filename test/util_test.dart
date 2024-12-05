@@ -34,18 +34,6 @@ void main() {
   hij''');
     expect(result.value, 'abc\n  def\n', reason: 'blank lines are ok');
   });
-  test('indent parser with adjustment', () {
-    final parser = whitespace().star() & indentedRegion(indentAdjust: 1);
-    var result = parser.end().pick(1).parse('''  abc
-   def
-   hij''');
-    expect(result.value, 'abc\n   def\n   hij');
-    result = parser.pick(1).parse('''  abc
- def
- hij''');
-    expect(result.value, 'abc\n',
-        reason: '1 extra space of indentation required');
-  });
   test('recursive list parser', () {
     final listStart =
         (lineStart() & whitespace().starString() & string('- ')).flatten();

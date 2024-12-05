@@ -5,28 +5,18 @@ const kUnlimitedSeparatingLineBreaks = -1;
 /// Returns a parser that applies [parser] to a uniformly indented region
 /// starting at the current position.
 ///
-/// [indentAdjust] allows applying an offset to the current position for
-/// determining the required level of indentation.
-///
 /// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
 /// allowed without considering the region to have ended. The default is
 /// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
 /// allowed.
-Parser indentedRegion(
-        {Parser? parser,
-        int indentAdjust = 0,
-        int maxSeparatingLineBreaks = -1}) =>
+Parser indentedRegion({Parser? parser, int maxSeparatingLineBreaks = -1}) =>
     IndentedRegionParser(
       parser ?? any().starString('Region content expected'),
-      indentAdjust,
       maxSeparatingLineBreaks,
     );
 
 /// A parser that applies [delegate] to a uniformly indented region
 /// starting at the current position.
-///
-/// [indentAdjust] allows applying an offset to the current position for
-/// determining the required level of indentation.
 ///
 /// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
 /// allowed without considering the region to have ended. The default is
@@ -35,17 +25,15 @@ Parser indentedRegion(
 class IndentedRegionParser<R> extends DelegateParser<R, R> {
   IndentedRegionParser(
     super.delegate,
-    this.indentAdjust,
     this.maxSeparatingLineBreaks,
   ) : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
             maxSeparatingLineBreaks > 0);
 
-  final int indentAdjust;
   final int maxSeparatingLineBreaks;
 
   @override
   IndentedRegionParser<R> copy() =>
-      IndentedRegionParser(delegate, indentAdjust, maxSeparatingLineBreaks);
+      IndentedRegionParser(delegate, maxSeparatingLineBreaks);
 
   @override
   Result<R> parseOn(Context context) {
@@ -78,8 +66,7 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
 
   int _endOfRegion(String buffer, int position) {
     final startOfLine = buffer.lastIndexOf('\n', position);
-    final indent = (startOfLine < 0 ? position : position - startOfLine - 1) +
-        indentAdjust;
+    final indent = startOfLine < 0 ? position : position - startOfLine - 1;
     var here = _endOfNextNewLineRun(buffer, position);
     while (here >= 0 && here < buffer.length - indent) {
       if (!_isIndentedTo(buffer, here, indent)) {

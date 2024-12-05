@@ -623,18 +623,20 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listItem() => ref0(listItemUnordered) | ref0(listItemOrdered);
 
   Parser listItemUnordered() =>
-      (ref0(indent) & ref0(listUnorderedBullet).and())
-          .flatten('List item (unordered) indent expected') &
+      ref0(listItemUnorderedIndent).flatten('indent expected') &
+      ref0(listUnorderedBullet) &
       indentedRegion(
-        parser: ref0(listUnorderedBullet).flatten('Unordered bullet expected') &
+        parser: char(' ').starString() &
             ref0(listCheckBox).trim(char(' ')).optional() &
             ref0(listTag).trim(char(' ')).optional() &
             ref0(listItemContents),
-        indentAdjust: 1,
         maxSeparatingLineBreaks: 2,
       );
 
-  Parser listUnorderedBullet() => anyOf('*-+') & char(' ');
+  Parser listItemUnorderedIndent() =>
+      ref0(indent) & (ref0(listUnorderedBullet) & char(' ')).and();
+
+  Parser listUnorderedBullet() => anyOf('*-+');
 
   Parser listTag() {
     final end = string(' ::') & (lineEnd().and() | char(' '));
@@ -644,21 +646,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser listItemOrdered() =>
-      (ref0(indent) & ref0(listOrderedBullet).and())
-          .flatten('List item (ordered) indent expected') &
+      ref0(listItemOrderedIndent).flatten('indent expected') &
+      ref0(listOrderedBullet).flatten('Ordered bullet expected') &
       indentedRegion(
-        parser: ref0(listOrderedBullet) &
+        parser: char(' ').starString() &
             ref0(listCounterSet).trim(char(' ')).optional() &
             ref0(listCheckBox).trim(char(' ')).optional() &
             ref0(listItemContents),
-        indentAdjust: 1,
         maxSeparatingLineBreaks: 2,
       );
 
+  Parser listItemOrderedIndent() =>
+      ref0(indent) & (ref0(listOrderedBullet) & char(' ')).and();
+
   Parser listOrderedBullet() =>
-      (digit().plusString('Bullet number expected') | letter()) &
-      anyOf('.)') &
-      char(' ');
+      (digit().plusString('Bullet number expected') | letter()) & anyOf('.)');
 
   Parser listCounterSet() =>
       string('[@') &
