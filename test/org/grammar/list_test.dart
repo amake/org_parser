@@ -193,6 +193,136 @@ void main() {
         ''
       ]);
     });
+    test('item with overlong block', () {
+      final result = parser.parse('''- foo
+  #+begin_src
+
+
+
+  #+end_src''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [
+              ' ',
+              null,
+              null,
+              [
+                'foo\n',
+                [
+                  '  ',
+                  [
+                    ['#+begin_src', null, '\n'],
+                    '\n\n\n',
+                    ['  ', '#+end_src']
+                  ],
+                  ''
+                ]
+              ]
+            ]
+          ]
+        ],
+        ''
+      ]);
+    });
+    test('item with overlong drawer', () {
+      final result = parser.parse('''- foo
+  :foo:
+
+
+
+  :end:''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [
+              ' ',
+              null,
+              null,
+              [
+                'foo\n',
+                [
+                  '  ',
+                  [
+                    [':', 'foo', ':', '\n'],
+                    ['\n\n\n'],
+                    ['  ', ':end:']
+                  ],
+                  ''
+                ]
+              ]
+            ]
+          ]
+        ],
+        ''
+      ]);
+    });
+    test('item with overlong drawers and blocks', () {
+      final result = parser.parse('''- foo
+  :foo:
+
+
+
+  :end:
+  #+begin_src
+
+
+
+  #+end_src
+  :bar:
+
+
+
+  :END:''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [
+              ' ',
+              null,
+              null,
+              [
+                'foo\n',
+                [
+                  '  ',
+                  [
+                    [':', 'foo', ':', '\n'],
+                    ['\n\n\n'],
+                    ['  ', ':end:']
+                  ],
+                  '\n'
+                ],
+                [
+                  '  ',
+                  [
+                    ['#+begin_src', null, '\n'],
+                    '\n\n\n',
+                    ['  ', '#+end_src']
+                  ],
+                  '\n'
+                ],
+                [
+                  '  ',
+                  [
+                    [':', 'bar', ':', '\n'],
+                    ['\n\n\n'],
+                    ['  ', ':END:']
+                  ],
+                  ''
+                ]
+              ]
+            ]
+          ]
+        ],
+        ''
+      ]);
+    });
     test('with tag', () {
       final result = parser.parse('- ~foo~ ::');
       expect(result.value, [

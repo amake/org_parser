@@ -213,8 +213,9 @@ foo''');
             [
               [
                 '',
+                '-',
                 [
-                  '- ',
+                  ' ',
                   null,
                   null,
                   [
@@ -230,7 +231,8 @@ foo''');
                     ],
                     [
                       '  ',
-                      ['baz\n']
+                      ['baz\n'],
+                      ''
                     ]
                   ]
                 ]
@@ -239,12 +241,6 @@ foo''');
             ''
           ]
         ],
-        // This parse result is incompatible with the requirement that 3
-        // linebreaks ends a list item, given the current implementation of
-        // IndentedRegionParser
-        //
-        // TODO(aaron): Fix block parsing inside list item
-        skip: true,
       );
     });
     group('arbitrary block', () {

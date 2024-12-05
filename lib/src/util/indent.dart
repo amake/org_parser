@@ -1,39 +1,18 @@
 import 'package:petitparser/petitparser.dart';
 
-const kUnlimitedSeparatingLineBreaks = -1;
-
 /// Returns a parser that applies [parser] to a uniformly indented region
 /// starting at the current position.
-///
-/// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
-/// allowed without considering the region to have ended. The default is
-/// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
-/// allowed.
-Parser indentedRegion({Parser? parser, int maxSeparatingLineBreaks = -1}) =>
-    IndentedRegionParser(
+Parser indentedRegion({Parser? parser}) => IndentedRegionParser(
       parser ?? any().starString('Region content expected'),
-      maxSeparatingLineBreaks,
     );
 
 /// A parser that applies [delegate] to a uniformly indented region
 /// starting at the current position.
-///
-/// [maxSeparatingLineBreaks] indicates how many consecutive line breaks are
-/// allowed without considering the region to have ended. The default is
-/// [kUnlimitedSeparatingLineBreaks], in which case any number of line breaks is
-/// allowed.
 class IndentedRegionParser<R> extends DelegateParser<R, R> {
-  IndentedRegionParser(
-    super.delegate,
-    this.maxSeparatingLineBreaks,
-  ) : assert(maxSeparatingLineBreaks == kUnlimitedSeparatingLineBreaks ||
-            maxSeparatingLineBreaks > 0);
-
-  final int maxSeparatingLineBreaks;
+  IndentedRegionParser(super.delegate);
 
   @override
-  IndentedRegionParser<R> copy() =>
-      IndentedRegionParser(delegate, maxSeparatingLineBreaks);
+  IndentedRegionParser<R> copy() => IndentedRegionParser(delegate);
 
   @override
   Result<R> parseOn(Context context) {
@@ -91,6 +70,9 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
   }
 
   int _endOfNextNewLineRun(String buffer, int position) {
+    // Org Mode explicitly checks for blocks and drawers:
+    // https://git.savannah.gnu.org/cgit/emacs/org-mode.git/tree/lisp/org-list.el?h=release_9.7.16#n754
+    position = _skipAll(buffer, position);
     final start = buffer.indexOf('\n', position);
     var end = start, here = start;
     var lines = 0;
@@ -104,8 +86,7 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
           break;
         case 0x0a: // line feed
           lines++;
-          if (maxSeparatingLineBreaks != kUnlimitedSeparatingLineBreaks &&
-              lines > maxSeparatingLineBreaks) {
+          if (lines > 2) {
             break outer;
           } else {
             end = ++here;
@@ -117,4 +98,42 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
     }
     return end;
   }
+
+  int _skipAll(String buffer, int position) {
+    while (true) {
+      var next = _skipOne(buffer, position, _blockStart, _blockEnd);
+      next = _skipOne(buffer, next, _drawerStart, _drawerEnd);
+      if (next == position) break;
+      position = next;
+    }
+    return position;
+  }
+
+  int _skipOne(String buffer, int position, Pattern start, Pattern end) {
+    while (buffer.startsWith(start, position)) {
+      final endStart = buffer.indexOf(end, position);
+      if (endStart < 0) {
+        break;
+      }
+      // It would be great not to have to do this match, but there doesn't seem
+      // to be an equivalent of `indexOf` that lets us get the end of the match.
+      final m = end.matchAsPrefix(buffer, endStart)!;
+      position = m.end;
+    }
+    return position;
+  }
 }
+
+final _blockStart =
+    RegExp(r'^[ \t]*#\+begin_', multiLine: true, caseSensitive: false);
+
+final _blockEnd =
+    RegExp(r'^[ \t]*#\+end_', multiLine: true, caseSensitive: false);
+
+// TODO(aaron): We are allowing the same drawer name here as in the main
+// grammar, but it should really be `[:word:]`
+final _drawerStart = RegExp(r'^[ \t]*:[a-zA-Z0-9_@#%]+:[ \t]*$',
+    multiLine: true, caseSensitive: false);
+
+final _drawerEnd =
+    RegExp(r'^[ \t]*:END:', multiLine: true, caseSensitive: false);

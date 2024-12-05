@@ -630,7 +630,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
             ref0(listCheckBox).trim(char(' ')).optional() &
             ref0(listTag).trim(char(' ')).optional() &
             ref0(listItemContents),
-        maxSeparatingLineBreaks: 2,
       );
 
   Parser listItemUnorderedIndent() =>
@@ -653,7 +652,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
             ref0(listCounterSet).trim(char(' ')).optional() &
             ref0(listCheckBox).trim(char(' ')).optional() &
             ref0(listItemContents),
-        maxSeparatingLineBreaks: 2,
       );
 
   Parser listItemOrderedIndent() =>

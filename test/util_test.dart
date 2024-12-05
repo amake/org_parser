@@ -25,15 +25,6 @@ void main() {
   hij''');
     expect(result.value, 'abc\n  def\n\n  hij', reason: 'blank lines are ok');
   });
-  test('indent parser with max blank lines', () {
-    final parser =
-        whitespace().star() & indentedRegion(maxSeparatingLineBreaks: 1);
-    final result = parser.pick(1).parse('''  abc
-  def
-
-  hij''');
-    expect(result.value, 'abc\n  def\n', reason: 'blank lines are ok');
-  });
   test('recursive list parser', () {
     final listStart =
         (lineStart() & whitespace().starString() & string('- ')).flatten();
