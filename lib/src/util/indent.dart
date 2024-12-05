@@ -130,10 +130,11 @@ final _blockStart =
 final _blockEnd =
     RegExp(r'^[ \t]*#\+end_', multiLine: true, caseSensitive: false);
 
-// TODO(aaron): We are allowing the same drawer name here as in the main
-// grammar, but it should really be `[:word:]`
-final _drawerStart = RegExp(r'^[ \t]*:[a-zA-Z0-9_@#%]+:[ \t]*$',
-    multiLine: true, caseSensitive: false);
+// TODO(aaron): The drawer name should really be `[:word:]` but this is
+// difficult to reproduce here and the approximation we use in the main grammar
+// would be inconvenient to use here, so we are lenient.
+final _drawerStart =
+    RegExp(r'^[ \t]*:[^\s:]+:[ \t]*$', multiLine: true, caseSensitive: false);
 
 final _drawerEnd =
     RegExp(r'^[ \t]*:END:', multiLine: true, caseSensitive: false);

@@ -21,6 +21,19 @@ void main() {
         ''
       ]);
     });
+    test('non-ASCII', () {
+      final result = parser.parse(''':あ:
+:end:''');
+      expect(result.value, [
+        '',
+        [
+          [':', 'あ', ':', '\n'],
+          [],
+          ['', ':end:']
+        ],
+        ''
+      ]);
+    });
     test('single property', () {
       final result = parser.parse('''  :foo:
   :bar: baz

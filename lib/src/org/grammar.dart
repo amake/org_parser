@@ -1,6 +1,6 @@
 import 'package:org_parser/src/todo/model.dart';
 import 'package:org_parser/src/util/util.dart';
-import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/petitparser.dart' hide word;
 
 // See https://orgmode.org/worg/dev/org-syntax.html
 
@@ -694,9 +694,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerStart() =>
       char(':') &
-      pattern('a-zA-Z0-9_@#%')
-          .plusLazy(char(':'))
-          .flatten('Drawer start expected') &
+      word().plusLazy(char(':')).flatten('Drawer start expected') &
       char(':') &
       lineTrailingWhitespace().flatten('Trailing whitespace expected');
 
