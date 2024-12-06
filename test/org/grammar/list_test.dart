@@ -227,6 +227,28 @@ void main() {
         ''
       ]);
     });
+    test('item with partial block', () {
+      final result = parser.parse('''- foo
+  #+begin_src''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [
+              ' ',
+              null,
+              null,
+              [
+                'foo\n',
+                ['  ', '#+begin_src', '']
+              ]
+            ]
+          ]
+        ],
+        ''
+      ]);
+    });
     test('item with overlong drawer', () {
       final result = parser.parse('''- foo
   :foo:
@@ -255,6 +277,25 @@ void main() {
                   ''
                 ]
               ]
+            ]
+          ]
+        ],
+        ''
+      ]);
+    });
+    test('item with partial drawer', () {
+      final result = parser.parse('''- foo
+  :foo:''');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [
+              ' ',
+              null,
+              null,
+              ['foo\n  :foo:']
             ]
           ]
         ],
