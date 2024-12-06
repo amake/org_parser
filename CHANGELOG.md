@@ -1,3 +1,9 @@
+## [8.0.0]
+- Markups (bold, italic, etc.) and sub/superscripts can now contain nested rich
+  content
+- List items containing blocks and drawers are parsed more accurately
+- Drawer parsing accuracy is improved
+
 ## [7.2.0]
 - Parse `<<link targtes>>` and `<<<radio targets>>>`
 - Parse links to radio targets. This requires a second parsing pass; see the
