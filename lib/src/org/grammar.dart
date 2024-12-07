@@ -143,7 +143,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(footnoteReference) |
       ref0(citation) |
       ref0(latexInline) |
-      ref0(affiliatedKeyword) |
       ref0(statsCookie);
 
   Parser nonLinkObjects() => object()..replace(ref0(link), noOpFail());
@@ -760,12 +759,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       lineStart() &
       ref0(footnoteReferenceNamed) &
       ref0(footnoteBody) &
-      newline().repeatString(0, 3, 'Footnote trailing content expected');
+      ref0(blankLines).optional();
 
+  // TODO(aaron): Org Mode includes in a footnote all elements up to the next
+  // footnote or two blank lines. That is hard to express in PEG so we limit the
+  // footnote scope to the immediate paragraph.
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
-        newline().repeat(3);
+        newline().repeatString(2);
     return ref1(textRun, end).plusLazy(end);
   }
 

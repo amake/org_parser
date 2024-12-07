@@ -27,9 +27,9 @@ baz bazinga
         [
           ' foo ',
           ['*', 'bar', '*'],
-          '\nbaz bazinga\n\n'
+          '\nbaz bazinga'
         ],
-        ''
+        '\n\n'
       ]);
     });
     test('indented', () {
