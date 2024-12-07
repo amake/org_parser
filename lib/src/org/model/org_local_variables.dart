@@ -1,15 +1,18 @@
 part of '../model.dart';
 
-class OrgLocalVariables extends OrgLeafNode {
+class OrgLocalVariables extends OrgLeafNode with OrgElement {
   OrgLocalVariables(
     this.start,
     Iterable<({String prefix, String content, String suffix})> content,
-    this.end,
+    this.trailing,
   ) : entries = List.unmodifiable(content);
 
+  @override
+  final String indent = '';
   final String start;
   final List<({String prefix, String content, String suffix})> entries;
-  final String end;
+  @override
+  final String trailing;
 
   String get contentString => entries.map((line) => line.content).join('\n');
 
@@ -17,7 +20,7 @@ class OrgLocalVariables extends OrgLeafNode {
   bool contains(Pattern pattern) =>
       start.contains(pattern) ||
       entries.any((line) => line.content.contains(pattern)) ||
-      end.contains(pattern);
+      trailing.contains(pattern);
 
   @override
   _toMarkupImpl(OrgSerializer buf) {
@@ -28,6 +31,6 @@ class OrgLocalVariables extends OrgLeafNode {
         ..write(entry.content)
         ..write(entry.suffix);
     }
-    buf.write(end);
+    buf.write(trailing);
   }
 }

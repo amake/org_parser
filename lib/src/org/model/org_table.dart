@@ -16,7 +16,7 @@ const _orgTableNumberFraction = 0.5;
 /// | Lorem ipsum | 30.000 |    1 |
 /// | 123         |        |      |
 /// ```
-class OrgTable extends OrgParentNode with IndentedElement {
+class OrgTable extends OrgParentNode with OrgElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing, [super.id])
       : rows = List.unmodifiable(rows);
 
@@ -88,12 +88,10 @@ class OrgTable extends OrgParentNode with IndentedElement {
   }
 }
 
-sealed class OrgTableRow extends OrgParentNode with IndentedElement {
+sealed class OrgTableRow extends OrgParentNode {
   OrgTableRow(this.indent, this.trailing, [super.id]);
 
-  @override
   final String indent;
-  @override
   final String trailing;
 
   @override

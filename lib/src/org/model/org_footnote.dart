@@ -4,12 +4,16 @@ part of '../model.dart';
 /// ```
 /// [fn:1] this is a footnote
 /// ```
-class OrgFootnote extends OrgParentNode {
-  OrgFootnote(this.marker, this.content, [super.id])
+class OrgFootnote extends OrgParentNode with OrgElement {
+  OrgFootnote(this.marker, this.content, this.trailing, [super.id])
       : assert(marker.isDefinition);
 
+  @override
+  final String indent = '';
   final OrgFootnoteReference marker;
   final OrgContent content;
+  @override
+  final String trailing;
 
   @override
   List<OrgNode> get children => [marker, content];
@@ -30,17 +34,20 @@ class OrgFootnote extends OrgParentNode {
   void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..visit(marker)
-      ..visit(content);
+      ..visit(content)
+      ..write(trailing);
   }
 
   OrgFootnote copyWith({
     OrgFootnoteReference? marker,
     OrgContent? content,
+    String? trailing,
     String? id,
   }) =>
       OrgFootnote(
         marker ?? this.marker,
         content ?? this.content,
+        trailing ?? this.trailing,
         id ?? this.id,
       );
 }

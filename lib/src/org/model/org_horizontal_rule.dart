@@ -4,10 +4,13 @@ part of '../model.dart';
 /// ```
 /// -----
 /// ```
-class OrgHorizontalRule extends OrgLeafNode {
+class OrgHorizontalRule extends OrgLeafNode with OrgElement {
   OrgHorizontalRule(this.content, this.trailing);
 
+  @override
+  final String indent = '';
   final String content;
+  @override
   final String trailing;
 
   @override

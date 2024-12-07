@@ -6,7 +6,7 @@ part of '../model.dart';
 /// :CUSTOM_ID: foobar
 /// :END:
 /// ```
-class OrgDrawer extends OrgParentNode with IndentedElement {
+class OrgDrawer extends OrgParentNode with OrgElement {
   OrgDrawer(
     this.indent,
     this.header,
@@ -87,7 +87,7 @@ class OrgDrawer extends OrgParentNode with IndentedElement {
 /// ```
 /// :CUSTOM_ID: foobar
 /// ```
-class OrgProperty extends OrgLeafNode with IndentedElement {
+class OrgProperty extends OrgLeafNode with OrgElement {
   OrgProperty(this.indent, this.key, this.value, this.trailing);
 
   @override

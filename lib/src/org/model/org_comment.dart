@@ -1,23 +1,28 @@
 part of '../model.dart';
 
-class OrgComment extends OrgLeafNode {
-  OrgComment(this.indent, this.start, this.content);
+class OrgComment extends OrgLeafNode with OrgElement {
+  OrgComment(this.indent, this.start, this.content, this.trailing);
 
+  @override
   final String indent;
   final String start;
   final String content;
+  @override
+  final String trailing;
 
   @override
   bool contains(Pattern pattern) =>
       indent.contains(pattern) ||
       start.contains(pattern) ||
-      content.contains(pattern);
+      content.contains(pattern) ||
+      trailing.contains(pattern);
 
   @override
   _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
       ..write(start)
-      ..write(content);
+      ..write(content)
+      ..write(trailing);
   }
 }

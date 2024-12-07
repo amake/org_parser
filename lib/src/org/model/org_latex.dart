@@ -6,10 +6,10 @@ part of '../model.dart';
 /// \nabla \cdot \mathbf{B} = 0
 /// \end{equation}
 /// ```
-class OrgLatexBlock extends OrgLeafNode {
+class OrgLatexBlock extends OrgLeafNode with OrgElement {
   OrgLatexBlock(
     this.environment,
-    this.leading,
+    this.indent,
     this.begin,
     this.content,
     this.end,
@@ -18,15 +18,17 @@ class OrgLatexBlock extends OrgLeafNode {
 
   /// The LaTeX environment, like `equation`
   final String environment;
-  final String leading;
+  @override
+  final String indent;
   final String begin;
   final String content;
   final String end;
+  @override
   final String trailing;
 
   @override
   bool contains(Pattern pattern) =>
-      leading.contains(pattern) ||
+      indent.contains(pattern) ||
       begin.contains(pattern) ||
       content.contains(pattern) ||
       end.contains(pattern) ||
@@ -38,7 +40,7 @@ class OrgLatexBlock extends OrgLeafNode {
   @override
   _toMarkupImpl(OrgSerializer buf) {
     buf
-      ..write(leading)
+      ..write(indent)
       ..write(begin)
       ..write(content)
       ..write(end)

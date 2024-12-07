@@ -6,7 +6,7 @@ part of '../model.dart';
 /// ```
 ///
 /// TODO(aaron): Should this be renamed to `OrgKeyword`?
-class OrgMeta extends OrgLeafNode with IndentedElement {
+class OrgMeta extends OrgLeafNode with OrgElement {
   OrgMeta(this.indent, this.keyword, this.trailing);
 
   @override

@@ -12,7 +12,7 @@ void main() {
 # End: ''');
       final variables = result.value as OrgLocalVariables;
       expect(variables.start, '# Local Variables:\n');
-      expect(variables.end, '# End: ');
+      expect(variables.trailing, '# End: ');
       expect(variables.entries.length, 1);
       expect(
         variables.entries[0],
@@ -26,7 +26,7 @@ void main() {
  /* End: */''');
       final variables = result.value as OrgLocalVariables;
       expect(variables.start, ' /* Local Variables: */\n');
-      expect(variables.end, ' /* End: */');
+      expect(variables.trailing, ' /* End: */');
       expect(variables.entries.length, 2);
       expect(
         variables.entries[0],

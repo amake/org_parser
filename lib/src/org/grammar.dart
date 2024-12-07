@@ -412,7 +412,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser comment() =>
       ref0(indent).flatten('Comment indent expected') &
       (char('#') & anyOf(' \t')).flatten('Comment start expected') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      newline().neg().starString('Comment content expected') &
+      ref0(blankLines);
 
   Parser block() =>
       ref1(namedBlock, 'comment') |

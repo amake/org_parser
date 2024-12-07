@@ -8,11 +8,17 @@ void main() {
     final parser = grammar.buildFrom(grammar.comment()).end();
     test('simple', () {
       final result = parser.parse('''# foo bar''');
-      expect(result.value, ['', '# ', 'foo bar']);
+      expect(result.value, ['', '# ', 'foo bar', '']);
     });
     test('indented', () {
       final result = parser.parse('''   # foo bar''');
-      expect(result.value, ['   ', '# ', 'foo bar']);
+      expect(result.value, ['   ', '# ', 'foo bar', '']);
+    });
+    test('trailing', () {
+      final result = parser.parse('''   # foo bar
+
+''');
+      expect(result.value, ['   ', '# ', 'foo bar', '\n\n']);
     });
   });
 }

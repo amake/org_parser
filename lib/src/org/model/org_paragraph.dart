@@ -1,10 +1,12 @@
 part of '../model.dart';
 
-class OrgParagraph extends OrgParentNode {
+class OrgParagraph extends OrgParentNode with OrgElement {
   OrgParagraph(this.indent, this.body, this.trailing, [super.id]);
 
+  @override
   final String indent;
   final OrgContent body;
+  @override
   final String trailing;
 
   @override

@@ -131,8 +131,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       buildFrom(nonLinkTextRun()).star().castList<OrgNode>().end();
 
   @override
-  Parser start() =>
-      super.start().castList<OrgNode>().map((elems) => OrgContent(elems));
+  Parser start() => super.start().castList<OrgNode>().map((elems) {
+        // TODO(aaron): fixup footnotes
+        return OrgContent(elems);
+      });
 
   @override
   Parser paragraph() => super.paragraph().map((items) {
@@ -304,8 +306,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser comment() => super.comment().castList<dynamic>().map((items) {
-        final [indent as String, content as String, trailing as String] = items;
-        return OrgComment(indent, content, trailing);
+        final [
+          indent as String,
+          start as String,
+          content as String,
+          trailing as String
+        ] = items;
+        return OrgComment(indent, start, content, trailing);
       });
 
   @override
@@ -674,12 +681,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser footnote() => super.footnote().map((values) {
         final marker = values[0] as OrgFootnoteReference;
-        var content = values[1] as OrgContent;
+        final content = values[1] as OrgContent;
         final trailing = values[2] as String;
-        if (trailing.isNotEmpty) {
-          content = OrgContent(content.children + [OrgPlainText(trailing)]);
-        }
-        return OrgFootnote(marker.copyWith(isDefinition: true), content);
+        return OrgFootnote(
+            marker.copyWith(isDefinition: true), content, trailing);
       });
 
   @override

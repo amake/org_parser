@@ -7,7 +7,7 @@ part of '../model.dart';
 /// ```
 ///
 /// See also [OrgSrcBlock]
-class OrgBlock extends OrgParentNode with IndentedElement {
+class OrgBlock extends OrgParentNode with OrgElement {
   OrgBlock(
     this.indent,
     this.header,

@@ -1,6 +1,6 @@
 part of '../model.dart';
 
-class OrgPgpBlock extends OrgLeafNode with IndentedElement {
+class OrgPgpBlock extends OrgLeafNode with OrgElement {
   OrgPgpBlock(this.indent, this.header, this.body, this.footer, this.trailing);
 
   @override

@@ -6,7 +6,7 @@ part of '../model.dart';
 /// - bar
 ///   - baz
 /// ```
-class OrgList extends OrgParentNode with IndentedElement {
+class OrgList extends OrgParentNode with OrgElement {
   OrgList(Iterable<OrgListItem> items, this.trailing, [super.id])
       : items = List.unmodifiable(items);
   final List<OrgListItem> items;

@@ -21,7 +21,7 @@ class OrgKeyword extends OrgLeafNode with SingleContentElement {
 /// ```
 /// CLOSED: [2021-12-09 Thu 12:02]
 /// ```
-class OrgPlanningLine extends OrgParentNode with IndentedElement {
+class OrgPlanningLine extends OrgParentNode with OrgElement {
   OrgPlanningLine(
     this.indent,
     this.keyword,

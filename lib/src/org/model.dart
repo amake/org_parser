@@ -278,7 +278,7 @@ mixin SingleContentElement {
   }
 }
 
-mixin IndentedElement {
+mixin OrgElement {
   /// Indenting whitespace
   String get indent;
 

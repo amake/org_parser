@@ -4,7 +4,7 @@ part of '../model.dart';
 /// ```
 /// : result of source block, or whatever
 /// ```
-class OrgFixedWidthArea extends OrgLeafNode with IndentedElement {
+class OrgFixedWidthArea extends OrgLeafNode with OrgElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing);
 
   @override
