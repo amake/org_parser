@@ -120,6 +120,9 @@ final _defaultOrgContentParser = OrgContentParserDefinition().build();
 /// it is used by [org] to parse text content in section headers.
 final _defaultTextRunParser = OrgContentParserDefinition().textRunParser;
 
+// A footnote is terminated by another footnote or by two blank lines.
+final _footnoteTerminator = RegExp(r'(?:\r?\n){3}$');
+
 /// Content-level parser definition
 class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   OrgContentParserDefinition({super.radioTargets});
@@ -131,10 +134,46 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       buildFrom(nonLinkTextRun()).star().castList<OrgNode>().end();
 
   @override
-  Parser start() => super.start().castList<OrgNode>().map((elems) {
-        // TODO(aaron): fixup footnotes
-        return OrgContent(elems);
-      });
+  Parser start() => super
+      .start()
+      .castList<OrgElement>()
+      .map((elems) => _fixUpFootnotes(elems))
+      .castList<OrgNode>()
+      .map((elems) => OrgContent(elems));
+
+  List<OrgElement> _fixUpFootnotes(List<OrgElement> elems) {
+    final result = <OrgElement>[];
+
+    for (var i = 0; i < elems.length;) {
+      final elem = elems[i++];
+
+      if (elem is! OrgFootnote || _footnoteTerminator.hasMatch(elem.trailing)) {
+        result.add(elem);
+        continue;
+      }
+
+      final toAppend = <OrgNode>[];
+      while (i < elems.length &&
+          elems[i] is! OrgFootnote &&
+          !_footnoteTerminator.hasMatch(elems[i].trailing)) {
+        toAppend.add(elems[i++] as OrgNode);
+      }
+
+      if (toAppend.isEmpty) {
+        result.add(elem);
+        continue;
+      }
+
+      final merged = elem.copyWith(
+        content: OrgContent(
+          [...elem.content.children, OrgPlainText(elem.trailing), ...toAppend],
+        ),
+        trailing: '',
+      );
+      result.add(merged);
+    }
+    return result;
+  }
 
   @override
   Parser paragraph() => super.paragraph().map((items) {

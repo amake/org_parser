@@ -762,9 +762,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(footnoteBody) &
       ref0(blankLines).optional();
 
-  // TODO(aaron): Org Mode includes in a footnote all elements up to the next
-  // footnote or two blank lines. That is hard to express in PEG so we limit the
-  // footnote scope to the immediate paragraph.
+  // Org Mode includes in a footnote all elements up to the next footnote or two
+  // blank lines. That is hard to express in PEG so for the grammar we limit the
+  // footnote scope to the immediate paragraph, and fix up the AST in the
+  // parser.
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
