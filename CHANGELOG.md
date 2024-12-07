@@ -1,3 +1,8 @@
+## [8.1.0]
+- Links can now contain nested rich content (except for other links)
+- Org "elements" now consistently inherit `OrgElement`
+- `OrgFootnote` content can now contain elements
+
 ## [8.0.0]
 - Markups (bold, italic, etc.) and sub/superscripts can now contain nested rich
   content
