@@ -126,6 +126,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 
+  Parser nonLinkTextRun([Parser? limit]) =>
+      ref0(nonLinkObjects) | ref1(plainText, limit);
+
   Parser object() =>
       ref0(link) |
       ref0(linkTarget) |
@@ -143,6 +146,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(latexInline) |
       ref0(affiliatedKeyword) |
       ref0(statsCookie);
+
+  Parser nonLinkObjects() => object()..replace(ref0(link), noOpFail());
 
   Parser plainText([Parser? limit]) {
     var fullLimit = ref0(object) | endOfInput();

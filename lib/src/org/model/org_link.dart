@@ -1,13 +1,19 @@
 part of '../model.dart';
 
+mixin OrgLink on OrgNode {
+  /// Where the link points
+  String get location;
+}
+
 /// A link, like
 /// ```
 /// https://example.com
 /// ```
-class OrgLink extends OrgLeafNode {
-  OrgLink(this.location);
+class OrgPlainLink extends OrgLeafNode with OrgLink {
+  OrgPlainLink(this.location);
 
   /// Where the link points
+  @override
   final String location;
 
   @override
@@ -30,15 +36,19 @@ class OrgLink extends OrgLeafNode {
 /// ```
 /// [[https://example.com]]
 /// ```
-class OrgBracketLink extends OrgLink {
-  OrgBracketLink(super.location, this.description);
+class OrgBracketLink extends OrgParentNode with OrgLink {
+  OrgBracketLink(this.location, this.description);
+
+  /// Where the link points
+  @override
+  final String location;
 
   /// The user-visible text
-  final String? description;
+  final OrgContent? description;
 
   @override
   bool contains(Pattern pattern) =>
-      super.contains(pattern) || description?.contains(pattern) == true;
+      location.contains(pattern) || description?.contains(pattern) == true;
 
   @override
   String toString() => 'OrgLink';
@@ -56,9 +66,26 @@ class OrgBracketLink extends OrgLink {
       buf
         ..write('][')
         ..write(description!
+            .toMarkup()
             .replaceAll(']]', ']\u200b]')
             .replaceAll(RegExp(r']$'), ']\u200b'));
     }
     buf.write(']]');
   }
+
+  @override
+  List<OrgNode> get children => description == null ? const [] : [description!];
+
+  @override
+  OrgParentNode fromChildren(List<OrgNode> children) =>
+      copyWith(description: children.single as OrgContent);
+
+  OrgBracketLink copyWith({
+    String? location,
+    OrgContent? description,
+  }) =>
+      OrgBracketLink(
+        location ?? this.location,
+        description ?? this.description,
+      );
 }

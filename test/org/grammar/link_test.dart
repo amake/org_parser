@@ -45,5 +45,17 @@ void main() {
       final result = parser.parse('foobar://example.com');
       expect(result, isA<Failure>());
     });
+    test('nested markup', () {
+      final result = parser.parse('[[http://example.com][*example*]]');
+      expect(
+          result.value,
+          [
+            '[',
+            ['[', 'http://example.com', ']'],
+            ['[', '*example*', ']'],
+            ']'
+          ],
+          reason: 'description content parsed on separate layer');
+    });
   });
 }

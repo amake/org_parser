@@ -46,5 +46,27 @@ void main() {
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
     });
+    test('nested markup', () {
+      final markup = '[[foo][*bar*]]';
+      final result = parser.parse(markup);
+      final link = result.value as OrgBracketLink;
+      final nested = link.find<OrgMarkup>((node) => true);
+      expect(nested, isNotNull);
+      expect(nested!.node.toMarkup(), '*bar*');
+      expect(link.toMarkup(), markup);
+    });
+    test('nested link', () {
+      final markup = '[[foo][link with [[https://orgro.org][link]​] inside]]';
+      final result = parser.parse(markup);
+      final link = result.value as OrgBracketLink;
+      final nested =
+          link.find<OrgBracketLink>((node) => !identical(node, link));
+      expect(nested, isNull);
+      expect(
+        link.description!.children.every((node) => node is OrgPlainText),
+        isTrue,
+      );
+      expect(link.toMarkup(), markup);
+    });
   });
 }

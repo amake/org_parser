@@ -11,18 +11,18 @@ void main() {
           parser.parse('[[*\\[wtf\\] what?][[lots][of][boxes]\u200b]]');
       final link = result.value as OrgBracketLink;
       expect(link.location, '*[wtf] what?');
-      expect(link.description, '[lots][of][boxes]');
+      expect(link.description!.children.single.toMarkup(), '[lots][of][boxes]');
     });
     test('link with search option', () {
       final result = parser.parse('[[foo::1][bar]]');
       final link = result.value as OrgBracketLink;
-      expect(link.description, 'bar');
+      expect(link.description!.children.single.toMarkup(), 'bar');
       expect(link.location, 'foo::1');
     });
     test('quotes in search option', () {
       final result = parser.parse(r'[[foo::"\[1\]"][bar]]');
       final link = result.value as OrgBracketLink;
-      expect(link.description, 'bar');
+      expect(link.description!.children.single.toMarkup(), 'bar');
       expect(link.location, 'foo::"[1]"');
     });
     test('no description', () {

@@ -127,6 +127,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   late Parser<List<OrgNode>> textRunParser =
       buildFrom(textRun()).star().castList<OrgNode>().end();
 
+  late Parser<List<OrgNode>> linkDescriptionParser =
+      buildFrom(nonLinkTextRun()).star().castList<OrgNode>().end();
+
   @override
   Parser start() =>
       super.start().castList<OrgNode>().map((elems) => OrgContent(elems));
@@ -146,12 +149,15 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser plainLink() =>
-      super.plainLink().map((value) => OrgLink(value as String));
+      super.plainLink().map((value) => OrgPlainLink(value as String));
 
   @override
   Parser regularLink() => super.regularLink().castList<dynamic>().map((values) {
         final location = values[1] as String;
-        final description = values.length > 3 ? values[2] as String? : null;
+        final rawDescription = values.length > 3 ? values[2] as String? : null;
+        final description = rawDescription == null
+            ? null
+            : OrgContent(linkDescriptionParser.parse(rawDescription).value);
         return OrgBracketLink(location, description);
       });
 
