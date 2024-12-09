@@ -1,3 +1,6 @@
+## [8.1.1]
+- Verbatim and code markups no longer have nested rich content
+
 ## [8.1.0]
 - Links can now contain nested rich content (except for other links)
 - Org "elements" now consistently inherit `OrgElement`
