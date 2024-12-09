@@ -251,7 +251,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final leading = values[0] as String;
         final body = values[1] as String;
         final trailing = values[2] as String;
-        final content = textRunParser.parse(body).value;
+        final content = switch (style) {
+          OrgStyle.bold ||
+          OrgStyle.italic ||
+          OrgStyle.strikeThrough ||
+          OrgStyle.underline =>
+            textRunParser.parse(body).value,
+          OrgStyle.verbatim || OrgStyle.code => [OrgPlainText(body)],
+        };
         return OrgMarkup(leading, OrgContent(content), trailing, style);
       });
 

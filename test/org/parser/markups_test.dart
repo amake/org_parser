@@ -17,7 +17,7 @@ bar/''');
       expect(markup.style, OrgStyle.italic);
     });
     test('nested markup', () {
-      final result = parser.parse("~foo *bar* baz~");
+      final result = parser.parse("/foo *bar* baz/");
       final markup = result.value as OrgMarkup;
       final nested =
           markup.find<OrgMarkup>((node) => node.style == OrgStyle.bold);
@@ -26,8 +26,20 @@ bar/''');
       expect(nested.path.map((n) => n.toString()).toList(),
           ['OrgMarkup', 'OrgContent', 'OrgMarkup']);
     });
+    test('verbatim with code markup', () {
+      final result = parser.parse("~foo *bar* baz~");
+      final markup = result.value as OrgMarkup;
+      final nested = markup.content.children.single as OrgPlainText;
+      expect(nested.content, 'foo *bar* baz');
+    });
+    test('verbatim with verbatim markup', () {
+      final result = parser.parse("=foo *bar* baz=");
+      final markup = result.value as OrgMarkup;
+      final nested = markup.content.children.single as OrgPlainText;
+      expect(nested.content, 'foo *bar* baz');
+    });
     test('double-nested markup', () {
-      final result = parser.parse("~foo *bar /baz/ buzz* bazinga~");
+      final result = parser.parse("+foo *bar /baz/ buzz* bazinga+");
       final markup = result.value as OrgMarkup;
       final nested =
           markup.find<OrgMarkup>((node) => node.style == OrgStyle.italic);
