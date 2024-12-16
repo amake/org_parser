@@ -325,28 +325,28 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser localVariables() => super.localVariables().map((items) {
-        final firstLine = items[0] as String;
-        final content = items[1] as List;
-        final trailing = items[2] as String;
+  Parser localVariables() =>
+      super.localVariables().castList<dynamic>().map((items) {
+        final [body as List, trailing as String] = items;
+        final [
+          firstLine as String,
+          content as List,
+          end as String,
+        ] = body;
         return OrgLocalVariables(
           firstLine,
           content.map(
             (line) => (prefix: line[0], content: line[1], suffix: line[2]),
           ),
+          end,
           trailing,
         );
       });
 
   @override
   Parser pgpBlock() => super.pgpBlock().castList<dynamic>().map((items) {
-        final [
-          indent as String,
-          header as String,
-          body as String,
-          footer as String,
-          trailing as String
-        ] = items;
+        final [indent as String, block as List, trailing as String] = items;
+        final [header, body, footer] = block.cast<String>();
         return OrgPgpBlock(indent, header, body, footer, trailing);
       });
 
@@ -493,9 +493,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser horizontalRule() =>
-      super.horizontalRule().castList<dynamic>().map((value) {
-        final [content as String, trailing as String] = value;
-        return OrgHorizontalRule(content, trailing);
+      super.horizontalRule().castList<String>().map((value) {
+        final [indent, content, trailing] = value;
+        return OrgHorizontalRule(indent, content, trailing);
       });
 
   @override

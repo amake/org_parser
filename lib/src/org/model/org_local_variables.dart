@@ -4,6 +4,7 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
   OrgLocalVariables(
     this.start,
     Iterable<({String prefix, String content, String suffix})> content,
+    this.end,
     this.trailing,
   ) : entries = List.unmodifiable(content);
 
@@ -11,6 +12,7 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
   final String indent = '';
   final String start;
   final List<({String prefix, String content, String suffix})> entries;
+  final String end;
   @override
   final String trailing;
 
@@ -20,6 +22,7 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
   bool contains(Pattern pattern) =>
       start.contains(pattern) ||
       entries.any((line) => line.content.contains(pattern)) ||
+      end.contains(pattern) ||
       trailing.contains(pattern);
 
   @override
@@ -31,6 +34,8 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
         ..write(entry.content)
         ..write(entry.suffix);
     }
-    buf.write(trailing);
+    buf
+      ..write(end)
+      ..write(trailing);
   }
 }

@@ -54,7 +54,8 @@ class LocalVariablesParser extends Parser<List<dynamic>> {
   }
 
   Parser _endLine(String prefix, String suffix) {
-    final end = suffix.isEmpty ? lineEnd() : string(suffix) & lineEnd();
+    final end =
+        suffix.isEmpty ? lineEnd().and() : string(suffix) & lineEnd().and();
     return (lineStart() &
             string(prefix) &
             string('End:') &

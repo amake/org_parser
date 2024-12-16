@@ -393,14 +393,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       string(': ') &
       ref0(lineTrailing).flatten('Trailing line content expected');
 
-  Parser localVariables() => localVariablesParser();
+  Parser localVariables() => localVariablesParser() & ref0(blankLines);
 
   Parser pgpBlock() =>
-      ref0(indent).flatten('Indent expected') &
-      ref0(pgpBlockStart) &
-      ref0(pgpBlockBody) &
-      ref0(pgpBlockEnd) &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      indented(ref0(pgpBlockStart) & ref0(pgpBlockBody) & ref0(pgpBlockEnd));
 
   Parser pgpBlockStart() => string('-----BEGIN PGP MESSAGE-----');
 

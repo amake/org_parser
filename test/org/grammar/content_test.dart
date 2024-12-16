@@ -659,15 +659,18 @@ bar
             ''
           ],
           [
-            '  # Local Variables:\n',
             [
-              ['  # ', 'my-foo: bar', '\n']
+              '  # Local Variables:\n',
+              [
+                ['  # ', 'my-foo: bar', '\n']
+              ],
+              '  # End:'
             ],
-            '  # End:\n'
+            '\n\n'
           ],
           [
             '',
-            ['\nbar\n'],
+            ['bar\n'],
             ''
           ]
         ],

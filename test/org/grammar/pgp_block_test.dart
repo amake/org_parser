@@ -16,12 +16,14 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
 ''');
       expect(result.value, [
         '',
-        '-----BEGIN PGP MESSAGE-----',
-        '\n\n'
-            'jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
-            'X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
-            '=chda\n',
-        '-----END PGP MESSAGE-----',
+        [
+          '-----BEGIN PGP MESSAGE-----',
+          '\n\n'
+              'jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
+              'X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
+              '=chda\n',
+          '-----END PGP MESSAGE-----',
+        ],
         '\n'
       ]);
     });
@@ -32,17 +34,20 @@ X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
    X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=
    =chda
    -----END PGP MESSAGE-----
+
 ''');
       expect(result.value, [
         '   ',
-        '-----BEGIN PGP MESSAGE-----',
+        [
+          '-----BEGIN PGP MESSAGE-----',
+          '\n\n'
+              '   jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
+              '   X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
+              '   =chda\n'
+              '   ',
+          '-----END PGP MESSAGE-----',
+        ],
         '\n\n'
-            '   jA0ECQMIP3AfqImNg7Xy0j8BBJmT8GSO3VIzObhKP4d6rcH3SdhUpI0dnFpg0y+O\n'
-            '   X0q9CWVysb7ljRYEkpIbFpdKeCtLFBXSJJdCxfKewKY=\n'
-            '   =chda\n'
-            '   ',
-        '-----END PGP MESSAGE-----',
-        '\n'
       ]);
     });
   });

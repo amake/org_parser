@@ -11,11 +11,14 @@ void main() {
 # foo: bar
 # End: ''');
       expect(result.value, [
-        '# Local Variables:\n',
         [
-          ['# ', 'foo: bar', '\n']
+          '# Local Variables:\n',
+          [
+            ['# ', 'foo: bar', '\n']
+          ],
+          '# End: ',
         ],
-        '# End: '
+        ''
       ]);
     });
     test('with suffix', () {
@@ -23,11 +26,14 @@ void main() {
 # foo: bar #
 # End: #''');
       expect(result.value, [
-        '# Local Variables: #\n',
         [
-          ['# ', 'foo: bar ', '#\n']
+          '# Local Variables: #\n',
+          [
+            ['# ', 'foo: bar ', '#\n']
+          ],
+          '# End: #'
         ],
-        '# End: #'
+        ''
       ]);
     });
     test('bad prefix', () {

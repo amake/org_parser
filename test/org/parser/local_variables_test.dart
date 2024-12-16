@@ -12,7 +12,8 @@ void main() {
 # End: ''');
       final variables = result.value as OrgLocalVariables;
       expect(variables.start, '# Local Variables:\n');
-      expect(variables.trailing, '# End: ');
+      expect(variables.end, '# End: ');
+      expect(variables.trailing, '');
       expect(variables.entries.length, 1);
       expect(
         variables.entries[0],
@@ -23,10 +24,13 @@ void main() {
       final result = parser.parse(''' /* Local Variables: */
  /* foo: bar */
  /* baz: bazinga */
- /* End: */''');
+ /* End: */
+
+''');
       final variables = result.value as OrgLocalVariables;
       expect(variables.start, ' /* Local Variables: */\n');
-      expect(variables.trailing, ' /* End: */');
+      expect(variables.end, ' /* End: */');
+      expect(variables.trailing, '\n\n');
       expect(variables.entries.length, 2);
       expect(
         variables.entries[0],
