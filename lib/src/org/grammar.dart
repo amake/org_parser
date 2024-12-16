@@ -115,7 +115,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser paragraph() =>
       ref0(indent).flatten('Paragraph indent expected') &
       ref1(textRun, ref0(paragraphEnd)).plusLazy(ref0(paragraphEnd)) &
-      ref0(blankLines).optional();
+      ref0(blankLines);
 
   Parser nonParagraphElements() =>
       element()..replace(ref0(paragraph), noOpFail());
@@ -760,7 +760,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       lineStart() &
       ref0(footnoteReferenceNamed) &
       ref0(footnoteBody) &
-      ref0(blankLines).optional();
+      ref0(blankLines);
 
   // Org Mode includes in a footnote all elements up to the next footnote or two
   // blank lines. That is hard to express in PEG so for the grammar we limit the
