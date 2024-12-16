@@ -9,6 +9,14 @@ void main() {
     test('minimal', () {
       final result = parser.parse('-----');
       final rule = result.value as OrgHorizontalRule;
+      expect(rule.indent, '');
+      expect(rule.content, '-----');
+      expect(rule.trailing, '');
+    });
+    test('indented', () {
+      final result = parser.parse(' -----');
+      final rule = result.value as OrgHorizontalRule;
+      expect(rule.indent, ' ');
       expect(rule.content, '-----');
       expect(rule.trailing, '');
     });
@@ -16,6 +24,7 @@ void main() {
       final result = parser.parse('''-----${' '}
 ''');
       final rule = result.value as OrgHorizontalRule;
+      expect(rule.indent, '');
       expect(rule.content, '-----');
       expect(rule.trailing, ' \n');
     });

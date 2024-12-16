@@ -5,10 +5,10 @@ part of '../model.dart';
 /// -----
 /// ```
 class OrgHorizontalRule extends OrgLeafNode with OrgElement {
-  OrgHorizontalRule(this.content, this.trailing);
+  OrgHorizontalRule(this.indent, this.content, this.trailing);
 
   @override
-  final String indent = '';
+  final String indent;
   final String content;
   @override
   final String trailing;
@@ -19,11 +19,14 @@ class OrgHorizontalRule extends OrgLeafNode with OrgElement {
   @override
   void _toMarkupImpl(OrgSerializer buf) {
     buf
+      ..write(indent)
       ..write(content)
       ..write(trailing);
   }
 
   @override
   bool contains(Pattern pattern) =>
-      content.contains(pattern) || trailing.contains(pattern);
+      indent.contains(pattern) ||
+      content.contains(pattern) ||
+      trailing.contains(pattern);
 }

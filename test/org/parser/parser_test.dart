@@ -73,6 +73,17 @@ bazoonga''');
       final footnoteBody1 = footnote.content.children[2] as OrgMeta;
       expect(footnoteBody1.keyword, '#+bibliography:');
     });
+    test('horizontal rule and PGP block are not confused', () {
+      final result = parser.parse('''-----BEGIN PGP MESSAGE-----
+
+jA0ECQMIPXY/UVXjq9/w0kABGCBUJHQLrNyzC4OBgn6jKhU+KPUSs5Egf9o+a3yB
+r0SZNYouvk7tY6rDz0Z62WRwOtrBx0D/5T0E9kT3rpnB
+=0CZV
+-----END PGP MESSAGE-----
+''');
+      final document = result.value as OrgDocument;
+      expect(document.content!.children.single, isA<OrgPgpBlock>());
+    });
     group('https://github.com/amake/orgro/issues/16', () {
       test('case 1', () {
         final result = parser.parse('* AB:CD: foo');

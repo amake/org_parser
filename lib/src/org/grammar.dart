@@ -524,10 +524,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
           .flatten('Table divider expected') &
       ref0(lineTrailing).flatten('Trailing line content expected');
 
-  Parser horizontalRule() => (lineStart() &
-          char('-').repeatString(5, unbounded) &
-          lineTrailingWhitespace().flatten())
-      .drop1(0);
+  Parser horizontalRule() =>
+      ref0(indent).flatten('Indent expected') &
+      char('-').repeatString(5, unbounded) &
+      (ref0(lineTrailingWhitespace) & ref0(blankLines)).flatten();
 
   Parser timestamp() =>
       ref0(timestampDiary) |
