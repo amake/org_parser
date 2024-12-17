@@ -765,7 +765,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
-        newline().repeatString(2);
+        newline().repeatString(2) |
+        ref0(nonParagraphElements);
     return ref1(textRun, end).plusLazy(end);
   }
 
