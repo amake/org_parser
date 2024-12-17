@@ -1,3 +1,7 @@
+## [8.2.0]
+- Footnote, horizontal rule parsing accuracy is improved
+- Trailing blank lines are handled more consistently
+
 ## [8.1.1]
 - Verbatim and code markups no longer have nested rich content
 
