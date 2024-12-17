@@ -28,23 +28,81 @@ void main() {
       expect(document.contains('あ'), isFalse);
       expect(document.toMarkup(), doc);
     });
-    test('footnotes', () {
-      final parser = org;
-      final doc = '''[fn:1] foo bar
+    group('footnotes', () {
+      test('single blank line continues scope', () {
+        final markup = '''[fn:1] foo bar
+
+biz baz
+''';
+        final doc = parser.parse(markup).value as OrgDocument;
+        expect(doc.content!.children.length, 1);
+        final footnote = doc.content!.children.single as OrgFootnote;
+        expect(footnote.content.children.length, 3);
+        expect(footnote.content.children[0], isA<OrgPlainText>());
+        expect(footnote.content.children[0].toMarkup(), ' foo bar');
+        // This blank-line-only content was the trailing lines of the originally
+        // parsed footnote. It's an artifact of fixing up the footnote scope. It
+        // would be nicer if it could be put on the previous object.
+        expect(footnote.content.children[1], isA<OrgPlainText>());
+        expect(footnote.content.children[1].toMarkup(), '\n\n');
+        expect(footnote.content.children[2], isA<OrgParagraph>());
+        expect(footnote.content.children[2].toMarkup(), 'biz baz\n');
+        expect(doc.toMarkup(), markup);
+      });
+      test('double blank line ends scope', () {
+        final markup = '''[fn:1] foo bar
+
+
+biz baz
+''';
+        final doc = parser.parse(markup).value as OrgDocument;
+        expect(doc.content!.children.length, 2);
+        final footnote = doc.content!.children[0] as OrgFootnote;
+        expect(footnote.content.children.length, 1);
+        expect(footnote.content.children.single, isA<OrgPlainText>());
+        expect(footnote.content.children.single.toMarkup(), ' foo bar');
+        expect(footnote.trailing, '\n\n\n');
+        expect(doc.content!.children[1], isA<OrgParagraph>());
+        expect(doc.toMarkup(), markup);
+      });
+      test('footnote contains elements', () {
+        final markup = '''[fn:1] foo bar
+#+begin_src
+foo
+#+end_src
+-----
+:DRAWER:
+blah
+:END:
+- a
+- b
+- c
+''';
+        final doc = parser.parse(markup).value as OrgDocument;
+        expect(doc.content!.children.length, 1);
+        final footnote = doc.content!.children.single as OrgFootnote;
+        expect(footnote.content.children.length, 5);
+        expect(footnote.content.children[0], isA<OrgPlainText>());
+        expect(footnote.content.children[0].toMarkup(), ' foo bar\n');
+        expect(footnote.content.children[1], isA<OrgSrcBlock>());
+        expect(footnote.content.children[2], isA<OrgHorizontalRule>());
+        expect(footnote.content.children[3], isA<OrgDrawer>());
+        expect(footnote.content.children[4], isA<OrgList>());
+        expect(doc.toMarkup(), markup);
+      });
+      test('another footnote breaks scope', () {
+        final markup = '''[fn:1] foo bar
 
 biz baz
 
 [fn:2] bazinga
-
-
-bazoonga''';
-      final result = parser.parse(doc);
-      expect(result is Success, isTrue);
-      final document = result.value as OrgDocument;
-      expect(document.contains('foo bar'), isTrue);
-      expect(document.contains('bazinga'), isTrue);
-      expect(document.contains('あ'), isFalse);
-      expect(document.toMarkup(), doc);
+''';
+        final doc = parser.parse(markup).value as OrgDocument;
+        expect(doc.content!.children.length, 2);
+        expect(doc.content!.children[0], isA<OrgFootnote>());
+        expect(doc.content!.children[1], isA<OrgFootnote>());
+        expect(doc.toMarkup(), markup);
+      });
     });
     test('complex document', () {
       final doc = File('test/org-syntax.org').readAsStringSync();
