@@ -166,7 +166,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
       final merged = elem.copyWith(
         content: OrgContent(
-          [...elem.content.children, OrgPlainText(elem.trailing), ...toAppend],
+          [
+            ...elem.content.children,
+            if (elem.trailing.isNotEmpty) OrgPlainText(elem.trailing),
+            ...toAppend
+          ],
         ),
         trailing: '',
       );
