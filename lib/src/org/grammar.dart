@@ -88,7 +88,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
 class OrgContentGrammarDefinition extends GrammarDefinition {
   const OrgContentGrammarDefinition({this.radioTargets});
 
-  /// Plain-text strings to be linked to a <<<radio target>>>.
+  /// Plain-text strings to be linked to a `<<<radio target>>>`.
   final List<String>? radioTargets;
 
   @override
