@@ -144,5 +144,18 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
           reason: 'Nested drawer disallowed; the trailing ":end:" is '
               'a separate paragraph, which fails the drawer-specific parser');
     });
+    test('https://github.com/amake/org_parser/issues/3', () {
+      final result = parser.parse(''':PROPERTIES:
+  :expectedNodes: 6
+  :archivedNodes:2
+  :END:
+  you can define also the drawer using the following directive....
+#+DRAWERS: DRAWER_ONE DRAWER_TWO Drawer1 Drawer2
+:DRAWER_ONE:
+I am drawer one, with one line
+:END:
+''');
+      expect(result, isA<Failure>());
+    });
   });
 }

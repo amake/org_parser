@@ -722,17 +722,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser propertyKey() =>
       char(':') &
-      any()
-          .plusLazy(
-            char(':') &
-                insignificantWhitespace().plusString() &
-                lineEnd().not(),
-          )
-          .flatten('Property name expected') &
+      (whitespace() | char(':')).neg().plusString('Property name expected') &
       char(':');
 
-  Parser propertyValue() =>
-      any().plusLazy(lineEnd()).flatten('Property value expected');
+  Parser propertyValue() => (insignificantWhitespace().plus() &
+          whitespace().neg() &
+          any().plusLazy(lineEnd()))
+      .flatten('Property value expected');
 
   Parser footnoteReference() =>
       ref0(footnoteReferenceNamed) | ref0(footnoteReferenceInline);
