@@ -1,3 +1,6 @@
+## [8.2.1]
+- Drawer parsing accuracy is improved
+
 ## [8.2.0]
 - Footnote, horizontal rule parsing accuracy is improved
 - Trailing blank lines are handled more consistently
