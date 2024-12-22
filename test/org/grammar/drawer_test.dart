@@ -34,6 +34,40 @@ void main() {
         ''
       ]);
     });
+    test('underline', () {
+      final result = parser.parse(''':DRAWER_ONE:
+foo
+:END:''');
+      expect(result.value, [
+        '',
+        [
+          [':', 'DRAWER_ONE', ':', '\n'],
+          ['foo\n'],
+          ['', ':END:']
+        ],
+        ''
+      ]);
+    });
+    test('hyphen', () {
+      final result = parser.parse(''':DRAWER-ONE:
+foo
+:END:''');
+      expect(result.value, [
+        '',
+        [
+          [':', 'DRAWER-ONE', ':', '\n'],
+          ['foo\n'],
+          ['', ':END:']
+        ],
+        ''
+      ]);
+    });
+    test('period', () {
+      final result = parser.parse(''':DRAWER.ONE:
+foo
+:END:''');
+      expect(result, isA<Failure>());
+    });
     test('single property', () {
       final result = parser.parse('''  :foo:
   :bar: baz

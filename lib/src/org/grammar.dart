@@ -694,7 +694,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerStart() =>
       char(':') &
-      word().plusLazy(char(':')).flatten('Drawer start expected') &
+      (anyOf('_-') | word())
+          .plusLazy(char(':'))
+          .flatten('Drawer start expected') &
       char(':') &
       lineTrailingWhitespace().flatten('Trailing whitespace expected');
 
