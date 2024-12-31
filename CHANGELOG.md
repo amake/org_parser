@@ -1,3 +1,6 @@
+## [8.3.0]
+- Drawer property values can now contain nested rich content
+
 ## [8.2.1]
 - Drawer parsing accuracy is improved
 
