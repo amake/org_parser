@@ -690,7 +690,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final key = values[1] as String;
         final value = values[2] as String;
         final trailing = values[3] as String;
-        return OrgProperty(indent, key, value, trailing);
+        return OrgProperty(indent, key,
+            OrgContent(textRunParser.parse(value).value), trailing);
       });
 
   @override

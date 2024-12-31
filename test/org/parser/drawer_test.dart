@@ -19,7 +19,8 @@ void main() {
       final body = drawer.body as OrgContent;
       final property = body.children[0] as OrgProperty;
       expect(property.key, ':bar:');
-      expect(property.value, ' baz');
+      final value = property.value.children[0] as OrgPlainText;
+      expect(value.content, ' baz');
       expect(drawer.footer, '  :end:');
       expect(drawer.properties().first, property);
     });
@@ -34,6 +35,17 @@ a
       final body = drawer.body as OrgContent;
       final text = body.children[0] as OrgPlainText;
       expect(text.content, 'a\n');
+    });
+    test('rich property', () {
+      final result = parser.parse(''':LOGBOOK:
+:foo: *bar*
+:END:
+''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.header, ':LOGBOOK:\n');
+      final property = drawer.properties().first;
+      final value = property.value.children[1] as OrgMarkup;
+      expect(value.toMarkup(), '*bar*');
     });
     test('empty', () {
       final result = parser.parse(''':FOOBAR:

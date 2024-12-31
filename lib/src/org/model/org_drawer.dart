@@ -87,13 +87,13 @@ class OrgDrawer extends OrgParentNode with OrgElement {
 /// ```
 /// :CUSTOM_ID: foobar
 /// ```
-class OrgProperty extends OrgLeafNode with OrgElement {
-  OrgProperty(this.indent, this.key, this.value, this.trailing);
+class OrgProperty extends OrgParentNode with OrgElement {
+  OrgProperty(this.indent, this.key, this.value, this.trailing, [super.id]);
 
   @override
   final String indent;
   final String key;
-  final String value;
+  final OrgContent value;
   @override
   final String trailing;
 
@@ -109,7 +109,29 @@ class OrgProperty extends OrgLeafNode with OrgElement {
     buf
       ..write(indent)
       ..write(key)
-      ..write(value)
+      ..visit(value)
       ..write(trailing);
   }
+
+  @override
+  List<OrgNode> get children => [value];
+
+  @override
+  OrgParentNode fromChildren(List<OrgNode> children) =>
+      copyWith(value: children.single as OrgContent);
+
+  OrgProperty copyWith({
+    String? indent,
+    String? key,
+    OrgContent? value,
+    String? trailing,
+    String? id,
+  }) =>
+      OrgProperty(
+        indent ?? this.indent,
+        key ?? this.key,
+        value ?? this.value,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
