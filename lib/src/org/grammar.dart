@@ -551,7 +551,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (active ? char('<') : char('[')) &
       ref0(date) &
       ref0(time).trim().optional() &
-      ref0(repeaterOrDelay).trim().repeat(0, 2) &
+      ref0(repeaterOrDelays) &
       (active ? char('>') : char(']'));
 
   Parser timestampRange(bool active) =>
@@ -561,7 +561,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (active ? char('<') : char('[')) &
       ref0(date) &
       (ref0(time) & char('-') & ref0(time)).trim() &
-      ref0(repeaterOrDelay).trim().repeat(0, 2) &
+      ref0(repeaterOrDelays) &
       (active ? char('>') : char(']'));
 
   Parser timestampDateRange(bool active) =>
@@ -592,6 +592,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser hours() => digit().repeatString(1, 2, 'Expected hours');
 
   Parser minutes() => digit().timesString(2, 'Expected minutes');
+
+  // TODO(aaron): Figure out if the spec is actually more restrictive than this.
+  //
+  // Namely, it appears that the only valid use cases are:
+  //
+  // - None
+  // - One of Repeater, Min/max Repeater, or Delay
+  // - Repeater followed by Delay
+  //
+  // We can be lenient here for the time being because we are not trying to
+  // validate the content.
+  Parser repeaterOrDelays() => ref0(repeaterOrDelay).trim().repeat(0, 2);
 
   Parser repeaterOrDelay() =>
       ref0(minMaxRepeater) | ref0(repeater) | ref0(delay);
