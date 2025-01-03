@@ -32,11 +32,11 @@ void main() {
       expect(result.toMarkup(), markup);
     });
     test('with repeater (min/max)', () {
-      final markup = '<2020-03-12 Wed 8:34 +1w/+2w>';
+      final markup = '<2020-03-12 Wed 8:34 +1w/2w>';
       final result = parser.parse(markup).value as OrgSimpleTimestamp;
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
-      expect(result.contains('+1w/+2w'), isTrue);
+      expect(result.contains('+1w/2w'), isTrue);
       expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });

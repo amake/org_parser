@@ -40,6 +40,18 @@ void main() {
         '>'
       ]);
     });
+    test('with repeater (min/max)', () {
+      final result = parser.parse('''<2020-03-12 Wed 8:34 +1w/2w>''');
+      expect(result.value, [
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['8', ':', '34'],
+        [
+          ['+', '1', 'w', '/', '2', 'w'],
+        ],
+        '>'
+      ]);
+    });
     test('with multiple repeaters', () {
       final result = parser.parse('''<2020-03-12 Wed 8:34 +1w --2d>''');
       expect(result.value, [

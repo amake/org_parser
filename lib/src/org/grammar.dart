@@ -594,18 +594,33 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser minutes() => digit().timesString(2, 'Expected minutes');
 
   Parser repeaterOrDelay() =>
+      ref0(minMaxRepeater) | ref0(repeater) | ref0(delay);
+
+  Parser minMaxRepeater() =>
       ref0(repeaterMark) &
       digit().plusString('Expected number') &
-      ref0(repeaterUnit) &
-      (string('/') & ref0(repeaterMark) &
+      ref0(minMaxRepeatUnit) &
+      char('/') &
       digit().plusString('Expected number') &
-      ref0(repeaterUnit)
-      ).repeat(0,1);
+      ref0(minMaxRepeatUnit);
 
-  Parser repeaterMark() =>
-      string('++') | string('.+') | string('--') | anyOf('+-');
+  Parser minMaxRepeatUnit() => anyOf('dwmy');
 
-  Parser repeaterUnit() => anyOf('hdwmy');
+  Parser repeater() =>
+      ref0(repeaterMark) &
+      digit().plusString('Expected number') &
+      ref0(repeatOrDelayUnit);
+
+  Parser repeaterMark() => string('++') | string('.+') | char('+');
+
+  Parser delay() =>
+      ref0(delayMark) &
+      digit().plusString('Expected number') &
+      ref0(repeatOrDelayUnit);
+
+  Parser delayMark() => string('--') | char('-');
+
+  Parser repeatOrDelayUnit() => anyOf('hdwmy');
 
   Parser keyword() => ref0(_keyword).flatten('Expected keyword');
 
