@@ -596,7 +596,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser repeaterOrDelay() =>
       ref0(repeaterMark) &
       digit().plusString('Expected number') &
-      ref0(repeaterUnit);
+      ref0(repeaterUnit) &
+      (string('/') & ref0(repeaterMark) &
+      digit().plusString('Expected number') &
+      ref0(repeaterUnit)
+      ).repeat(0,1);
 
   Parser repeaterMark() =>
       string('++') | string('.+') | string('--') | anyOf('+-');
