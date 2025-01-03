@@ -40,6 +40,18 @@ void main() {
         '>'
       ]);
     });
+    test('with repeater (min/max)', () {
+      final result = parser.parse('''<2020-03-12 Wed 8:34 +1w/2w>''');
+      expect(result.value, [
+        '<',
+        ['2020', '-', '03', '-', '12', 'Wed'],
+        ['8', ':', '34'],
+        [
+          ['+', '1', 'w', '/', '2', 'w'],
+        ],
+        '>'
+      ]);
+    });
     test('with multiple repeaters', () {
       final result = parser.parse('''<2020-03-12 Wed 8:34 +1w --2d>''');
       expect(result.value, [
@@ -145,6 +157,14 @@ void main() {
     test('with seconds', () {
       final result = parser.parse('''[2020-03-11 Wed 18:34:56 .+1w --12d]''');
       expect(result, isA<Failure>(), reason: 'Seconds not supported');
+    });
+    test('min/max with hour', () {
+      final result = parser.parse('''[2020-03-11 Wed 18:34:56 .+1h/2h]''');
+      expect(result, isA<Failure>(), reason: 'Hours not supported for min/max');
+    });
+    test('min/max delay', () {
+      final result = parser.parse('''[2020-03-11 Wed 18:34:56 -1d/2d]''');
+      expect(result, isA<Failure>(), reason: 'Min/max not supported on delay');
     });
   });
 }
