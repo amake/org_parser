@@ -1,3 +1,6 @@
+## [8.3.1]
+- Support min/max-style timestamp repeaters
+
 ## [8.3.0]
 - Drawer property values can now contain nested rich content
 
