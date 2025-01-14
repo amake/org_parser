@@ -88,3 +88,29 @@ class OrgSrcBlock extends OrgBlock {
   /// The language of the block, like `sh`
   final String? language;
 }
+
+/// An inline source block, like `src_sh{echo "hello world"}`
+class OrgInlineSrcBlock extends OrgLeafNode {
+  OrgInlineSrcBlock(this.leading, this.language, this.arguments, this.body);
+
+  final String leading;
+  final String language;
+  final String? arguments;
+  final String body;
+
+  @override
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(language)
+      ..write(arguments ?? '')
+      ..write(body);
+  }
+
+  @override
+  bool contains(Pattern pattern) =>
+      leading.contains(pattern) ||
+      language.contains(pattern) ||
+      arguments?.contains(pattern) == true ||
+      body.contains(pattern);
+}

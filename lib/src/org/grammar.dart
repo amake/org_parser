@@ -133,6 +133,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(linkTarget) |
       ref0(radioTarget) |
       ref0(radioLink) |
+      ref0(inlineSourceBlock) |
       ref0(markups) |
       ref0(entity) |
       ref0(subscript) |
@@ -263,6 +264,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser radioLinkAfter() =>
       lineEnd().and() | alnum().not() | lineBreakable().and();
+
+  Parser inlineSourceBlock() =>
+      string('src_') &
+      ref0(inlineSourceLanguage) &
+      ref0(inlineSourceArguments).optional() &
+      ref0(inlineSourceBody);
+
+  // TODO(aaron): Do we need to include \r? It's not in the original regex.
+  Parser inlineSourceLanguage() => anyOf(' \t\n[{').neg().plusString();
+
+  Parser inlineSourceArguments() =>
+      (char('[') & any().starLazy(char(']')) & char(']'))
+          .flatten('Arguments expected');
+
+  Parser inlineSourceBody() =>
+      (char('{') & any().starLazy(char('}')) & char('}'))
+          .flatten('Body expected');
 
   Parser markups() =>
       ref0(bold) |

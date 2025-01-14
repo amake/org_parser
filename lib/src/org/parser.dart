@@ -233,6 +233,15 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser inlineSourceBlock() => super.inlineSourceBlock().map((values) {
+        final leading = values[0] as String;
+        final srcLang = values[1] as String;
+        final arguments = values[2] as String?;
+        final body = values[3] as String;
+        return OrgInlineSrcBlock(leading, srcLang, arguments, body);
+      });
+
+  @override
   Parser bold() => mapMarkup(super.bold(), OrgStyle.bold);
 
   @override

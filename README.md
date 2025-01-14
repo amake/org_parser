@@ -43,6 +43,11 @@ applications.
     foo bar
     #+END_SRC
     ```
+- Inline src
+
+    ```org
+    foo src_sh{echo "bar"} baz
+    ```
 - Affiliated keywords
 
     ```org
