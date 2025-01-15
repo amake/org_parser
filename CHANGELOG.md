@@ -1,3 +1,6 @@
+## [8.4.0]
+- Support inline src blocks
+
 ## [8.3.1]
 - Support min/max-style timestamp repeaters
 
