@@ -6,7 +6,7 @@ part of '../model.dart';
 /// ```
 ///
 /// TODO(aaron): Should this be renamed to `OrgKeyword`?
-class OrgMeta extends OrgLeafNode with OrgElement {
+class OrgMeta extends OrgParentNode with OrgElement {
   OrgMeta(this.indent, this.key, this.value, this.trailing);
 
   @override
@@ -14,7 +14,7 @@ class OrgMeta extends OrgLeafNode with OrgElement {
 
   /// The key, including the leading `#+` and trailing `:`.
   final String key;
-  final String value;
+  final OrgContent? value;
   @override
   final String trailing;
 
@@ -22,7 +22,7 @@ class OrgMeta extends OrgLeafNode with OrgElement {
   bool contains(Pattern pattern) =>
       indent.contains(pattern) ||
       key.contains(pattern) ||
-      value.contains(pattern) ||
+      value?.contains(pattern) == true ||
       trailing.contains(pattern);
 
   @override
@@ -32,8 +32,31 @@ class OrgMeta extends OrgLeafNode with OrgElement {
   void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
-      ..write(key)
-      ..write(value)
-      ..write(trailing);
+      ..write(key);
+    if (value != null) {
+      buf.visit(value!);
+    }
+    buf.write(trailing);
+  }
+
+  @override
+  List<OrgNode> get children => (value == null) ? const [] : [value!];
+
+  @override
+  OrgParentNode fromChildren(List<OrgNode> children) =>
+      copyWith(value: children.singleOrNull as OrgContent?);
+
+  OrgMeta copyWith({
+    String? indent,
+    String? key,
+    OrgContent? value,
+    String? trailing,
+  }) {
+    return OrgMeta(
+      indent ?? this.indent,
+      key ?? this.key,
+      value ?? this.value,
+      trailing ?? this.trailing,
+    );
   }
 }
