@@ -101,10 +101,14 @@ bazinga''');
     });
     group('affiliated keyword', () {
       test('with trailing paragraph', () {
-        final result = parser.parse('''#+blah
+        final result = parser.parse('''#+blah:
 foo''');
         expect(result.value, [
-          ['', '#+blah', '\n'],
+          [
+            '',
+            ['#+blah:', ''],
+            '\n'
+          ],
           [
             '',
             ['foo'],
@@ -113,10 +117,14 @@ foo''');
         ]);
       });
       test('indented', () {
-        final result = parser.parse('''   #+blah
+        final result = parser.parse('''   #+blah:
 foo''');
         expect(result.value, [
-          ['   ', '#+blah', '\n'],
+          [
+            '   ',
+            ['#+blah:', ''],
+            '\n'
+          ],
           [
             '',
             ['foo'],
@@ -127,7 +135,7 @@ foo''');
       test('sandwiched', () {
         // TODO(aaron): Figure out why this fails without the leading 'a'
         final result = parser.parse('''a
-#+blah
+#+blah:
 foo''');
         expect(result.value, [
           [
@@ -135,7 +143,11 @@ foo''');
             ['a\n'],
             ''
           ],
-          ['', '#+blah', '\n'],
+          [
+            '',
+            ['#+blah:', ''],
+            '\n'
+          ],
           [
             '',
             ['foo'],
@@ -194,7 +206,11 @@ foo''');
           ],
           '\n'
         ],
-        ['', '#+bazinga:', ' bozo']
+        [
+          '',
+          ['#+bazinga:', ' bozo'],
+          ''
+        ]
       ]);
     });
     test('block', () {

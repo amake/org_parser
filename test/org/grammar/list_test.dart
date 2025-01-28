@@ -240,8 +240,10 @@ void main() {
               null,
               null,
               [
-                'foo\n',
-                ['  ', '#+begin_src', '']
+                'foo\n  #+begin',
+                // It isn't apparent from rendering in Emacs, but this is indeed
+                // interpreted as a subscript
+                ['_', 'src']
               ]
             ]
           ]

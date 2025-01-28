@@ -71,7 +71,7 @@ bazoonga''');
       final footnoteBody0 = footnote.content.children[0] as OrgPlainText;
       expect(footnoteBody0.content, ' foo bar');
       final footnoteBody1 = footnote.content.children[2] as OrgMeta;
-      expect(footnoteBody1.keyword, '#+bibliography:');
+      expect(footnoteBody1.key, '#+bibliography:');
     });
     test('horizontal rule and PGP block are not confused', () {
       final result = parser.parse('''-----BEGIN PGP MESSAGE-----

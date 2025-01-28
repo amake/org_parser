@@ -12,9 +12,9 @@ List<OrgTodoStates> extractTodoSettings(
 ) {
   final results = <OrgTodoStates>[];
   tree.visit<OrgMeta>((meta) {
-    if (_todoMetaKeywords.contains(meta.keyword.toUpperCase())) {
-      final trailing = meta.trailing.trim();
-      final parsed = orgTodo.parse(trailing);
+    if (_todoMetaKeywords.contains(meta.key.toUpperCase())) {
+      final value = meta.value.trim();
+      final parsed = orgTodo.parse(value);
       if (parsed is Failure) {
         return true;
       }

@@ -320,9 +320,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser affiliatedKeyword() => super.affiliatedKeyword().map((items) {
         final indent = items[0] as String;
-        final keyword = items[1] as String;
+        final [String key, String value] = items[1] as List;
         final trailing = items[2] as String;
-        return OrgMeta(indent, keyword, trailing);
+        return OrgMeta(indent, key, value, trailing);
       });
 
   @override

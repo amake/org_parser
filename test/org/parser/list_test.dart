@@ -85,7 +85,7 @@ void main() {
       final text = item.body?.children[0] as OrgPlainText;
       expect(text.content, '\n');
       final meta = item.body?.children[1] as OrgMeta;
-      expect(meta.keyword, '#+vindex:');
+      expect(meta.key, '#+vindex:');
     });
   });
 }

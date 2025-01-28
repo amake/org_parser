@@ -397,12 +397,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char('(') & any().starLazy(char(')')) & char(')');
 
   Parser affiliatedKeyword() => indented(
-        ref0(affiliatedKeywordBody).flatten('Affiliated keyword body expected'),
-      );
+      ref0(affiliatedKeywordKey).flatten('Affiliated keyword body expected') &
+          ref0(affiliatedKeywordValue));
 
-  // TODO(aaron): Actually parse real keywords
-  Parser affiliatedKeywordBody() =>
-      string('#+') & whitespace().neg().plusString();
+  Parser affiliatedKeywordKey() =>
+      string('#+') & whitespace().neg().starLazy(char(':')) & char(':');
+
+  Parser affiliatedKeywordValue() =>
+      any().starLazy(lineEnd()).flatten('Affiliated keyword value expected');
 
   Parser fixedWidthArea() => ref0(fixedWidthLine).plus() & ref0(blankLines);
 

@@ -7,18 +7,22 @@ part of '../model.dart';
 ///
 /// TODO(aaron): Should this be renamed to `OrgKeyword`?
 class OrgMeta extends OrgLeafNode with OrgElement {
-  OrgMeta(this.indent, this.keyword, this.trailing);
+  OrgMeta(this.indent, this.key, this.value, this.trailing);
 
   @override
   final String indent;
-  final String keyword;
+
+  /// The key, including the leading `#+` and trailing `:`.
+  final String key;
+  final String value;
   @override
   final String trailing;
 
   @override
   bool contains(Pattern pattern) =>
       indent.contains(pattern) ||
-      keyword.contains(pattern) ||
+      key.contains(pattern) ||
+      value.contains(pattern) ||
       trailing.contains(pattern);
 
   @override
@@ -28,7 +32,8 @@ class OrgMeta extends OrgLeafNode with OrgElement {
   void _toMarkupImpl(OrgSerializer buf) {
     buf
       ..write(indent)
-      ..write(keyword)
+      ..write(key)
+      ..write(value)
       ..write(trailing);
   }
 }
