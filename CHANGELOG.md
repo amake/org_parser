@@ -1,3 +1,6 @@
+## [9.0.1]
+- Fix detection of empty (disabled) TODO settings
+
 ## [9.0.0]
 - Keyword values are now parsed separately; see `key` and `value` on `OrgMeta`
   - Note that `OrgMeta.trailing` is still present but is guaranteed to only be
