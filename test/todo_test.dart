@@ -294,10 +294,20 @@ void main() {
         ],
       );
     });
-    test('empty', () {
+    test('empty value', () {
       final doc = OrgDocument.parse('''#+TODO:  ''');
       final result = extractTodoSettings(doc);
       expect(result, [OrgTodoStates()]);
+    });
+    test('null value', () {
+      final doc = OrgDocument.parse('''#+TODO:''');
+      final result = extractTodoSettings(doc);
+      expect(result, [OrgTodoStates()]);
+    });
+    test('missing', () {
+      final doc = OrgDocument.parse('''#+TODONT:''');
+      final result = extractTodoSettings(doc);
+      expect(result, <OrgTodoStates>[]);
     });
   });
 }
