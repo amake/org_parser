@@ -1,3 +1,7 @@
+## [9.1.0]
+- `OrgTree.attachDir` now returns a record indicating the type in addition to
+  the value
+
 ## [9.0.1]
 - Fix detection of empty (disabled) TODO settings
 
