@@ -120,6 +120,17 @@ sealed class OrgLeafNode extends OrgNode {
   List<OrgNode>? get children => null;
 }
 
+enum OrgAttachDirType {
+  /// The Org Attach directory is specified by a `:DIR:` property in the
+  /// section. Such a directory is relative to the parent file.
+  dir,
+
+  /// The Org Attach directory is specified by an `:ID:` property in the
+  /// section. Such a directory is relative to `org-attach-id-dir` (default:
+  /// `data`).
+  id
+}
+
 sealed class OrgParentNode extends OrgNode {
   OrgParentNode([String? id])
       : id = id ?? Random().nextInt(pow(2, 32).toInt()).toString();
@@ -236,12 +247,20 @@ sealed class OrgTree extends OrgParentNode {
   /// `org-attach-use-inheritance` is `selective` and
   /// `org-use-property-inheritance` is `nil`, meaning that the relevant
   /// properties are not inherited from parent sections.
-  String? get attachDir {
+  ///
+  /// If the returned type is [OrgAttachDirType.dir], the directory is relative
+  /// to the parent file. If the returned type is [OrgAttachDirType.id], the
+  /// directory is relative to the attachment directory
+  /// (`org-attach-id-dir`).
+  ({OrgAttachDirType type, String dir})? get attachDir {
     final dir = dirs.lastOrNull;
-    if (dir != null) return dir;
+    if (dir != null) return (type: OrgAttachDirType.dir, dir: dir);
     final id = ids.lastOrNull;
     if (id != null && id.length >= 3) {
-      return 'data/${id.substring(0, 2)}/${id.substring(2)}';
+      return (
+        type: OrgAttachDirType.id,
+        dir: '${id.substring(0, 2)}/${id.substring(2)}'
+      );
     }
     return null;
   }

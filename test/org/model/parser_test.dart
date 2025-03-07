@@ -349,7 +349,7 @@ content''');
 :END:
 ''');
         final doc = result.value as OrgDocument;
-        expect(doc.attachDir, '/foo/');
+        expect(doc.attachDir, (type: OrgAttachDirType.dir, dir: '/foo/'));
       });
       test('from id', () {
         final result = parser.parse('''
@@ -358,7 +358,7 @@ content''');
 :END:
 ''');
         final doc = result.value as OrgDocument;
-        expect(doc.attachDir, 'data/ab/cd1234');
+        expect(doc.attachDir, (type: OrgAttachDirType.id, dir: 'ab/cd1234'));
       });
       test('dir overrides id', () {
         final result = parser.parse('''
@@ -368,7 +368,7 @@ content''');
 :END:
 ''');
         final doc = result.value as OrgDocument;
-        expect(doc.attachDir, '/foo/');
+        expect(doc.attachDir, (type: OrgAttachDirType.dir, dir: '/foo/'));
       });
       test('invalid id', () {
         final result = parser.parse('''
@@ -387,7 +387,7 @@ content''');
 :END:
 ''');
         final doc = result.value as OrgDocument;
-        expect(doc.attachDir, 'data/ef/gh5678');
+        expect(doc.attachDir, (type: OrgAttachDirType.id, dir: 'ef/gh5678'));
       });
       test('multiple dirs', () {
         final result = parser.parse('''
@@ -397,7 +397,7 @@ content''');
 :END:
 ''');
         final doc = result.value as OrgDocument;
-        expect(doc.attachDir, '/bar/');
+        expect(doc.attachDir, (type: OrgAttachDirType.dir, dir: '/bar/'));
       });
     });
     group('decrypted content', () {
