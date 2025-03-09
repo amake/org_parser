@@ -9,6 +9,7 @@ part 'model/org_comment.dart';
 part 'model/org_content.dart';
 part 'model/org_decrypted_content.dart';
 part 'model/org_drawer.dart';
+part 'model/org_dynamic_block.dart';
 part 'model/org_entity.dart';
 part 'model/org_fixed_width_area.dart';
 part 'model/org_footnote.dart';

@@ -473,6 +473,27 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser dynamicBlockStart() =>
+      super.dynamicBlockStart().flatten('Dynamic block start expected');
+
+  @override
+  Parser dynamicBlockContent() => super
+      .dynamicBlockContent()
+      .castList<OrgNode>()
+      .map((elems) => OrgContent(elems));
+
+  @override
+  Parser dynamicBlock() => super.dynamicBlock().map((parts) {
+        final indent = parts[0] as String;
+        final body = parts[1] as List;
+        final header = body[0] as String;
+        final content = body[1] as OrgContent;
+        final footer = (body[2] as List).join();
+        final trailing = parts[2] as String;
+        return OrgDynamicBlock(indent, header, content, footer, trailing);
+      });
+
+  @override
   Parser table() => super.table().map((items) {
         final rows = items[0] as List;
         final trailing = items[1] as String;

@@ -436,7 +436,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref1(namedVerbatimBlock, 'example') |
       ref1(namedVerbatimBlock, 'export') |
       ref0(srcBlock) |
-      ref1(namedRichBlock, 'verse');
+      ref1(namedRichBlock, 'verse') |
+      ref0(dynamicBlock);
 
   Parser srcBlock() => indented(
         ref0(srcBlockStart) &
@@ -494,6 +495,26 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser arbitraryGreaterBlock() => indented(blockParser(ref0(textRun).star()));
+
+  Parser dynamicBlock() => indented(ref0(dynamicBlockStart) &
+      ref0(dynamicBlockContent) &
+      ref0(dynamicBlockEnd));
+
+  Parser dynamicBlockStart() =>
+      stringIgnoreCase('#+begin:') &
+      // Dynamic block requires a function name. Not really the same as
+      // srcBlockLanguageToken, but close enough
+      ref0(srcBlockLanguageToken) &
+      ref0(lineTrailing).flatten('Trailing line content expected');
+
+  Parser dynamicBlockContent() {
+    final end = ref0(dynamicBlockEnd);
+    return ref1(textRun, end).starLazy(end);
+  }
+
+  Parser dynamicBlockEnd() =>
+      ref0(indent).flatten('Block end indent expected') &
+      stringIgnoreCase('#+end:');
 
   Parser indent() => lineStart() & insignificantWhitespace().starString();
 
