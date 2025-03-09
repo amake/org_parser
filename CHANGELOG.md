@@ -1,3 +1,8 @@
+## [9.2.0]
+- Block type is now exposed as `OrgBlock.type`
+- Block content parsing now better matches Org Mode in Emacs
+- Dynamic blocks are now parsed as `OrgDynamicBlock`
+
 ## [9.1.0]
 - `OrgTree.attachDir` now returns a record indicating the type in addition to
   the value
