@@ -9,6 +9,7 @@ part of '../model.dart';
 /// See also [OrgSrcBlock]
 class OrgBlock extends OrgParentNode with OrgElement {
   OrgBlock(
+    this.type,
     this.indent,
     this.header,
     this.body,
@@ -24,6 +25,9 @@ class OrgBlock extends OrgParentNode with OrgElement {
   final String footer;
   @override
   final String trailing;
+
+  /// The kind of block, like `quote`, `example`, etc. Normalized to lower case.
+  final String type;
 
   @override
   List<OrgNode> get children => [body];
@@ -52,6 +56,7 @@ class OrgBlock extends OrgParentNode with OrgElement {
   }
 
   OrgBlock copyWith({
+    String? type,
     String? indent,
     String? header,
     OrgNode? body,
@@ -60,6 +65,7 @@ class OrgBlock extends OrgParentNode with OrgElement {
     String? id,
   }) =>
       OrgBlock(
+        type ?? this.type,
         indent ?? this.indent,
         header ?? this.header,
         body ?? this.body,
@@ -83,7 +89,7 @@ class OrgSrcBlock extends OrgBlock {
     OrgNode body,
     String footer,
     String trailing,
-  ) : super(indent, header, body, footer, trailing);
+  ) : super('src', indent, header, body, footer, trailing);
 
   /// The language of the block, like `sh`
   final String? language;

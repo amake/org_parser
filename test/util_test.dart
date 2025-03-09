@@ -68,6 +68,7 @@ void main() {
    bar
 #+end_foo''');
     expect(result.value, [
+      'foo',
       ['#+begin_', 'foo', '\n'],
       '   bar\n',
       ['', '#+end_foo']
@@ -75,6 +76,7 @@ void main() {
     result = parser.parse('''#+begin_foo
 #+end_foo''');
     expect(result.value, [
+      'foo',
       ['#+begin_', 'foo', '\n'],
       '',
       ['', '#+end_foo']

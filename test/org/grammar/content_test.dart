@@ -268,6 +268,7 @@ foo''');
           [
             '',
             [
+              'fofo',
               ['#+begin_', 'fofo', '\n'],
               [
                 '   bar ',
@@ -288,6 +289,7 @@ Text
           [
             '',
             [
+              'RESULTS',
               ['#+BEGIN_', 'RESULTS', '\n'],
               ['Text\n'],
               ['', '#+END_RESULTS']
@@ -304,6 +306,7 @@ Text
           [
             '',
             [
+              'description',
               ['#+Begin_', 'description', '\n'],
               ['Text\n'],
               ['', '#+end_DESCRIPTION']

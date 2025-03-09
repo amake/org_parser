@@ -38,6 +38,14 @@ class BlockParser<R> extends DelegateParser<R, List<dynamic>> {
     }
     return context.success(
       [
+        // Returning the name as if it was a part of the content is a hack. I
+        // would have preferred to return a record like
+        //
+        //   (type: name, parts: [...])
+        //
+        // but records containing lists would need a custom matcher, and I just
+        // can't be bothered with all that.
+        name,
         startResult.value,
         contentResult.value,
         [endMatch[1]!, endMatch[2]!],

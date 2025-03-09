@@ -398,7 +398,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           default:
             bodyContent = OrgPlainText(content);
         }
-        return OrgBlock(indent, header, bodyContent, footer, trailing);
+        return OrgBlock(name, indent, header, bodyContent, footer, trailing);
       });
 
   @override
@@ -439,14 +439,15 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.namedBlockEnd(name).flatten('Named block "$name" end expected');
 
   @override
-  Parser greaterBlock() => super.greaterBlock().map((parts) {
+  Parser namedGreaterBlock(String name) =>
+      super.namedGreaterBlock(name).map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;
         final header = body[0] as String;
         final content = body[1] as OrgContent;
         final footer = body[2] as String;
         final trailing = parts[2] as String;
-        return OrgBlock(indent, header, content, footer, trailing);
+        return OrgBlock(name, indent, header, content, footer, trailing);
       });
 
   @override
@@ -459,11 +460,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser arbitraryGreaterBlock() => super.arbitraryGreaterBlock().map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;
-        final header = (body[0] as List).join();
-        final content = OrgContent((body[1] as List).cast());
-        final footer = (body[2] as List).join();
+        final name = body[0] as String;
+        final header = (body[1] as List).join();
+        final content = OrgContent((body[2] as List).cast());
+        final footer = (body[3] as List).join();
         final trailing = parts[2] as String;
-        return OrgBlock(indent, header, content, footer, trailing);
+        return OrgBlock(
+            name.toLowerCase(), indent, header, content, footer, trailing);
       });
 
   @override

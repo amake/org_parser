@@ -13,12 +13,12 @@ void main() {
 #+end_example
 ''');
       final block = result.value as OrgBlock;
-      final body = block.body as OrgMarkup;
-      final bodyContent = body.content.children.single as OrgPlainText;
+      final body = block.body as OrgPlainText;
       expect(block.header, '#+begin_example\n');
-      expect(bodyContent.content, '  echo \'foo\'\n  rm bar\n');
+      expect(body.content, '  echo \'foo\'\n  rm bar\n');
       expect(block.footer, '#+end_example');
       expect(block.trailing, '\n');
+      expect(block.type, 'example');
     });
     group('source block', () {
       test('simple', () {
@@ -34,6 +34,7 @@ void main() {
         expect(body.content, '  echo \'foo\'\n  rm bar\n');
         expect(block.footer, '#+end_src');
         expect(block.trailing, '\n');
+        expect(block.type, 'src');
       });
       test('empty', () {
         final result = parser.parse('''#+begin_src
@@ -42,6 +43,7 @@ void main() {
         final body = block.body as OrgPlainText;
         expect(block.language, isNull);
         expect(body.content, '');
+        expect(block.type, 'src');
       });
     });
   });

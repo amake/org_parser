@@ -21,5 +21,6 @@ void main() {
     expect(child2Body.content, 'bar');
     expect(block.footer, '#+end_center');
     expect(block.trailing, '\n');
+    expect(block.type, 'center');
   });
 }
