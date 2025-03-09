@@ -385,20 +385,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final content = body[1] as String;
         final footer = body[2] as String;
         final trailing = parts[2] as String;
-        OrgNode bodyContent;
-        switch (name) {
-          case 'example':
-          case 'export':
-            // TODO(aaron): We are using "verbatim" markup here just to get the
-            // visual styling of example and export blocks. This mixes
-            // presentation with semantics; instead we should expose the block
-            // name in the AST and let the UI layer decide how to render it.
-            bodyContent = OrgMarkup.just(content, OrgStyle.verbatim);
-            break;
-          default:
-            bodyContent = OrgPlainText(content);
-        }
-        return OrgBlock(name, indent, header, bodyContent, footer, trailing);
+        return OrgBlock(
+            name, indent, header, OrgPlainText(content), footer, trailing);
       });
 
   @override
