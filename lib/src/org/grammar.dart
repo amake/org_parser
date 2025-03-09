@@ -432,21 +432,27 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(blankLines);
 
   Parser block() =>
-      ref1(namedBlock, 'comment') |
-      ref1(namedBlock, 'example') |
-      ref1(namedBlock, 'export') |
+      ref1(namedRichBlock, 'comment') |
+      ref1(namedVerbatimBlock, 'example') |
+      ref1(namedVerbatimBlock, 'export') |
       ref0(srcBlock) |
-      ref1(namedBlock, 'verse');
+      ref1(namedRichBlock, 'verse');
 
   Parser srcBlock() => indented(
         ref0(srcBlockStart) &
-            ref1(namedBlockContent, 'src') &
+            ref1(verbatimBlockContent, 'src') &
             ref1(namedBlockEnd, 'src'),
       );
 
-  Parser namedBlock(String name) => indented(
+  Parser namedVerbatimBlock(String name) => indented(
         ref1(namedBlockStart, name) &
-            ref1(namedBlockContent, name) &
+            ref1(verbatimBlockContent, name) &
+            ref1(namedBlockEnd, name),
+      );
+
+  Parser namedRichBlock(String name) => indented(
+        ref1(namedBlockStart, name) &
+            ref1(richBlockContent, name) &
             ref1(namedBlockEnd, name),
       );
 
@@ -463,7 +469,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       stringIgnoreCase('#+begin_$name') &
       ref0(lineTrailing).flatten('Trailing line content expected');
 
-  Parser namedBlockContent(String name) => ref1(namedBlockEnd, name)
+  Parser verbatimBlockContent(String name) => ref1(namedBlockEnd, name)
       .neg()
       .starString('Named block content expected');
 
@@ -474,13 +480,15 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser greaterBlock() =>
       ref1(namedGreaterBlock, 'quote') | ref1(namedGreaterBlock, 'center');
 
+  // TODO(aaron): In principle, greater blocks should be able to contain more
+  // than just rich text.
   Parser namedGreaterBlock(String name) => indented(
         ref1(namedBlockStart, name) &
-            namedGreaterBlockContent(name) &
+            richBlockContent(name) &
             ref1(namedBlockEnd, name),
       );
 
-  Parser namedGreaterBlockContent(String name) {
+  Parser richBlockContent(String name) {
     final end = ref1(namedBlockEnd, name);
     return ref1(textRun, end).starLazy(end);
   }

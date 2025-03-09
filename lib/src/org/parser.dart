@@ -378,16 +378,32 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedBlock(String name) => super.namedBlock(name).map((parts) {
+  Parser namedVerbatimBlock(String name) =>
+      super.namedVerbatimBlock(name).map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;
         final header = body[0] as String;
-        final content = body[1] as String;
+        final content = body[1] as OrgPlainText;
         final footer = body[2] as String;
         final trailing = parts[2] as String;
-        return OrgBlock(
-            name, indent, header, OrgPlainText(content), footer, trailing);
+        return OrgBlock(name, indent, header, content, footer, trailing);
       });
+
+  @override
+  Parser namedRichBlock(String name) => super.namedRichBlock(name).map((parts) {
+        final indent = parts[0] as String;
+        final body = parts[1] as List;
+        final header = body[0] as String;
+        final content = body[1] as OrgContent;
+        final footer = body[2] as String;
+        final trailing = parts[2] as String;
+        return OrgBlock(name, indent, header, content, footer, trailing);
+      });
+
+  @override
+  Parser verbatimBlockContent(String name) => super
+      .verbatimBlockContent(name)
+      .map((value) => OrgPlainText(value as String));
 
   @override
   Parser srcBlock() => super.srcBlock().map((parts) {
@@ -397,15 +413,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
         final headerParts = headerToken.value as List;
         final language = headerParts[1] as String?;
         final header = headerToken.input;
-        final content = body[1] as String;
+        final content = body[1] as OrgPlainText;
         final footer = body[2] as String;
         final trailing = parts[2] as String;
-        final bodyContent = OrgPlainText(content);
         return OrgSrcBlock(
           language,
           indent,
           header,
-          bodyContent,
+          content,
           footer,
           trailing,
         );
@@ -439,8 +454,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser namedGreaterBlockContent(String name) => super
-      .namedGreaterBlockContent(name)
+  Parser richBlockContent(String name) => super
+      .richBlockContent(name)
       .castList<OrgNode>()
       .map((elems) => OrgContent(elems));
 
