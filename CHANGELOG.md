@@ -1,3 +1,7 @@
+## [9.3.0]
+- Improve AST for Org planning keywords (see
+  [#18](https://github.com/amake/org_parser/issues/18))
+
 ## [9.2.0]
 - Block type is now exposed as `OrgBlock.type`
 - Block content parsing now better matches Org Mode in Emacs
