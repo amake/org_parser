@@ -104,7 +104,6 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(table) |
       ref0(horizontalRule) |
       ref0(list) |
-      ref0(planningLine) |
       ref0(drawer) |
       ref0(footnote) |
       ref0(localVariables) |
@@ -139,7 +138,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(subscript) |
       ref0(superscript) |
       ref0(timestamp) |
-      ref0(keyword) |
+      ref0(planningEntry) |
+      ref0(planningKeyword) |
       ref0(macroReference) |
       ref0(footnoteReference) |
       ref0(citation) |
@@ -683,18 +683,14 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser repeatOrDelayUnit() => anyOf('hdwmy');
 
-  Parser keyword() =>
+  Parser planningEntry() =>
+      planningKeyword() & insignificantWhitespace().starString() & timestamp();
+
+  Parser planningKeyword() =>
       string('SCHEDULED:') |
       string('DEADLINE:') |
       string('CLOCK:') |
       string('CLOSED:');
-
-  Parser planningLine() => indented(ref0(_planningLine));
-
-  Parser _planningLine() {
-    final limit = lineEnd();
-    return ref0(keyword) & ref1(textRun, limit).plusLazy(limit);
-  }
 
   Parser list() => ref0(listItem).plus() & ref0(blankLines);
 

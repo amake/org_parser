@@ -26,7 +26,7 @@ part 'model/org_meta.dart';
 part 'model/org_paragraph.dart';
 part 'model/org_pgp_block.dart';
 part 'model/org_plain_text.dart';
-part 'model/org_planning_line.dart';
+part 'model/org_planning_entry.dart';
 part 'model/org_radio_target.dart';
 part 'model/org_section.dart';
 part 'model/org_statistics_cookie.dart';

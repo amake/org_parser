@@ -4,12 +4,11 @@ import 'package:test/test.dart';
 
 void main() {
   final definition = OrgContentParserDefinition();
-  final parser = definition.buildFrom(definition.planningLine()).end();
-  test('planning line', () {
-    final markup =
-        'CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49';
+  final parser = definition.buildFrom(definition.planningEntry()).end();
+  test('planning entry', () {
+    final markup = 'CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19]';
     final result = parser.parse(markup);
-    final planningLine = result.value as OrgPlanningLine;
+    final planningLine = result.value as OrgPlanningEntry;
     expect(planningLine.contains('CLOCK'), isTrue);
     expect(planningLine.contains('あ'), isFalse);
     expect(planningLine.toMarkup(), markup);
