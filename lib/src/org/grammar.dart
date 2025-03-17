@@ -683,9 +683,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser repeatOrDelayUnit() => anyOf('hdwmy');
 
-  Parser keyword() => ref0(_keyword).flatten('Expected keyword');
-
-  Parser _keyword() =>
+  Parser keyword() =>
       string('SCHEDULED:') |
       string('DEADLINE:') |
       string('CLOCK:') |
