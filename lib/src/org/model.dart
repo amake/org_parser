@@ -42,6 +42,8 @@ typedef OrgPath = List<OrgNode>;
 class OrgSerializer {
   final _buf = StringBuffer();
 
+  int get length => _buf.length;
+
   void visit(OrgNode node) => node._toMarkupImpl(this);
 
   void write(String str) => _buf.write(str);
