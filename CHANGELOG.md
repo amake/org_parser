@@ -1,3 +1,6 @@
+## [9.4.0]
+- Expose `canGo*` methods on OrgZipper, add `canGoLeft`
+
 ## [9.3.0]
 - Improve AST for Org planning keywords (see
   [#18](https://github.com/amake/org_parser/issues/18))
