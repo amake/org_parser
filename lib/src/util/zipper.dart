@@ -5,7 +5,15 @@ typedef OrgZipper = ZipperLocation<OrgNode, OrgLeafNode, OrgParentNode>;
 
 extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
     on ZipperLocation<ZR, ZI, ZS> {
-  bool _canGoRight() {
+  bool canGoLeft() {
+    if (path is TopPath) {
+      return false;
+    }
+    final p = path as NodePath<ZS, ZR>;
+    return p.left.isNotEmpty;
+  }
+
+  bool canGoRight() {
     if (path is TopPath) {
       return false;
     }
@@ -13,11 +21,11 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
     return p.right.isNotEmpty;
   }
 
-  bool _canGoUp() {
+  bool canGoUp() {
     return path is NodePath;
   }
 
-  bool _canGoDown() {
+  bool canGoDown() {
     if (!sectionP(node)) {
       return false;
     }
@@ -43,23 +51,23 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
       if (identical(location.node, node)) {
         return location;
       }
-      if (location._canGoDown()) {
+      if (location.canGoDown()) {
         location = location.goDown();
         continue;
       }
-      if (location._canGoRight()) {
+      if (location.canGoRight()) {
         location = location.goRight();
         continue;
       }
 
       retracing:
       while (true) {
-        if (location._canGoUp()) {
+        if (location.canGoUp()) {
           location = location.goUp();
         } else {
           return null;
         }
-        if (location._canGoRight()) {
+        if (location.canGoRight()) {
           location = location.goRight();
           break retracing;
         }
