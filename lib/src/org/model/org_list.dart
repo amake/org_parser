@@ -70,9 +70,12 @@ sealed class OrgListItem extends OrgParentNode {
   @override
   String toString() => runtimeType.toString();
 
-  OrgListItem toggleCheckbox() {
-    final toggledCheckbox =
-        switch (checkbox) { '[X]' => '[ ]', '[ ]' => '[X]', _ => checkbox };
+  OrgListItem toggleCheckbox({bool add = false}) {
+    final toggledCheckbox = switch (checkbox) {
+      '[X]' => '[ ]',
+      '[ ]' => '[X]',
+      _ => add ? '[ ]' : checkbox
+    };
     final self = this;
     // TODO(aaron): Is there no better way to do this?
     return switch (self) {

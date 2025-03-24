@@ -89,5 +89,28 @@ void main() {
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
     });
+    group('toggle checkbox', () {
+      final list = parser.parse('''
+- [ ] foo
+1. bar''').value as OrgList;
+      test('toggle checkbox', () {
+        final item = list.items[0] as OrgListUnorderedItem;
+        expect(item.checkbox, '[ ]');
+        final toggled = item.toggleCheckbox();
+        expect(toggled.checkbox, '[X]');
+        final untoggled = toggled.toggleCheckbox();
+        expect(untoggled.checkbox, '[ ]');
+        final retoggled = untoggled.toggleCheckbox();
+        expect(retoggled.checkbox, '[X]');
+      });
+      test('toggle checkbox with body', () {
+        final item = list.items[1] as OrgListOrderedItem;
+        expect(item.checkbox, isNull);
+        final toggled = item.toggleCheckbox();
+        expect(toggled.checkbox, isNull);
+        final forceToggled = item.toggleCheckbox(add: true);
+        expect(forceToggled.checkbox, '[ ]');
+      });
+    });
   });
 }
