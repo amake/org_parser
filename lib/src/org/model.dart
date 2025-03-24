@@ -134,9 +134,13 @@ enum OrgAttachDirType {
   id
 }
 
+/// Generate a random ID for an Org node. Use this when creating a new node
+/// based on an existing node with `copyWith`, where both nodes will be present
+/// in the tree at the same time.
+String orgId() => Random().nextInt(pow(2, 32).toInt()).toString();
+
 sealed class OrgParentNode extends OrgNode {
-  OrgParentNode([String? id])
-      : id = id ?? Random().nextInt(pow(2, 32).toInt()).toString();
+  OrgParentNode([String? id]) : id = id ?? orgId();
 
   /// A unique ID for this node. Use this to identify nodes across edits via
   /// [OrgTree.edit], because [OrgParentNode]s can be recreated and thus will
