@@ -628,9 +628,33 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser list() => super.list().map((items) {
         final listItems = items[0] as List;
-        final trailing = items[1] as String;
-        return OrgList(listItems.cast(), trailing);
+        final listTrailing = items[1] as String;
+        final (fixedListItems, lastItemtrailing) =
+            _fixUpListTrailingSpace(listItems.cast());
+        return OrgList(fixedListItems, '$lastItemtrailing$listTrailing');
       });
+
+  (List<OrgListItem>, String) _fixUpListTrailingSpace(List<OrgListItem> items) {
+    final lastItem = items.last;
+    var trailingSpace = '';
+    if (lastItem.body?.children.isNotEmpty == true) {
+      final lastChildren = lastItem.body!.children;
+      final lastChild = lastChildren.last;
+      if (lastChild is OrgPlainText) {
+        final m = RegExp(r'\n(\s*)$').firstMatch(lastChild.content);
+        if (m != null) {
+          items.last = lastItem.parentCopyWith(
+            body: OrgContent([
+              ...lastChildren.take(lastChildren.length - 1),
+              OrgPlainText(lastChild.content.substring(0, m.start + 1)),
+            ]),
+          );
+          trailingSpace = m.group(1)!;
+        }
+      }
+    }
+    return (items, trailingSpace);
+  }
 
   @override
   Parser listItemOrdered() => super.listItemOrdered().map((values) {

@@ -83,6 +83,29 @@ sealed class OrgListItem extends OrgParentNode {
       OrgListUnorderedItem() => self.copyWith(checkbox: toggledCheckbox),
     };
   }
+
+  OrgListItem parentCopyWith({
+    String? indent,
+    String? bullet,
+    String? checkbox,
+    OrgContent? body,
+  }) {
+    final self = this;
+    return switch (self) {
+      OrgListOrderedItem() => self.copyWith(
+          indent: indent,
+          bullet: bullet,
+          checkbox: checkbox,
+          body: body,
+        ),
+      OrgListUnorderedItem() => self.copyWith(
+          indent: indent,
+          bullet: bullet,
+          checkbox: checkbox,
+          body: body,
+        ),
+    };
+  }
 }
 
 /// An unordered list item, like
