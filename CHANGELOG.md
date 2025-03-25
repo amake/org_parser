@@ -1,3 +1,9 @@
+## [9.5.0]
+- Expose `orgId` generator for generating `OrgParentNode` IDs
+- Allow adding a checkbox to a non-checkbox list item in
+  `OrgListItem.toggleCheckbox` (see the `add` argument)
+- Fixes to aid structured editing scenarios
+
 ## [9.4.0]
 - Expose `canGo*` methods on OrgZipper, add `canGoLeft`
 
