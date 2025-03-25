@@ -225,6 +225,30 @@ content''');
         ]);
       });
     });
+    test('toMarkup', () {
+      final markup = '''
+* Foobar
+/boo/
+''';
+      final doc = parser.parse(markup).value as OrgDocument;
+      final serializer = _TracingSerializer();
+      doc.toMarkup(serializer: serializer);
+      expect(serializer.visited, [
+        isA<OrgDocument>(),
+        isA<OrgSection>(),
+        isA<OrgHeadline>(),
+        isA<OrgContent>(),
+        isA<OrgPlainText>(),
+        isA<OrgContent>(),
+        isA<OrgParagraph>(),
+        isA<OrgContent>(),
+        isA<OrgMarkup>(),
+        isA<OrgContent>(),
+        isA<OrgPlainText>(),
+        isA<OrgPlainText>(),
+      ]);
+      expect(doc.toMarkup(), markup);
+    });
     group('find containing tree', () {
       final result = parser.parse('''
 ~blah~
@@ -407,7 +431,7 @@ content''');
 baz''';
         final content = OrgDecryptedContent.fromDecryptedResult(
           cleartext,
-          _TestSerializer((c) => c.toCleartextMarkup()),
+          _TestDCSerializer((c) => c.toCleartextMarkup()),
         );
         expect(content.toCleartextMarkup(), cleartext);
         expect(content.toMarkup(), cleartext);
@@ -418,7 +442,7 @@ baz''';
 baz''';
         final content = OrgDecryptedContent.fromDecryptedResult(
           cleartext,
-          _TestSerializer((c) => 'bazinga'),
+          _TestDCSerializer((c) => 'bazinga'),
         );
         expect(content.toCleartextMarkup(), cleartext);
         expect(content.toMarkup(), 'bazinga');
@@ -513,11 +537,21 @@ baz''', interpretEmbeddedSettings: true);
   });
 }
 
-class _TestSerializer extends DecryptedContentSerializer {
-  _TestSerializer(this._toMarkup);
+class _TestDCSerializer extends DecryptedContentSerializer {
+  _TestDCSerializer(this._toMarkup);
 
   final String Function(OrgDecryptedContent) _toMarkup;
 
   @override
   String toMarkup(OrgDecryptedContent content) => _toMarkup(content);
+}
+
+class _TracingSerializer extends OrgSerializer {
+  final visited = <OrgNode>[];
+
+  @override
+  void visit(OrgNode node) {
+    visited.add(node);
+    super.visit(node);
+  }
 }

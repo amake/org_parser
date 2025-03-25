@@ -111,7 +111,7 @@ abstract class OrgNode {
 
   String toMarkup({OrgSerializer? serializer}) {
     serializer ??= OrgSerializer();
-    _toMarkupImpl(serializer);
+    serializer.visit(this);
     return serializer.toString();
   }
 
