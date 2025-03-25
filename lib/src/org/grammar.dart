@@ -92,7 +92,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   final List<String>? radioTargets;
 
   @override
-  Parser start() => ref0(element).star().end();
+  Parser start() => ref0(elements).end();
 
   Parser element() =>
       ref0(block) |
@@ -111,16 +111,18 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(comment) |
       ref0(paragraph);
 
+  Parser elements() => ref0(element).star();
+
   Parser paragraph() =>
       ref0(indent).flatten('Paragraph indent expected') &
       ref1(textRun, ref0(paragraphEnd)).plusLazy(ref0(paragraphEnd)) &
       ref0(blankLines);
 
-  Parser nonParagraphElements() =>
+  Parser nonParagraphElement() =>
       element()..replace(ref0(paragraph), noOpFail());
 
   Parser paragraphEnd() =>
-      endOfInput() | newline().repeatString(2) | ref0(nonParagraphElements);
+      endOfInput() | newline().repeatString(2) | ref0(nonParagraphElement);
 
   Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 
@@ -743,7 +745,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser listItemContents() {
     final end =
-        ref0(listItemAnyStart) | ref0(nonParagraphElements) | endOfInput();
+        ref0(listItemAnyStart) | ref0(nonParagraphElement) | endOfInput();
     return (ref0(element) | ref1(textRun, end)).star();
   }
 
@@ -781,7 +783,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser nonDrawerElements() =>
-      nonParagraphElements()..replace(ref0(drawer), noOpFail());
+      nonParagraphElement()..replace(ref0(drawer), noOpFail());
 
   Parser drawerEnd() =>
       ref0(indent).flatten('Drawer end indent expected') &
@@ -838,7 +840,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
         newline().repeatString(2) |
-        ref0(nonParagraphElements);
+        ref0(nonParagraphElement);
     return ref1(textRun, end).plusLazy(end);
   }
 

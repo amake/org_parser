@@ -134,8 +134,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       buildFrom(nonLinkTextRun()).star().castList<OrgNode>().end();
 
   @override
-  Parser start() => super
-      .start()
+  Parser elements() => super
+      .elements()
       .castList<OrgElement>()
       .map((elems) => _fixUpFootnotes(elems))
       .castList<OrgNode>()
