@@ -27,7 +27,7 @@ bazinga''');
           '  ',
           [
             ['#+begin_quote', '\n'],
-            ['    blah\n'],
+            '    blah\n',
             ['  ', '#+end_quote']
           ],
           '\n'
@@ -271,9 +271,15 @@ foo''');
               'fofo',
               ['#+begin_', 'fofo', '\n'],
               [
-                '   bar ',
-                ['~', 'baz', '~'],
-                '\n'
+                [
+                  '   ',
+                  [
+                    'bar ',
+                    ['~', 'baz', '~'],
+                    '\n'
+                  ],
+                  ''
+                ]
               ],
               ['', '#+end_fofo']
             ],
@@ -291,7 +297,13 @@ Text
             [
               'RESULTS',
               ['#+BEGIN_', 'RESULTS', '\n'],
-              ['Text\n'],
+              [
+                [
+                  '',
+                  ['Text\n'],
+                  ''
+                ]
+              ],
               ['', '#+END_RESULTS']
             ],
             ''
@@ -308,7 +320,13 @@ Text
             [
               'description',
               ['#+Begin_', 'description', '\n'],
-              ['Text\n'],
+              [
+                [
+                  '',
+                  ['Text\n'],
+                  ''
+                ]
+              ],
               ['', '#+end_DESCRIPTION']
             ],
             ''

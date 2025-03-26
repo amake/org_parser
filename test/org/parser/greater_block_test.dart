@@ -14,11 +14,13 @@ void main() {
     final block = result.value as OrgBlock;
     expect(block.header, '#+begin_center\n');
     final body = block.body as OrgContent;
-    final child1 = body.children[0] as OrgPlainText;
-    expect(child1.content, '  foo ');
-    final child2 = body.children[1] as OrgMarkup;
-    final child2Body = child2.content.children.first as OrgPlainText;
-    expect(child2Body.content, 'bar');
+    final child1 = body.children[0] as OrgParagraph;
+    expect(child1.indent, '  ');
+    final gchild1 = child1.body.children.first as OrgPlainText;
+    expect(gchild1.content, 'foo ');
+    final gchild2 = child1.body.children[1] as OrgMarkup;
+    final ggchild1Body = gchild2.content.children.first as OrgPlainText;
+    expect(ggchild1Body.content, 'bar');
     expect(block.footer, '#+end_center');
     expect(block.trailing, '\n');
     expect(block.type, 'center');

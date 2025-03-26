@@ -133,6 +133,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   late Parser<List<OrgNode>> linkDescriptionParser =
       buildFrom(nonLinkTextRun()).star().castList<OrgNode>().end();
 
+  late Parser<List<OrgNode>> greaterBlockContentParser =
+      buildFrom(nonBlockElement()).star().castList<OrgNode>().end();
+
   @override
   Parser elements() => super
       .elements()
@@ -460,6 +463,13 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
+  Parser greaterBlockContent(String name) =>
+      super.greaterBlockContent(name).cast<String>().map((value) {
+        final nodes = greaterBlockContentParser.parse(value).value;
+        return OrgContent(nodes);
+      });
+
+  @override
   Parser arbitraryGreaterBlock() => super.arbitraryGreaterBlock().map((parts) {
         final indent = parts[0] as String;
         final body = parts[1] as List;
@@ -477,10 +487,11 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.dynamicBlockStart().flatten('Dynamic block start expected');
 
   @override
-  Parser dynamicBlockContent() => super
-      .dynamicBlockContent()
-      .castList<OrgNode>()
-      .map((elems) => OrgContent(elems));
+  Parser dynamicBlockContent() =>
+      super.dynamicBlockContent().cast<String>().map((value) {
+        final nodes = greaterBlockContentParser.parse(value).value;
+        return OrgContent(nodes);
+      });
 
   @override
   Parser dynamicBlock() => super.dynamicBlock().map((parts) {

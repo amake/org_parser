@@ -113,6 +113,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser elements() => ref0(element).star();
 
+  Parser nonBlockElement() => element()
+    ..replace(ref0(block), noOpFail())
+    ..replace(ref0(greaterBlock), noOpFail())
+    ..replace(ref0(arbitraryGreaterBlock), noOpFail());
+
   Parser paragraph() =>
       ref0(indent).flatten('Paragraph indent expected') &
       ref1(textRun, ref0(paragraphEnd)).plusLazy(ref0(paragraphEnd)) &
@@ -434,10 +439,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(blankLines);
 
   Parser block() =>
-      ref1(namedRichBlock, 'comment') |
+      // Comment is not exported so it can have arbitrary content
+      ref1(namedGreaterBlock, 'comment') |
       ref1(namedVerbatimBlock, 'example') |
       ref1(namedVerbatimBlock, 'export') |
       ref0(srcBlock) |
+      // Verse is stylized in buffer, but exported as whitespace-verbatim plain
+      // text
       ref1(namedRichBlock, 'verse') |
       ref0(dynamicBlock);
 
@@ -458,6 +466,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
             ref1(richBlockContent, name) &
             ref1(namedBlockEnd, name),
       );
+
+  Parser richBlockContent(String name) {
+    final end = ref1(namedBlockEnd, name);
+    return ref1(textRun, end).starLazy(end);
+  }
 
   Parser srcBlockStart() =>
       stringIgnoreCase('#+begin_src') &
@@ -483,20 +496,19 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser greaterBlock() =>
       ref1(namedGreaterBlock, 'quote') | ref1(namedGreaterBlock, 'center');
 
-  // TODO(aaron): In principle, greater blocks should be able to contain more
-  // than just rich text.
   Parser namedGreaterBlock(String name) => indented(
         ref1(namedBlockStart, name) &
-            richBlockContent(name) &
+            greaterBlockContent(name) &
             ref1(namedBlockEnd, name),
       );
 
-  Parser richBlockContent(String name) {
+  Parser greaterBlockContent(String name) {
     final end = ref1(namedBlockEnd, name);
-    return ref1(textRun, end).starLazy(end);
+    return any().starLazy(end).flatten('Greater block content expected');
   }
 
-  Parser arbitraryGreaterBlock() => indented(blockParser(ref0(textRun).star()));
+  Parser arbitraryGreaterBlock() =>
+      indented(blockParser(ref0(nonBlockElement).star()));
 
   Parser dynamicBlock() => indented(ref0(dynamicBlockStart) &
       ref0(dynamicBlockContent) &
@@ -511,7 +523,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser dynamicBlockContent() {
     final end = ref0(dynamicBlockEnd);
-    return ref1(textRun, end).starLazy(end);
+    return any().starLazy(end).flatten('Dynamic block content expected');
   }
 
   Parser dynamicBlockEnd() =>

@@ -14,11 +14,7 @@ void main() {
         '',
         [
           ['#+begin_quote', '\n'],
-          [
-            '  foo ',
-            ['*', 'bar', '*'],
-            '\n'
-          ],
+          '  foo *bar*\n',
           ['', '#+end_quote']
         ],
         ''
@@ -33,11 +29,7 @@ void main() {
         '',
         [
           ['#+BEGIN_QUOTE', '\n'],
-          [
-            '  foo ',
-            ['/', 'bar', '/'],
-            '\n'
-          ],
+          '  foo /bar/\n',
           ['', '#+EnD_qUOtE']
         ],
         '\n'

@@ -20,7 +20,7 @@ void main() {
             [' ', 'myblock'],
             ' :parameter1 value1 :parameter2 value2\n'
           ],
-          ['  foobar\n'],
+          '  foobar\n',
           ['', '#+END:']
         ],
         '\n'
@@ -40,7 +40,7 @@ void main() {
             [' ', 'myblock'],
             ' :parameter1 value1 :parameter2 value2\n'
           ],
-          ['  foobar\n'],
+          '  foobar\n',
           ['', '#+end:']
         ],
         '\n'
