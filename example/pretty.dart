@@ -12,7 +12,7 @@ void main(List<String> arguments) async {
 }
 
 void visit(OrgNode node, {int depth = 0}) {
-  final preview = makePreview(node).replaceAll('\n', r'\n');
+  final preview = makePreview(node);
   print('${'  ' * depth}$node: $preview');
   if (node is OrgParentNode) {
     for (final child in node.children) {
@@ -22,7 +22,8 @@ void visit(OrgNode node, {int depth = 0}) {
 }
 
 String makePreview(OrgNode node) {
-  final result = node.toMarkup(serializer: PreviewSerializer());
+  final result =
+      node.toMarkup(serializer: PreviewSerializer()).replaceAll('\n', r'\n');
   if (result.trim().isEmpty) return '"$result"';
   return result;
 }
