@@ -87,7 +87,32 @@ void main() {
       final meta = item.body?.children[1] as OrgMeta;
       expect(meta.key, '#+vindex:');
     });
-    test('trailing space', () {
+    test('0 trailing spaces', () {
+      final result = parser.parse('''- foo
+- bar''');
+      final list = result.value as OrgList;
+      final item = list.items[0] as OrgListUnorderedItem;
+      final text = item.body?.children[0] as OrgPlainText;
+      expect(text.content, 'foo\n');
+      final item2 = list.items[1] as OrgListUnorderedItem;
+      final text2 = item2.body?.children[0] as OrgPlainText;
+      expect(text2.content, 'bar');
+      expect(list.trailing, '');
+    });
+    test('1 trailing space', () {
+      final result = parser.parse('''- foo
+- bar
+''');
+      final list = result.value as OrgList;
+      final item = list.items[0] as OrgListUnorderedItem;
+      final text = item.body?.children[0] as OrgPlainText;
+      expect(text.content, 'foo\n');
+      final item2 = list.items[1] as OrgListUnorderedItem;
+      final text2 = item2.body?.children[0] as OrgPlainText;
+      expect(text2.content, 'bar\n');
+      expect(list.trailing, '');
+    });
+    test('2 trailing spaces', () {
       final result = parser.parse('''- foo
 - bar
 
