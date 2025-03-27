@@ -1,3 +1,7 @@
+## [9.6.0]
+- "Greater" `OrgBlock`s and `OrgDynamicBlock`s can now contain "elements", not
+  just rich inline markup
+
 ## [9.5.0]
 - Expose `orgId` generator for generating `OrgParentNode` IDs
 - Allow adding a checkbox to a non-checkbox list item in
