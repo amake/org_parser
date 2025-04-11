@@ -22,4 +22,26 @@ void main() {
     expect(edited.toMarkup(), '''* TODO [#A] foo bar
   2''');
   });
+  test('find node', () {
+    final doc = OrgDocument.parse('''* TODO [#A] foo bar
+  *baz*''');
+    final found = doc.find<OrgMarkup>((_) => true)!;
+    var zipper = doc.editNode(found.node)!;
+    zipper = zipper.replace(
+        found.node.copyWith(leadingDecoration: '/', trailingDecoration: '/'));
+    final edited = zipper.commit();
+    expect(edited.toMarkup(), '''* TODO [#A] foo bar
+  /baz/''');
+  });
+  test('find by predicate', () {
+    final doc = OrgDocument.parse('''* TODO [#A] foo bar
+  *baz*''');
+    var zipper = doc.edit().findWhere((node) => node is OrgMarkup)!;
+    final found = zipper.node as OrgMarkup;
+    zipper = zipper.replace(
+        found.copyWith(leadingDecoration: '/', trailingDecoration: '/'));
+    final edited = zipper.commit();
+    expect(edited.toMarkup(), '''* TODO [#A] foo bar
+  /baz/''');
+  });
 }

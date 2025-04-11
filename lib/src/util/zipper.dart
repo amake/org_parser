@@ -45,10 +45,15 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
 
   /// Navigate to the supplied [node], which is presumed to be a child in the
   /// tree of this zipper. Returns null if the node is not found.
-  ZipperLocation<ZR, ZI, ZS>? find(ZR node) {
+  ZipperLocation<ZR, ZI, ZS>? find(ZR node) =>
+      findWhere((n) => identical(n, node));
+
+  /// Navigate to the node that satisfies [predicate]. Returns null if no such
+  /// node is not found.
+  ZipperLocation<ZR, ZI, ZS>? findWhere(bool Function(dynamic) predicate) {
     var location = this;
     while (true) {
-      if (identical(location.node, node)) {
+      if (predicate(location.node)) {
         return location;
       }
       if (location.canGoDown()) {
