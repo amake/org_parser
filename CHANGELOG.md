@@ -1,3 +1,6 @@
+## [9.7.0]
+- Add `OrgZipper.findWhere` to allow editing a node by arbitrary predicate
+
 ## [9.6.0]
 - "Greater" `OrgBlock`s and `OrgDynamicBlock`s can now contain "elements", not
   just rich inline markup
