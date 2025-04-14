@@ -88,11 +88,39 @@ class OrgSrcBlock extends OrgBlock {
     String header,
     OrgNode body,
     String footer,
-    String trailing,
-  ) : super('src', indent, header, body, footer, trailing);
+    String trailing, [
+    String? id,
+  ]) : super('src', indent, header, body, footer, trailing, id);
 
   /// The language of the block, like `sh`
   final String? language;
+
+  @override
+  OrgSrcBlock fromChildren(List<OrgNode> children) =>
+      copyWith(body: children.single);
+
+  @override
+  OrgSrcBlock copyWith({
+    String? language,
+    // TODO(aaron): OrgSrcBlock doesn't use [type] but we need it to make this a
+    // valid override of [OrgBlock.copyWith]. Is there a better way?
+    String? type,
+    String? indent,
+    String? header,
+    OrgNode? body,
+    String? footer,
+    String? trailing,
+    String? id,
+  }) =>
+      OrgSrcBlock(
+        language ?? this.language,
+        indent ?? this.indent,
+        header ?? this.header,
+        body ?? this.body,
+        footer ?? this.footer,
+        trailing ?? this.trailing,
+        id ?? this.id,
+      );
 }
 
 /// An inline source block, like `src_sh{echo "hello world"}`
