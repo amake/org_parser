@@ -1,3 +1,6 @@
+## [9.7.2]
+- Fix handling of single-character drawer property values
+
 ## [9.7.1]
 - Fix behavior of `OrgSrcBlock.fromChildren`
 
