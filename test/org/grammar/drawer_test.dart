@@ -129,6 +129,34 @@ CLOCK: [2021-01-23 Sat 09:30]--[2021-01-23 Sat 10:19] =>  0:49
         '\n'
       ]);
     });
+    test('short property value', () {
+      final result = parser.parse(''':PROPERTIES:
+:foo: bar
+:baz: t
+:END:''');
+      expect(result.value, [
+        '',
+        [
+          [':', 'PROPERTIES', ':', '\n'],
+          [
+            [
+              '',
+              [':', 'foo', ':'],
+              ' bar',
+              '\n'
+            ],
+            [
+              '',
+              [':', 'baz', ':'],
+              ' t',
+              '\n'
+            ]
+          ],
+          ['', ':END:']
+        ],
+        ''
+      ]);
+    });
     test('nested', () {
       final result = parser.parse(''':foo:
 :bar:

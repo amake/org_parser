@@ -815,7 +815,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser propertyValue() => (insignificantWhitespace().plus() &
           whitespace().neg() &
-          any().plusLazy(lineEnd()))
+          any().starLazy(lineEnd()))
       .flatten('Property value expected');
 
   Parser footnoteReference() =>
