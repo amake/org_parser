@@ -41,9 +41,12 @@ class OrgSimpleTimestamp extends OrgLeafNode {
       ..write('-')
       ..write(date.month)
       ..write('-')
-      ..write(date.day)
-      ..write(' ')
-      ..write(date.dayName);
+      ..write(date.day);
+    if (date.dayName.isNotEmpty) {
+      buf
+        ..write(' ')
+        ..write(date.dayName);
+    }
     if (time != null) {
       buf
         ..write(' ')
