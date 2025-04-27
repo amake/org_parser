@@ -609,8 +609,15 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser<OrgDate> date() => super.date().castList<String>().map((value) {
-        final [year, _, month, _, day, dayName] = value;
+  Parser<OrgDate> date() => super.date().castList<dynamic>().map((value) {
+        final [
+          year as String,
+          _,
+          month as String,
+          _,
+          day as String,
+          dayName as String?
+        ] = value;
         return (year: year, month: month, day: day, dayName: dayName);
       });
 

@@ -638,7 +638,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(month) &
       char('-') &
       ref0(day) &
-      dayName().trim();
+      dayName().trim().optional();
 
   Parser year() => digit().timesString(4, 'Expected year');
 
@@ -648,7 +648,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser dayName() => (whitespace() | anyOf('+-]>\n') | digit())
       .neg()
-      .starString('Expected day name');
+      .plusString('Expected day name');
 
   Parser time() => ref0(hours) & char(':') & ref0(minutes);
 
