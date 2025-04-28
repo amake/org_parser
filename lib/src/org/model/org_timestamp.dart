@@ -11,7 +11,7 @@ class OrgDiaryTimestamp extends OrgLeafNode with SingleContentElement {
   String toString() => 'OrgDiaryTimestamp';
 }
 
-typedef OrgDate = ({String year, String month, String day, String dayName});
+typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
 /// A timestamp, like `[2020-05-05 Tue]`
@@ -41,9 +41,12 @@ class OrgSimpleTimestamp extends OrgLeafNode {
       ..write('-')
       ..write(date.month)
       ..write('-')
-      ..write(date.day)
-      ..write(' ')
-      ..write(date.dayName);
+      ..write(date.day);
+    if (date.dayName != null) {
+      buf
+        ..write(' ')
+        ..write(date.dayName!);
+    }
     if (time != null) {
       buf
         ..write(' ')
@@ -64,7 +67,7 @@ class OrgSimpleTimestamp extends OrgLeafNode {
       date.year.contains(pattern) ||
       date.month.contains(pattern) ||
       date.day.contains(pattern) ||
-      date.dayName.contains(pattern) ||
+      date.dayName?.contains(pattern) == true ||
       time?.hour.contains(pattern) == true ||
       time?.minute.contains(pattern) == true ||
       repeaterOrDelay.any((item) => item.contains(pattern)) ||
@@ -159,9 +162,13 @@ class OrgTimeRangeTimestamp extends OrgLeafNode {
       ..write('-')
       ..write(date.month)
       ..write('-')
-      ..write(date.day)
-      ..write(' ')
-      ..write(date.dayName)
+      ..write(date.day);
+    if (date.dayName != null) {
+      buf
+        ..write(' ')
+        ..write(date.dayName!);
+    }
+    buf
       ..write(' ')
       ..write(timeStart.hour)
       ..write(':')
@@ -183,7 +190,7 @@ class OrgTimeRangeTimestamp extends OrgLeafNode {
       date.year.contains(pattern) ||
       date.month.contains(pattern) ||
       date.day.contains(pattern) ||
-      date.dayName.contains(pattern) ||
+      date.dayName?.contains(pattern) == true ||
       timeStart.hour.contains(pattern) ||
       timeStart.minute.contains(pattern) ||
       timeEnd.hour.contains(pattern) ||
