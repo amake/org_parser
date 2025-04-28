@@ -1,3 +1,6 @@
+## [9.7.3]
+- Accept timestamps without day of the week
+
 ## [9.7.2]
 - Fix handling of single-character drawer property values
 
