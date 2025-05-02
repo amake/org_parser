@@ -76,7 +76,7 @@
 - Drawer parsing accuracy is improved
 
 ## [7.2.0]
-- Parse `<<link targtes>>` and `<<<radio targets>>>`
+- Parse `<<link targets>>` and `<<<radio targets>>>`
 - Parse links to radio targets. This requires a second parsing pass; see the
   `interpretEmbeddedSettings` arg to `OrgDocument.parse`.
 - Improve Unicode handling
