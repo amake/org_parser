@@ -12,6 +12,7 @@ void main() {
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isTrue);
       expect(result.toMarkup(), markup);
     });
     test('date and time', () {
@@ -20,6 +21,7 @@ void main() {
       expect(result.contains('2020'), isTrue);
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isTrue);
       expect(result.toMarkup(), markup);
     });
     test('with repeater', () {
@@ -29,6 +31,7 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('+1w'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isTrue);
       expect(result.toMarkup(), markup);
     });
     test('with repeater (min/max)', () {
@@ -38,6 +41,7 @@ void main() {
       expect(result.contains('Wed'), isTrue);
       expect(result.contains('+1w/2w'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isTrue);
       expect(result.toMarkup(), markup);
     });
     test('with multiple repeaters', () {
@@ -48,6 +52,7 @@ void main() {
       expect(result.contains('+1w'), isTrue);
       expect(result.contains('--2d'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isTrue);
       expect(result.toMarkup(), markup);
     });
     test('inactive', () {
@@ -58,6 +63,7 @@ void main() {
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isFalse);
       expect(result.toMarkup(), markup);
     });
     test('time range', () {
@@ -68,6 +74,7 @@ void main() {
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isFalse);
       expect(result.toMarkup(), markup);
     });
     test('date range', () {
@@ -81,6 +88,7 @@ void main() {
       expect(result.contains('.+1w'), isTrue);
       expect(result.contains('--12d'), isTrue);
       expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isFalse);
       expect(result.toMarkup(), markup);
     });
     test('sexp', () {
