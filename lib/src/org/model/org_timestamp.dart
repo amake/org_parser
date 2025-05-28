@@ -30,6 +30,8 @@ class OrgSimpleTimestamp extends OrgLeafNode {
   final List<String> repeaterOrDelay;
   final String suffix;
 
+  bool get isActive => prefix == '<' && suffix == '>';
+
   @override
   String toString() => 'OrgSimpleTimestamp';
 
@@ -96,6 +98,8 @@ class OrgDateRangeTimestamp extends OrgParentNode {
   final String delimiter;
   final OrgSimpleTimestamp end;
 
+  bool get isActive => start.isActive && end.isActive;
+
   @override
   List<OrgNode> get children => [start, end];
 
@@ -150,6 +154,8 @@ class OrgTimeRangeTimestamp extends OrgLeafNode {
   final OrgTime timeEnd;
   final List<String> repeaterOrDelay;
   final String suffix;
+
+  bool get isActive => prefix == '<' && suffix == '>';
 
   @override
   String toString() => 'OrgTimeRangeTimestamp';
