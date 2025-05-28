@@ -40,9 +40,9 @@ void main() {
       final parentSection = result.sections[0];
       final firstChildSection = parentSection.sections[0];
       final secondChildSection = parentSection.sections[1];
-      expect(["school"], parentSection.tagsWithInheritance(result));
-      expect(["school"], firstChildSection.tagsWithInheritance(result));
-      expect(["school"], secondChildSection.tagsWithInheritance(result));
+      expect(parentSection.tagsWithInheritance(result), ["school"]);
+      expect(firstChildSection.tagsWithInheritance(result), ["school"]);
+      expect(secondChildSection.tagsWithInheritance(result), ["school"]);
       expect(parentSection.toMarkup(), markup);
     });
     test('test tag inheritance - parent and child have tags', () {
@@ -52,8 +52,8 @@ void main() {
       final result = OrgDocument.parse(markup);
       final parentSection = result.sections[0];
       final childSection = parentSection.sections[0];
-      expect(["school"], parentSection.tagsWithInheritance(result));
-      expect(["school", "history"], childSection.tagsWithInheritance(result));
+      expect(parentSection.tagsWithInheritance(result), ["school"]);
+      expect(childSection.tagsWithInheritance(result), ["school", "history"]);
       expect(parentSection.toMarkup(), markup);
     });
     test('test tag inheritance - no tags', () {
@@ -63,8 +63,8 @@ void main() {
       final result = OrgDocument.parse(markup);
       final parentSection = result.sections[0];
       final childSection = parentSection.sections[0];
-      expect(<List<String>>[], parentSection.tagsWithInheritance(result));
-      expect(<List<String>>[], childSection.tagsWithInheritance(result));
+      expect(parentSection.tagsWithInheritance(result), isEmpty);
+      expect(childSection.tagsWithInheritance(result), isEmpty);
       expect(parentSection.toMarkup(), markup);
     });
     test('test tag inheritance - only child tags', () {
@@ -74,8 +74,8 @@ void main() {
       final result = OrgDocument.parse(markup);
       final parentSection = result.sections[0];
       final childSection = parentSection.sections[0];
-      expect(<List<String>>[], parentSection.tagsWithInheritance(result));
-      expect(["history"], childSection.tagsWithInheritance(result));
+      expect(parentSection.tagsWithInheritance(result), isEmpty);
+      expect(childSection.tagsWithInheritance(result), ["history"]);
       expect(parentSection.toMarkup(), markup);
     });
     test('test tag inheritance - multi level inheritance', () {
@@ -87,9 +87,10 @@ void main() {
       final firstSection = result.sections[0];
       final secondSection = firstSection.sections[0];
       final thirdSection = secondSection.sections[0];
-      expect(["tag1"], firstSection.tags);
-      expect(["tag1", "tag2"], secondSection.tagsWithInheritance(result));
-      expect(["tag1", "tag2", "tag3"], thirdSection.tagsWithInheritance(result));
+      expect(firstSection.tags, ["tag1"]);
+      expect(secondSection.tagsWithInheritance(result), ["tag1", "tag2"]);
+      expect(
+          thirdSection.tagsWithInheritance(result), ["tag1", "tag2", "tag3"]);
       expect(firstSection.toMarkup(), markup);
     });
   });
