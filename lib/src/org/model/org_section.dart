@@ -20,6 +20,15 @@ class OrgSection extends OrgTree {
   /// The section's tags. Convenience accessor for tags of [headline].
   List<String> get tags => headline.tags?.values ?? const [];
 
+  /// Returns the tags of this section and all parent sections.
+  List<String> tagsWithInheritance(OrgTree doc) =>
+      doc
+          .find((node) => identical(node, this))
+          ?.path
+          .whereType<OrgSection>()
+          .fold<List<String>>([], (acc, node) => [...acc, ...node.tags]) ??
+      const [];
+
   @override
   List<OrgNode> get children => [headline, ...super.children];
 
