@@ -21,16 +21,13 @@ class OrgSection extends OrgTree {
   List<String> get tags => headline.tags?.values ?? const [];
 
   /// Returns the tags of this section and all parent sections.
-  List<String> tagsWithInheritance(OrgTree doc) {
-    var currentNode = doc.find((node) => identical(node, this));
-
-    return currentNode?.path.fold<List<String>>([],
-            (List<String> tagList, OrgNode node) {
-          if (node.runtimeType != OrgSection) return tagList;
-          return List<String>.from(tagList)..addAll((node as OrgSection).tags);
-        }) ??
-        [];
-  }
+  List<String> tagsWithInheritance(OrgTree doc) =>
+      doc
+          .find((node) => identical(node, this))
+          ?.path
+          .whereType<OrgSection>()
+          .fold<List<String>>([], (acc, node) => [...acc, ...node.tags]) ??
+      const [];
 
   @override
   List<OrgNode> get children => [headline, ...super.children];
