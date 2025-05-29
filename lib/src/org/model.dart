@@ -219,6 +219,15 @@ sealed class OrgTree extends OrgParentNode {
           .toList(growable: false) ??
       const [];
 
+  List<String> getPropertiesWithInheritance(String key, OrgTree doc) =>
+      doc
+          .find((node) => identical(this, node))
+          ?.path
+          .whereType<OrgTree>()
+          .fold<List<String>>(
+              [], (acc, tree) => acc..addAll(tree.getProperties(key))) ??
+      const [];
+
   /// Retrieve this section's PROPERTIES drawer, if it exists.
   OrgDrawer? get _propertiesDrawer {
     OrgDrawer? result;

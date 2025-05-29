@@ -424,6 +424,68 @@ content''');
         expect(doc.attachDir, (type: OrgAttachDirType.dir, dir: '/bar/'));
       });
     });
+    group('properties', () {
+      test('simple', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO: foo
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), ['foo']);
+        expect(doc.getProperties('FOO'), isEmpty);
+        expect(doc.getProperties(':BAR:'), isEmpty);
+      });
+      test('multiple', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO: foo
+:BAR: bar
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), ['foo']);
+        expect(doc.getProperties(':BAR:'), ['bar']);
+      });
+      test('duplicate', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO: foo
+:FOO: bar
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), ['foo', 'bar']);
+      });
+      test('inheritance', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO: foo
+:FOO: bar
+:END:
+
+* Section
+:PROPERTIES:
+:FOO: baz
+:BAZINGA: qux
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), ['foo', 'bar']);
+        expect(doc.getProperties(':BAZINGA:'), isEmpty);
+        final section = doc.sections[0];
+        expect(section.getProperties(':FOO:'), ['baz']);
+        expect(section.getProperties(':BAZINGA:'), ['qux']);
+        expect(
+          section.getPropertiesWithInheritance(':FOO:', doc),
+          ['foo', 'bar', 'baz'],
+        );
+        expect(
+          section.getPropertiesWithInheritance(':BAZINGA:', doc),
+          ['qux'],
+        );
+      });
+    });
     group('decrypted content', () {
       test('verbatim', () {
         final cleartext = '''foo
