@@ -35,6 +35,14 @@ class OrgSimpleTimestamp extends OrgLeafNode {
   @override
   String toString() => 'OrgSimpleTimestamp';
 
+  DateTime get dateTime => DateTime(
+        int.parse(date.year),
+        int.parse(date.month),
+        int.parse(date.day),
+        time != null ? int.parse(time!.hour) : 0,
+        time != null ? int.parse(time!.minute) : 0,
+      );
+
   @override
   void _toMarkupImpl(OrgSerializer buf) {
     buf
@@ -156,6 +164,22 @@ class OrgTimeRangeTimestamp extends OrgLeafNode {
   final String suffix;
 
   bool get isActive => prefix == '<' && suffix == '>';
+
+  DateTime get startDateTime => DateTime(
+        int.parse(date.year),
+        int.parse(date.month),
+        int.parse(date.day),
+        int.parse(timeStart.hour),
+        int.parse(timeStart.minute),
+      );
+
+  DateTime get endDateTime => DateTime(
+        int.parse(date.year),
+        int.parse(date.month),
+        int.parse(date.day),
+        int.parse(timeEnd.hour),
+        int.parse(timeEnd.minute),
+      );
 
   @override
   String toString() => 'OrgTimeRangeTimestamp';
