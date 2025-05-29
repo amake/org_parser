@@ -26,7 +26,7 @@ class OrgSection extends OrgTree {
           .find((node) => identical(node, this))
           ?.path
           .whereType<OrgSection>()
-          .fold<List<String>>([], (acc, node) => [...acc, ...node.tags]) ??
+          .fold<List<String>>([], (acc, node) => acc..addAll(node.tags)) ??
       const [];
 
   @override
