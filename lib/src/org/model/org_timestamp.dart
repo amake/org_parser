@@ -39,8 +39,8 @@ class OrgSimpleTimestamp extends OrgLeafNode {
         int.parse(date.year),
         int.parse(date.month),
         int.parse(date.day),
-        time != null ? int.parse(time!.hour) : 0,
-        time != null ? int.parse(time!.minute) : 0,
+        time == null ? 0 : int.parse(time!.hour),
+        time == null ? 0 : int.parse(time!.minute),
       );
 
   @override
