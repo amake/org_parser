@@ -14,8 +14,12 @@ class OrgDiaryTimestamp extends OrgLeafNode with SingleContentElement {
 typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
+sealed class OrgGenericTimestamp extends OrgNode {
+  bool get isActive;
+}
+
 /// A timestamp, like `[2020-05-05 Tue]`
-class OrgSimpleTimestamp extends OrgLeafNode {
+class OrgSimpleTimestamp extends OrgLeafNode implements OrgGenericTimestamp {
   OrgSimpleTimestamp(
     this.prefix,
     this.date,
@@ -30,6 +34,7 @@ class OrgSimpleTimestamp extends OrgLeafNode {
   final List<String> repeaterOrDelay;
   final String suffix;
 
+  @override
   bool get isActive => prefix == '<' && suffix == '>';
 
   @override
@@ -99,13 +104,15 @@ class OrgSimpleTimestamp extends OrgLeafNode {
       );
 }
 
-class OrgDateRangeTimestamp extends OrgParentNode {
+class OrgDateRangeTimestamp extends OrgParentNode
+    implements OrgGenericTimestamp {
   OrgDateRangeTimestamp(this.start, this.delimiter, this.end);
 
   final OrgSimpleTimestamp start;
   final String delimiter;
   final OrgSimpleTimestamp end;
 
+  @override
   bool get isActive => start.isActive && end.isActive;
 
   @override
@@ -146,7 +153,7 @@ class OrgDateRangeTimestamp extends OrgParentNode {
       );
 }
 
-class OrgTimeRangeTimestamp extends OrgLeafNode {
+class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgGenericTimestamp {
   OrgTimeRangeTimestamp(
     this.prefix,
     this.date,
@@ -163,6 +170,7 @@ class OrgTimeRangeTimestamp extends OrgLeafNode {
   final List<String> repeaterOrDelay;
   final String suffix;
 
+  @override
   bool get isActive => prefix == '<' && suffix == '>';
 
   DateTime get startDateTime => DateTime(
