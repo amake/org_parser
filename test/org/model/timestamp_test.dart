@@ -111,7 +111,7 @@ void main() {
     group("generic timestamp tests", () {
       test('OrgSimeTimestamp parse', () {
         final markup = '<2025-05-30>';
-        final result = parser.parse(markup).value as OrgGenericTimestamp;
+        final result = parser.parse(markup).value as OrgTimestamp;
 
         expect(result is OrgSimpleTimestamp, isTrue);
         expect(result is OrgDateRangeTimestamp, isFalse);
@@ -119,7 +119,7 @@ void main() {
       });
       test('OrgSimeTimestamp parse', () {
         final markup = '<2025-05-30 15:00-16:00>';
-        final result = parser.parse(markup).value as OrgGenericTimestamp;
+        final result = parser.parse(markup).value as OrgTimestamp;
 
         expect(result is OrgTimeRangeTimestamp, isTrue);
         expect(result is OrgSimpleTimestamp, isFalse);
@@ -127,7 +127,7 @@ void main() {
       });
       test('OrgSimeTimestamp parse', () {
         final markup = '<2025-05-30>--<2025-06-30>';
-        final result = parser.parse(markup).value as OrgGenericTimestamp;
+        final result = parser.parse(markup).value as OrgTimestamp;
 
         expect(result is OrgDateRangeTimestamp, isTrue);
         expect(result is OrgSimpleTimestamp, isFalse);

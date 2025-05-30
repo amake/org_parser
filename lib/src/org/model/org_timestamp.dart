@@ -14,12 +14,12 @@ class OrgDiaryTimestamp extends OrgLeafNode with SingleContentElement {
 typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
-sealed class OrgGenericTimestamp extends OrgNode {
+sealed class OrgTimestamp extends OrgNode {
   bool get isActive;
 }
 
 /// A timestamp, like `[2020-05-05 Tue]`
-class OrgSimpleTimestamp extends OrgLeafNode implements OrgGenericTimestamp {
+class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
   OrgSimpleTimestamp(
     this.prefix,
     this.date,
@@ -104,8 +104,7 @@ class OrgSimpleTimestamp extends OrgLeafNode implements OrgGenericTimestamp {
       );
 }
 
-class OrgDateRangeTimestamp extends OrgParentNode
-    implements OrgGenericTimestamp {
+class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   OrgDateRangeTimestamp(this.start, this.delimiter, this.end);
 
   final OrgSimpleTimestamp start;
@@ -153,7 +152,7 @@ class OrgDateRangeTimestamp extends OrgParentNode
       );
 }
 
-class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgGenericTimestamp {
+class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
   OrgTimeRangeTimestamp(
     this.prefix,
     this.date,
