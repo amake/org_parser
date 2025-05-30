@@ -108,5 +108,31 @@ void main() {
       expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
+    group("generic timestamp tests", () {
+      test('OrgSimeTimestamp parse', () {
+        final markup = '<2025-05-30>';
+        final result = parser.parse(markup).value as OrgGenericTimestamp;
+
+        expect(result is OrgSimpleTimestamp, isTrue);
+        expect(result is OrgDateRangeTimestamp, isFalse);
+        expect(result is OrgTimeRangeTimestamp, isFalse);
+      });
+      test('OrgSimeTimestamp parse', () {
+        final markup = '<2025-05-30 15:00-16:00>';
+        final result = parser.parse(markup).value as OrgGenericTimestamp;
+
+        expect(result is OrgTimeRangeTimestamp, isTrue);
+        expect(result is OrgSimpleTimestamp, isFalse);
+        expect(result is OrgDateRangeTimestamp, isFalse);
+      });
+      test('OrgSimeTimestamp parse', () {
+        final markup = '<2025-05-30>--<2025-06-30>';
+        final result = parser.parse(markup).value as OrgGenericTimestamp;
+
+        expect(result is OrgDateRangeTimestamp, isTrue);
+        expect(result is OrgSimpleTimestamp, isFalse);
+        expect(result is OrgTimeRangeTimestamp, isFalse);
+      });
+    });
   });
 }
