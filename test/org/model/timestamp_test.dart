@@ -108,5 +108,51 @@ void main() {
       expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
     });
+    group("generic timestamp tests", () {
+      test('OrgSimpleTimestamp', () {
+        final markup = '<2025-05-30>';
+        final result = parser.parse(markup).value as OrgTimestamp;
+
+        expect(result.isActive, isTrue);
+        expect(result, isA<OrgTimestamp>());
+        expect(result, isA<OrgSimpleTimestamp>());
+        expect(result, isNot(isA<OrgDateRangeTimestamp>()));
+        expect(result, isNot(isA<OrgTimeRangeTimestamp>()));
+        expect(result.toMarkup(), markup);
+      });
+      test('OrgTimeRangeTimestamp', () {
+        final markup = '<2025-05-30 15:00-16:00>';
+        final result = parser.parse(markup).value as OrgTimestamp;
+
+        expect(result.isActive, isTrue);
+        expect(result, isA<OrgTimestamp>());
+        expect(result, isA<OrgTimeRangeTimestamp>());
+        expect(result, isNot(isA<OrgSimpleTimestamp>()));
+        expect(result, isNot(isA<OrgDateRangeTimestamp>()));
+        expect(result.toMarkup(), markup);
+      });
+      test('OrgDateRangeTimestamp', () {
+        final markup = '[2025-05-30]--[2025-06-30]';
+        final result = parser.parse(markup).value as OrgTimestamp;
+
+        expect(result.isActive, isFalse);
+        expect(result, isA<OrgTimestamp>());
+        expect(result, isA<OrgDateRangeTimestamp>());
+        expect(result, isNot(isA<OrgSimpleTimestamp>()));
+        expect(result, isNot(isA<OrgTimeRangeTimestamp>()));
+        expect(result.toMarkup(), markup);
+      });
+      test('Exhaustivity', () {
+        final markup = '[2025-05-30]--[2025-06-30]';
+        final result = parser.parse(markup).value as OrgTimestamp;
+
+        final type = switch (result) {
+          OrgTimeRangeTimestamp() => result.toString(),
+          OrgDateRangeTimestamp() => result.toString(),
+          OrgSimpleTimestamp() => result.toString(),
+        };
+        expect(type, isNotEmpty);
+      });
+    });
   });
 }
