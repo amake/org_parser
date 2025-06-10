@@ -1,3 +1,11 @@
+## [9.8.0]
+- Add common class for timestamps: `OrgTimestamp`
+- Add `OrgTimestamp.isActive` to determine whether timestamp is "active"
+- Add getters for obtaining timestamps as `DateTime`
+- Add `OrgTree.tagsWithInheritance` for computing tags with inheritance
+- Add `OrgTree.propertiesWithInheritance` for computing properties with
+  inheritance
+
 ## [9.7.3]
 - Accept timestamps without day of the week
 
