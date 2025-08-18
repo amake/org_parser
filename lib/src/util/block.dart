@@ -1,12 +1,12 @@
 import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
-final _start = stringIgnoreCase('#+begin_') &
-    whitespace().neg().plusString('Block name expected') &
-    lineTrailing().flatten('Trailing line content expected');
+final _start = string('#+begin_', ignoreCase: true) &
+    whitespace().neg().plusString(message: 'Block name expected') &
+    lineTrailing().flatten(message: 'Trailing line content expected');
 
-Parser blockParser([Parser? delegate]) =>
-    BlockParser(delegate ?? any().starString('Block content expected'));
+Parser blockParser([Parser? delegate]) => BlockParser(
+    delegate ?? any().starString(message: 'Block content expected'));
 
 class BlockParser<R> extends DelegateParser<R, List<dynamic>> {
   BlockParser(super.delegate);

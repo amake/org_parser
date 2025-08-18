@@ -2,8 +2,8 @@ import 'package:org_parser/src/util/util.dart';
 import 'package:petitparser/petitparser.dart';
 
 final _prefix = string('Local Variables:').neg().starString();
-final _suffix = any().starLazy(lineEnd()).flatten('Suffix expected');
-final _start = lineStart().flatten('Leading content expected') &
+final _suffix = any().starLazy(lineEnd()).flatten(message: 'Suffix expected');
+final _start = lineStart().flatten(message: 'Leading content expected') &
     _prefix &
     string('Local Variables:') &
     insignificantWhitespace().starString() &
@@ -48,8 +48,8 @@ class LocalVariablesParser extends Parser<List<dynamic>> {
             string('End:')
                 .neg()
                 .starLazy(end)
-                .flatten('Local variable line expected') &
-            end.flatten('Trailing content expected'))
+                .flatten(message: 'Local variable line expected') &
+            end.flatten(message: 'Trailing content expected'))
         .drop1(0);
   }
 
@@ -66,5 +66,5 @@ class LocalVariablesParser extends Parser<List<dynamic>> {
 
   Parser<List<dynamic>> _rest(String prefix, String suffix) =>
       _internalLine(prefix, suffix).star() &
-      _endLine(prefix, suffix).flatten('End line expected');
+      _endLine(prefix, suffix).flatten(message: 'End line expected');
 }

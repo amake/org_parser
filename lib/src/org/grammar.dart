@@ -59,11 +59,11 @@ class OrgGrammarDefinition extends GrammarDefinition {
       string('[#') &
       letter() &
       (char(']') & char(' ').starString())
-          .flatten('Priority trailing expected');
+          .flatten(message: 'Priority trailing expected');
 
   Parser title() {
     final limit = ref0(tags) | lineEnd();
-    return newline().neg().plusLazy(limit).flatten('Title expected');
+    return newline().neg().plusLazy(limit).flatten(message: 'Title expected');
   }
 
   Parser tags() => (was(char(' ')) &
@@ -73,9 +73,10 @@ class OrgGrammarDefinition extends GrammarDefinition {
           lineEnd().and())
       .drop1(0);
 
-  Parser tag() => (alnum() | anyOf('_@#%')).plus().flatten('Tags expected');
+  Parser tag() =>
+      (alnum() | anyOf('_@#%')).plus().flatten(message: 'Tags expected');
 
-  Parser content() => ref0(_content).flatten('Content expected');
+  Parser content() => ref0(_content).flatten(message: 'Content expected');
 
   Parser _content() =>
       ref0(headline).not() & any().plusLazy(ref0(headline) | endOfInput());
@@ -119,7 +120,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     ..replace(ref0(arbitraryGreaterBlock), noOpFail());
 
   Parser paragraph() =>
-      ref0(indent).flatten('Paragraph indent expected') &
+      ref0(indent).flatten(message: 'Paragraph indent expected') &
       ref1(textRun, ref0(paragraphEnd)).plusLazy(ref0(paragraphEnd)) &
       ref0(blankLines);
 
@@ -127,7 +128,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       element()..replace(ref0(paragraph), noOpFail());
 
   Parser paragraphEnd() =>
-      endOfInput() | newline().repeatString(2) | ref0(nonParagraphElement);
+      endOfInput() | newline().repeatString(2, 2) | ref0(nonParagraphElement);
 
   Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 
@@ -160,12 +161,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     if (limit != null) {
       fullLimit |= limit;
     }
-    return any().plusLazy(fullLimit).flatten('Plain text expected');
+    return any().plusLazy(fullLimit).flatten(message: 'Plain text expected');
   }
 
   Parser link() => ref0(regularLink) | ref0(plainLink);
 
-  Parser plainLink() => ref0(_plainLink).flatten('Plain link expected');
+  Parser plainLink() =>
+      ref0(_plainLink).flatten(message: 'Plain link expected');
 
   Parser _plainLink() => ref0(protocol) & char(':') & ref0(path2);
 
@@ -242,7 +244,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser linkTarget() =>
       string('<<') &
-      ref0(linkTargetContent).flatten('Target content expected') &
+      ref0(linkTargetContent).flatten(message: 'Target content expected') &
       string('>>');
 
   Parser linkTargetContent() =>
@@ -254,7 +256,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser radioTarget() =>
       string('<<<') &
-      ref0(linkTargetContent).flatten('Target content expected') &
+      ref0(linkTargetContent).flatten(message: 'Target content expected') &
       string('>>>');
 
   Parser radioLink() => radioTargets?.isNotEmpty == true
@@ -263,7 +265,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser radioLinkImpl(List<String> targets) =>
       ref0(radioLinkBefore) &
-      targets.map(stringIgnoreCase).toChoiceParser() &
+      targets.map((t) => string(t, ignoreCase: true)).toChoiceParser() &
       ref0(radioLinkAfter);
 
   Parser radioLinkBefore() =>
@@ -283,11 +285,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser inlineSourceArguments() =>
       (char('[') & any().starLazy(char(']')) & char(']'))
-          .flatten('Arguments expected');
+          .flatten(message: 'Arguments expected');
 
   Parser inlineSourceBody() =>
       (char('{') & any().starLazy(char('}')) & char('}'))
-          .flatten('Body expected');
+          .flatten(message: 'Body expected');
 
   Parser markups() =>
       ref0(bold) |
@@ -324,7 +326,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser _markup(String marker) =>
       (startOfInput() | was(ref0(preMarkup))) &
       char(marker) &
-      ref1(markupContents, marker).flatten('Markup content expected') &
+      ref1(markupContents, marker).flatten(message: 'Markup content expected') &
       char(marker) &
       (ref0(postMarkup).and() | endOfInput());
 
@@ -353,8 +355,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser entity() =>
       char(r'\') &
-      ref0(entityBody).flatten('Entity body expected') &
-      ref0(entityEnd).flatten('Entity end expected');
+      ref0(entityBody).flatten(message: 'Entity body expected') &
+      ref0(entityEnd).flatten(message: 'Entity end expected');
 
   Parser entityBody() =>
       string('there4') |
@@ -366,12 +368,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser subscript() => (was(whitespace().neg()) &
           char('_') &
-          ref0(subSuperscriptBody).flatten('Subscript body expected'))
+          ref0(subSuperscriptBody).flatten(message: 'Subscript body expected'))
       .drop1(0);
 
   Parser superscript() => (was(whitespace().neg()) &
           char('^') &
-          ref0(subSuperscriptBody).flatten('Superscript body expected'))
+          ref0(subSuperscriptBody)
+              .flatten(message: 'Superscript body expected'))
       .drop1(0);
 
   // "Reverse ID" is not an Org concept; it's the reverse of the identifier
@@ -389,11 +392,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser macroReference() =>
       string('{{{') &
-      ref0(macroReferenceKey).flatten('Macro reference key expected') &
+      ref0(macroReferenceKey).flatten(message: 'Macro reference key expected') &
       // TODO(aaron): Actually parse arguments
       ref0(macroReferenceArgs)
           .optional()
-          .flatten('Macro reference args expected') &
+          .flatten(message: 'Macro reference args expected') &
       string('}}}');
 
   // See `org-element-macro-parser'
@@ -403,22 +406,23 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser macroReferenceArgs() =>
       char('(') & any().starLazy(char(')')) & char(')');
 
-  Parser affiliatedKeyword() => indented(
-      ref0(affiliatedKeywordKey).flatten('Affiliated keyword body expected') &
-          ref0(affiliatedKeywordValue));
+  Parser affiliatedKeyword() => indented(ref0(affiliatedKeywordKey)
+          .flatten(message: 'Affiliated keyword body expected') &
+      ref0(affiliatedKeywordValue));
 
   Parser affiliatedKeywordKey() =>
       string('#+') & whitespace().neg().starLazy(char(':')) & char(':');
 
-  Parser affiliatedKeywordValue() =>
-      any().starLazy(lineEnd()).flatten('Affiliated keyword value expected');
+  Parser affiliatedKeywordValue() => any()
+      .starLazy(lineEnd())
+      .flatten(message: 'Affiliated keyword value expected');
 
   Parser fixedWidthArea() => ref0(fixedWidthLine).plus() & ref0(blankLines);
 
   Parser fixedWidthLine() =>
-      ref0(indent).flatten('Fixed-width line indent expected') &
+      ref0(indent).flatten(message: 'Fixed-width line indent expected') &
       string(': ') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser localVariables() => localVariablesParser() & ref0(blankLines);
 
@@ -427,15 +431,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser pgpBlockStart() => string('-----BEGIN PGP MESSAGE-----');
 
-  Parser pgpBlockBody() =>
-      any().starLazy(ref0(pgpBlockEnd)).flatten('PGP block body expected');
+  Parser pgpBlockBody() => any()
+      .starLazy(ref0(pgpBlockEnd))
+      .flatten(message: 'PGP block body expected');
 
   Parser pgpBlockEnd() => string('-----END PGP MESSAGE-----');
 
   Parser comment() =>
-      ref0(indent).flatten('Comment indent expected') &
-      (char('#') & anyOf(' \t')).flatten('Comment start expected') &
-      newline().neg().starString('Comment content expected') &
+      ref0(indent).flatten(message: 'Comment indent expected') &
+      (char('#') & anyOf(' \t')).flatten(message: 'Comment start expected') &
+      newline().neg().starString(message: 'Comment content expected') &
       ref0(blankLines);
 
   Parser block() =>
@@ -473,25 +478,26 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser srcBlockStart() =>
-      stringIgnoreCase('#+begin_src') &
+      string('#+begin_src', ignoreCase: true) &
       ref0(srcBlockLanguageToken).optional() &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser srcBlockLanguageToken() =>
-      insignificantWhitespace().plusString('Separating whitespace expected') &
-      whitespace().neg().plusString('Language token expected');
+      insignificantWhitespace()
+          .plusString(message: 'Separating whitespace expected') &
+      whitespace().neg().plusString(message: 'Language token expected');
 
   Parser namedBlockStart(String name) =>
-      stringIgnoreCase('#+begin_$name') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      string('#+begin_$name', ignoreCase: true) &
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser verbatimBlockContent(String name) => ref1(namedBlockEnd, name)
       .neg()
-      .starString('Named block content expected');
+      .starString(message: 'Named block content expected');
 
   Parser namedBlockEnd(String name) =>
-      ref0(indent).flatten('Block end indent expected') &
-      stringIgnoreCase('#+end_$name');
+      ref0(indent).flatten(message: 'Block end indent expected') &
+      string('#+end_$name', ignoreCase: true);
 
   Parser greaterBlock() =>
       ref1(namedGreaterBlock, 'quote') | ref1(namedGreaterBlock, 'center');
@@ -504,7 +510,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser greaterBlockContent(String name) {
     final end = ref1(namedBlockEnd, name);
-    return any().starLazy(end).flatten('Greater block content expected');
+    return any()
+        .starLazy(end)
+        .flatten(message: 'Greater block content expected');
   }
 
   Parser arbitraryGreaterBlock() =>
@@ -515,30 +523,32 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(dynamicBlockEnd));
 
   Parser dynamicBlockStart() =>
-      stringIgnoreCase('#+begin:') &
+      string('#+begin:', ignoreCase: true) &
       // Dynamic block requires a function name. Not really the same as
       // srcBlockLanguageToken, but close enough
       ref0(srcBlockLanguageToken) &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser dynamicBlockContent() {
     final end = ref0(dynamicBlockEnd);
-    return any().starLazy(end).flatten('Dynamic block content expected');
+    return any()
+        .starLazy(end)
+        .flatten(message: 'Dynamic block content expected');
   }
 
   Parser dynamicBlockEnd() =>
-      ref0(indent).flatten('Block end indent expected') &
-      stringIgnoreCase('#+end:');
+      ref0(indent).flatten(message: 'Block end indent expected') &
+      string('#+end:', ignoreCase: true);
 
   Parser indent() => lineStart() & insignificantWhitespace().starString();
 
   Parser indented(Parser parser) =>
-      ref0(indent).flatten('Indent expected') &
+      ref0(indent).flatten(message: 'Indent expected') &
       parser &
       (ref0(lineTrailing) & ref0(blankLines))
-          .flatten('Trailing line content expected');
+          .flatten(message: 'Trailing line content expected');
 
-  Parser blankLines() => newline().starString('Blank lines expected');
+  Parser blankLines() => newline().starString(message: 'Blank lines expected');
 
   Parser lineTrailing() => any().starLazy(lineEnd()) & lineEnd();
 
@@ -552,15 +562,16 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser tableRow() => ref0(tableRowRule) | ref0(tableRowStandard);
 
   Parser tableRowStandard() =>
-      ref0(indent).flatten('Table row indent expected') &
+      ref0(indent).flatten(message: 'Table row indent expected') &
       char('|') &
       ref0(tableCell).star() &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser tableCell() =>
       ref0(tableCellLeading) &
       ref0(tableCellContents) &
-      ref0(tableCellTrailing).flatten('Cell trailing content expected');
+      ref0(tableCellTrailing)
+          .flatten(message: 'Cell trailing content expected');
 
   Parser tableCellLeading() => char(' ').starString();
 
@@ -572,21 +583,22 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser tableRowRule() =>
-      ref0(indent).flatten('Table row rule indent expected') &
+      ref0(indent).flatten(message: 'Table row rule indent expected') &
       (string('|-') & anyOf('-+').starString() & char('|'))
-          .flatten('Trailing line content expected') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+          .flatten(message: 'Trailing line content expected') &
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser tableDotElDivider() =>
-      ref0(indent).flatten('Table.el divider indent expected') &
+      ref0(indent).flatten(message: 'Table.el divider indent expected') &
       (string('+-') & anyOf('+-').starString())
-          .flatten('Table divider expected') &
-      ref0(lineTrailing).flatten('Trailing line content expected');
+          .flatten(message: 'Table divider expected') &
+      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
   Parser horizontalRule() =>
-      ref0(indent).flatten('Indent expected') &
+      ref0(indent).flatten(message: 'Indent expected') &
       char('-').repeatString(5, unbounded) &
-      (ref0(lineTrailingWhitespace) & ref0(blankLines)).flatten();
+      (ref0(lineTrailingWhitespace) & ref0(blankLines))
+          .flatten(message: 'Trailing line content expected');
 
   Parser timestamp() =>
       ref0(timestampDiary) |
@@ -603,7 +615,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref1(sexpAtom, delimiters) | ref1(sexpList, delimiters);
 
   Parser sexpAtom([String delimiters = '()']) =>
-      (anyOf(delimiters) | whitespace()).neg().plusString('Expected atom');
+      (anyOf(delimiters) | whitespace())
+          .neg()
+          .plusString(message: 'Expected atom');
 
   Parser sexpList([String delimiters = '()']) =>
       char(delimiters[0]) &
@@ -629,7 +643,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser timestampDateRange(bool active) =>
       ref1(timestampSimple, active) &
-      char('-').repeatString(1, 3, 'Expected timestamp separator') &
+      char('-').repeatString(1, 3, message: 'Expected timestamp separator') &
       ref1(timestampSimple, active);
 
   Parser date() =>
@@ -640,21 +654,21 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(day) &
       dayName().trim().optional();
 
-  Parser year() => digit().timesString(4, 'Expected year');
+  Parser year() => digit().timesString(4, message: 'Expected year');
 
-  Parser month() => digit().timesString(2, 'Expected month');
+  Parser month() => digit().timesString(2, message: 'Expected month');
 
-  Parser day() => digit().timesString(2, 'Expected day');
+  Parser day() => digit().timesString(2, message: 'Expected day');
 
   Parser dayName() => (whitespace() | anyOf('+-]>\n') | digit())
       .neg()
-      .plusString('Expected day name');
+      .plusString(message: 'Expected day name');
 
   Parser time() => ref0(hours) & char(':') & ref0(minutes);
 
-  Parser hours() => digit().repeatString(1, 2, 'Expected hours');
+  Parser hours() => digit().repeatString(1, 2, message: 'Expected hours');
 
-  Parser minutes() => digit().timesString(2, 'Expected minutes');
+  Parser minutes() => digit().timesString(2, message: 'Expected minutes');
 
   // TODO(aaron): Figure out if the spec is actually more restrictive than this.
   //
@@ -673,24 +687,24 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser minMaxRepeater() =>
       ref0(repeaterMark) &
-      digit().plusString('Expected number') &
+      digit().plusString(message: 'Expected number') &
       ref0(minMaxRepeatUnit) &
       char('/') &
-      digit().plusString('Expected number') &
+      digit().plusString(message: 'Expected number') &
       ref0(minMaxRepeatUnit);
 
   Parser minMaxRepeatUnit() => anyOf('dwmy');
 
   Parser repeater() =>
       ref0(repeaterMark) &
-      digit().plusString('Expected number') &
+      digit().plusString(message: 'Expected number') &
       ref0(repeatOrDelayUnit);
 
   Parser repeaterMark() => string('++') | string('.+') | char('+');
 
   Parser delay() =>
       ref0(delayMark) &
-      digit().plusString('Expected number') &
+      digit().plusString(message: 'Expected number') &
       ref0(repeatOrDelayUnit);
 
   Parser delayMark() => string('--') | char('-');
@@ -711,7 +725,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser listItem() => ref0(listItemUnordered) | ref0(listItemOrdered);
 
   Parser listItemUnordered() =>
-      ref0(listItemUnorderedIndent).flatten('indent expected') &
+      ref0(listItemUnorderedIndent).flatten(message: 'indent expected') &
       ref0(listUnorderedBullet) &
       indentedRegion(
         parser: char(' ').starString() &
@@ -729,12 +743,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
     final end = string(' ::') & (lineEnd().and() | char(' '));
     final limit = end | lineEnd();
     return ref1(textRun, limit).plusLazy(limit) &
-        end.flatten('List tag end expected');
+        end.flatten(message: 'List tag end expected');
   }
 
   Parser listItemOrdered() =>
-      ref0(listItemOrderedIndent).flatten('indent expected') &
-      ref0(listOrderedBullet).flatten('Ordered bullet expected') &
+      ref0(listItemOrderedIndent).flatten(message: 'indent expected') &
+      ref0(listOrderedBullet).flatten(message: 'Ordered bullet expected') &
       indentedRegion(
         parser: char(' ').starString() &
             ref0(listCounterSet).trim(char(' ')).optional() &
@@ -746,11 +760,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(indent) & (ref0(listOrderedBullet) & char(' ')).and();
 
   Parser listOrderedBullet() =>
-      (digit().plusString('Bullet number expected') | letter()) & anyOf('.)');
+      (digit().plusString(message: 'Bullet number expected') | letter()) &
+      anyOf('.)');
 
   Parser listCounterSet() =>
       string('[@') &
-      digit().plusString('Counter set number expected') &
+      digit().plusString(message: 'Counter set number expected') &
       char(']');
 
   Parser listCheckBox() => char('[') & anyOf(' -X') & char(']');
@@ -784,9 +799,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(':') &
       (anyOf('_-') | word())
           .plusLazy(char(':'))
-          .flatten('Drawer start expected') &
+          .flatten(message: 'Drawer start expected') &
       char(':') &
-      lineTrailingWhitespace().flatten('Trailing whitespace expected');
+      lineTrailingWhitespace().flatten(message: 'Trailing whitespace expected');
 
   Parser drawerContent() {
     final end = ref0(drawerEnd);
@@ -798,25 +813,29 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       nonParagraphElement()..replace(ref0(drawer), noOpFail());
 
   Parser drawerEnd() =>
-      ref0(indent).flatten('Drawer end indent expected') &
-      (stringIgnoreCase(':END:') & insignificantWhitespace().starString())
-          .flatten('Drawer end expected');
+      ref0(indent).flatten(message: 'Drawer end indent expected') &
+      (string(':END:', ignoreCase: true) &
+              insignificantWhitespace().starString())
+          .flatten(message: 'Drawer end expected');
 
   Parser property() =>
-      ref0(indent).flatten('Property indent expected') &
+      ref0(indent).flatten(message: 'Property indent expected') &
       ref0(propertyKey) &
       ref0(propertyValue) &
-      (lineEnd() & ref0(blankLines)).flatten('Trailing whitespace expected');
+      (lineEnd() & ref0(blankLines))
+          .flatten(message: 'Trailing whitespace expected');
 
   Parser propertyKey() =>
       char(':') &
-      (whitespace() | char(':')).neg().plusString('Property name expected') &
+      (whitespace() | char(':'))
+          .neg()
+          .plusString(message: 'Property name expected') &
       char(':');
 
   Parser propertyValue() => (insignificantWhitespace().plus() &
           whitespace().neg() &
           any().starLazy(lineEnd()))
-      .flatten('Property value expected');
+      .flatten(message: 'Property value expected');
 
   Parser footnoteReference() =>
       ref0(footnoteReferenceNamed) | ref0(footnoteReferenceInline);
@@ -832,7 +851,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(']');
 
   Parser footnoteName() =>
-      pattern('-_A-Za-z0-9').plusString('Footnote name expected');
+      pattern('-_A-Za-z0-9').plusString(message: 'Footnote name expected');
 
   Parser footnoteDefinition() => textRun(char(']')).plusLazy(char(']'));
 
@@ -851,7 +870,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser footnoteBody() {
     final end = endOfInput() |
         lineStart() & ref0(footnoteReferenceNamed) |
-        newline().repeatString(2) |
+        newline().repeatString(2, 2) |
         ref0(nonParagraphElement);
     return ref1(textRun, end).plusLazy(end);
   }
@@ -864,11 +883,12 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       char(']');
 
   Parser citationStyle() =>
-      char('/') & char(':').neg().plusString('Citation style expected');
+      char('/') &
+      char(':').neg().plusString(message: 'Citation style expected');
 
   Parser citationBody() => char(']')
       .neg()
-      .plusString('Citation body expected')
+      .plusString(message: 'Citation body expected')
       .where((val) => val.contains('@'));
 
   Parser latexBlock() => indented(LatexBlockParser());
@@ -881,6 +901,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser _latexInline(String start, String end) =>
       string(start) &
-      string(end).neg().plusLazy(string(end)).flatten('LaTeX body expected') &
+      string(end)
+          .neg()
+          .plusLazy(string(end))
+          .flatten(message: 'LaTeX body expected') &
       string(end);
 }

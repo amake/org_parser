@@ -3,7 +3,7 @@ import 'package:petitparser/petitparser.dart';
 /// Returns a parser that applies [parser] to a uniformly indented region
 /// starting at the current position.
 Parser indentedRegion({Parser? parser}) => IndentedRegionParser(
-      parser ?? any().starString('Region content expected'),
+      parser ?? any().starString(message: 'Region content expected'),
     );
 
 /// A parser that applies [delegate] to a uniformly indented region

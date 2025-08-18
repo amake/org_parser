@@ -44,7 +44,8 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
   // TODO(aaron): Support regex element: {^boss.*}
   Parser element() => ref0(propertyExpression) | ref0(tag);
 
-  Parser tag() => (alnum() | anyOf('_@#%')).plus().flatten('Tag expected');
+  Parser tag() =>
+      (alnum() | anyOf('_@#%')).plus().flatten(message: 'Tag expected');
 
   Parser propertyExpression() =>
       ref0(propertyName) & ref0(op) & ref0(propertyValue);
@@ -52,7 +53,7 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
   Parser propertyName() => insignificantWhitespace()
       .neg()
       .plusLazy(ref0(op))
-      .flatten('Property name expected');
+      .flatten(message: 'Property name expected');
 
   Parser op() =>
       string('<=') |
@@ -72,6 +73,9 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
 
   Parser stringValue() =>
       char('"') &
-      char('"').neg().plusLazy(char('"')).flatten('String content expected') &
+      char('"')
+          .neg()
+          .plusLazy(char('"'))
+          .flatten(message: 'String content expected') &
       char('"');
 }

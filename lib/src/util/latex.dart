@@ -3,7 +3,7 @@ import 'package:petitparser/petitparser.dart';
 Parser<List<dynamic>> _latexBlockStart() =>
     string(r'\begin{') &
     (char('}').neg().plusLazy(char('}')))
-        .flatten('LaTeX environment expected') &
+        .flatten(message: 'LaTeX environment expected') &
     char('}');
 
 class LatexBlockParser extends DelegateParser<List<dynamic>, List<dynamic>> {

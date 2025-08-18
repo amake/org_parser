@@ -20,12 +20,15 @@ class TodoGrammar extends GrammarDefinition {
       whitespace()
           .neg()
           .plusLazy(ref0(annotation) | whitespace() | endOfInput())
-          .flatten('state name expected')
+          .flatten(message: 'state name expected')
           .where((result) => result != '|') &
       ref0(annotation).optional();
 
   Parser annotation() =>
       char('(') &
-      char(')').neg().plusGreedy(char(')')).flatten('annotation expected') &
+      char(')')
+          .neg()
+          .plusGreedy(char(')'))
+          .flatten(message: 'annotation expected') &
       char(')');
 }

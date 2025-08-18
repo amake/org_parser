@@ -317,7 +317,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser macroReference() => super
       .macroReference()
-      .flatten('Macro reference expected')
+      .flatten(message: 'Macro reference expected')
       .map((value) => OrgMacroReference(value));
 
   @override
@@ -437,12 +437,14 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       super.srcBlockLanguageToken().castList<String>().pick(1);
 
   @override
-  Parser namedBlockStart(String name) =>
-      super.namedBlockStart(name).flatten('Named block "$name" start expected');
+  Parser namedBlockStart(String name) => super
+      .namedBlockStart(name)
+      .flatten(message: 'Named block "$name" start expected');
 
   @override
-  Parser namedBlockEnd(String name) =>
-      super.namedBlockEnd(name).flatten('Named block "$name" end expected');
+  Parser namedBlockEnd(String name) => super
+      .namedBlockEnd(name)
+      .flatten(message: 'Named block "$name" end expected');
 
   @override
   Parser namedGreaterBlock(String name) =>
@@ -483,8 +485,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser dynamicBlockStart() =>
-      super.dynamicBlockStart().flatten('Dynamic block start expected');
+  Parser dynamicBlockStart() => super
+      .dynamicBlockStart()
+      .flatten(message: 'Dynamic block start expected');
 
   @override
   Parser dynamicBlockContent() =>
@@ -555,7 +558,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser timestampDiary() => super
       .timestampDiary()
-      .flatten('Diary timestamp expected')
+      .flatten(message: 'Diary timestamp expected')
       .map((value) => OrgDiaryTimestamp(value));
 
   @override
@@ -585,7 +588,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
 
   @override
   Parser repeaterOrDelay() =>
-      super.repeaterOrDelay().flatten('Repeater or delay expected');
+      super.repeaterOrDelay().flatten(message: 'Repeater or delay expected');
 
   @override
   Parser timestampTimeRange(bool active) =>
@@ -717,15 +720,17 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
-  Parser listOrderedBullet() =>
-      super.listOrderedBullet().flatten('Ordered list bullet expected');
+  Parser listOrderedBullet() => super
+      .listOrderedBullet()
+      .flatten(message: 'Ordered list bullet expected');
 
   @override
   Parser listCounterSet() =>
-      super.listCounterSet().flatten('Counter set expected');
+      super.listCounterSet().flatten(message: 'Counter set expected');
 
   @override
-  Parser listCheckBox() => super.listCheckBox().flatten('Check box expected');
+  Parser listCheckBox() =>
+      super.listCheckBox().flatten(message: 'Check box expected');
 
   @override
   Parser statsCookieFraction() =>
@@ -755,7 +760,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser drawerStart() => super.drawerStart().flatten('Drawer start expected');
+  Parser drawerStart() =>
+      super.drawerStart().flatten(message: 'Drawer start expected');
 
   @override
   Parser drawerContent() => super
@@ -764,7 +770,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       .map((elems) => OrgContent(elems));
 
   @override
-  Parser drawerEnd() => super.drawerEnd().flatten('Drawer end expected');
+  Parser drawerEnd() =>
+      super.drawerEnd().flatten(message: 'Drawer end expected');
 
   @override
   Parser property() => super.property().map((values) {
@@ -777,7 +784,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser propertyKey() => super.propertyKey().flatten('Property key expected');
+  Parser propertyKey() =>
+      super.propertyKey().flatten(message: 'Property key expected');
 
   @override
   Parser footnoteReferenceNamed() =>
