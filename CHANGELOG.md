@@ -1,3 +1,6 @@
+## [9.9.0]
+* Update petitparser to 7.0.1
+
 ## [9.8.0]
 - Add common class for timestamps: `OrgTimestamp`
 - Add `OrgTimestamp.isActive` to determine whether timestamp is "active"
