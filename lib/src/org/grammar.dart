@@ -478,7 +478,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   }
 
   Parser srcBlockStart() =>
-      string('#+begin_src', ignoreCase: true) &
+      (string('#+begin_src', ignoreCase: true) & whitespace().neg().not())
+          .flatten(message: 'Src block start expected') &
       ref0(srcBlockLanguageToken).optional() &
       ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
@@ -489,7 +490,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlockStart(String name) =>
       string('#+begin_$name', ignoreCase: true) &
-      ref0(lineTrailing).flatten(message: 'Trailing line content expected');
+      (whitespace().neg().not() & ref0(lineTrailing))
+          .flatten(message: 'Trailing line content expected');
 
   Parser verbatimBlockContent(String name) => ref1(namedBlockEnd, name)
       .neg()
@@ -497,7 +499,8 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser namedBlockEnd(String name) =>
       ref0(indent).flatten(message: 'Block end indent expected') &
-      string('#+end_$name', ignoreCase: true);
+      (string('#+end_$name', ignoreCase: true) & whitespace().neg().not())
+          .flatten(message: 'Block end expected');
 
   Parser greaterBlock() =>
       ref1(namedGreaterBlock, 'quote') | ref1(namedGreaterBlock, 'center');
