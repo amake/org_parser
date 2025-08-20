@@ -3,9 +3,9 @@ import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('block', () {
+  group('src block', () {
     final grammar = OrgContentGrammarDefinition();
-    final parser = grammar.buildFrom(grammar.block()).end();
+    final parser = grammar.buildFrom(grammar.srcBlock()).end();
     test('lower case', () {
       final result = parser.parse('''#+begin_src sh
   echo 'foo'
