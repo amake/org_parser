@@ -1,3 +1,6 @@
+## [9.9.1]
+- Fix block parsing edge cases
+
 ## [9.9.0]
 * Update petitparser to 7.0.1
 
