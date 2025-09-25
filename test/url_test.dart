@@ -3,20 +3,20 @@ import 'package:test/test.dart';
 
 void main() {
   test('local section url parser', () {
-    expect(true, isOrgLocalSectionUrl('*foo'));
-    expect(false, isOrgLocalSectionUrl('foo'));
-    expect('foo bar', parseOrgLocalSectionUrl('*foo bar'));
-    expect('foo bar', parseOrgLocalSectionUrl('''*foo
-  bar'''));
+    expect(isOrgLocalSectionUrl('*foo'), isTrue);
+    expect(isOrgLocalSectionUrl('foo'), isFalse);
+    expect(parseOrgLocalSectionUrl('*foo bar'), 'foo bar');
+    expect(parseOrgLocalSectionUrl('''*foo
+  bar'''), 'foo bar');
   });
   test('custom ID url parser', () {
-    expect(true, isOrgCustomIdUrl('#foo'));
-    expect(false, isOrgCustomIdUrl('foo'));
-    expect('foo bar', parseOrgCustomIdUrl('#foo bar'));
+    expect(isOrgCustomIdUrl('#foo'), isTrue);
+    expect(isOrgCustomIdUrl('foo'), isFalse);
+    expect(parseOrgCustomIdUrl('#foo bar'), 'foo bar');
   });
   test('ID url parser', () {
-    expect(true, isOrgIdUrl('id:foo'));
-    expect(false, isOrgIdUrl('foo'));
-    expect('foo bar', parseOrgIdUrl('id:foo bar'));
+    expect(isOrgIdUrl('id:foo'), isTrue);
+    expect(isOrgIdUrl('foo'), isFalse);
+    expect(parseOrgIdUrl('id:foo bar'), 'foo bar');
   });
 }
