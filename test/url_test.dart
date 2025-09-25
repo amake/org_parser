@@ -19,4 +19,10 @@ void main() {
     expect(isOrgIdUrl('foo'), isFalse);
     expect(parseOrgIdUrl('id:foo bar'), 'foo bar');
   });
+  test('Coderef url parser', () {
+    expect(isCoderefUrl('(foo)'), isTrue);
+    expect(isCoderefUrl('foo'), isFalse);
+    expect(isCoderefUrl('(f(o)o)'), isFalse);
+    expect(parseCoderefUrl('(foo bar)'), 'foo bar');
+  });
 }

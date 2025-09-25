@@ -32,3 +32,15 @@ String parseOrgIdUrl(String url) {
   assert(isOrgIdUrl(url));
   return url.substring(3);
 }
+
+// See org-src-coderef-regexp
+final _coderefUrlPattern =
+    RegExp(r'^\((?<name>[-a-zA-Z0-9_][-a-zA-Z0-9_ ]*)\)$');
+
+bool isCoderefUrl(String url) => _coderefUrlPattern.hasMatch(url);
+
+String parseCoderefUrl(String url) {
+  assert(isCoderefUrl(url));
+  final match = _coderefUrlPattern.firstMatch(url);
+  return match!.namedGroup('name')!;
+}
