@@ -389,5 +389,18 @@ void main() {
         ''
       ]);
     });
+    test('empty body', () {
+      final result = parser.parse('- ');
+      expect(result.value, [
+        [
+          [
+            '',
+            '-',
+            [' ', null, null, []]
+          ]
+        ],
+        ''
+      ]);
+    });
   });
 }
