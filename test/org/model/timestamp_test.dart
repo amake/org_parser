@@ -15,6 +15,7 @@ void main() {
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed');
     });
     test('date and time', () {
       final markup = '<2020-03-12 Wed 8:34>';
@@ -25,6 +26,7 @@ void main() {
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 8:34');
     });
     test('with repeater', () {
       final markup = '<2020-03-12 Wed 8:34 +1w>';
@@ -36,6 +38,7 @@ void main() {
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w');
     });
     test('with repeater (min/max)', () {
       final markup = '<2020-03-12 Wed 8:34 +1w/2w>';
@@ -47,6 +50,7 @@ void main() {
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w/2w');
     });
     test('with multiple repeaters', () {
       final markup = '<2020-03-12 Wed 8:34 +1w --2d>';
@@ -59,6 +63,7 @@ void main() {
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w --2d');
     });
     test('inactive', () {
       final markup = '[2020-03-12 Wed 18:34 .+1w --12d]';
@@ -71,6 +76,7 @@ void main() {
       expect(result.isActive, isFalse);
       expect(result.dateTime, DateTime(2020, 03, 12, 18, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 18:34 .+1w --12d');
     });
     test('time range', () {
       final markup = '[2020-03-12 Wed 18:34-19:35 .+1w --12d]';
@@ -84,6 +90,7 @@ void main() {
       expect(result.startDateTime, DateTime(2020, 03, 12, 18, 34));
       expect(result.endDateTime, DateTime(2020, 03, 12, 19, 35));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 18:34-19:35 .+1w --12d');
     });
     test('date range', () {
       final markup =
@@ -100,6 +107,8 @@ void main() {
       expect(result.start.dateTime, DateTime(2020, 03, 11, 18, 34));
       expect(result.end.dateTime, DateTime(2020, 03, 12, 18, 34));
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(),
+          '2020-03-11 Wed 18:34 .+1w --12d--2020-03-12 Wed 18:34 .+1w --12d');
     });
     test('sexp', () {
       final markup = '<%%(what (the (f)))>';
@@ -107,6 +116,7 @@ void main() {
       expect(result.contains('what'), isTrue);
       expect(result.contains('あ'), isFalse);
       expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '<%%(what (the (f)))>');
     });
     group("generic timestamp tests", () {
       test('OrgSimpleTimestamp', () {
@@ -119,6 +129,7 @@ void main() {
         expect(result, isNot(isA<OrgDateRangeTimestamp>()));
         expect(result, isNot(isA<OrgTimeRangeTimestamp>()));
         expect(result.toMarkup(), markup);
+        expect(result.toPlainText(), '2025-05-30');
       });
       test('OrgTimeRangeTimestamp', () {
         final markup = '<2025-05-30 15:00-16:00>';
@@ -130,6 +141,7 @@ void main() {
         expect(result, isNot(isA<OrgSimpleTimestamp>()));
         expect(result, isNot(isA<OrgDateRangeTimestamp>()));
         expect(result.toMarkup(), markup);
+        expect(result.toPlainText(), '2025-05-30 15:00-16:00');
       });
       test('OrgDateRangeTimestamp', () {
         final markup = '[2025-05-30]--[2025-06-30]';
@@ -141,6 +153,7 @@ void main() {
         expect(result, isNot(isA<OrgSimpleTimestamp>()));
         expect(result, isNot(isA<OrgTimeRangeTimestamp>()));
         expect(result.toMarkup(), markup);
+        expect(result.toPlainText(), '2025-05-30--2025-06-30');
       });
       test('Exhaustivity', () {
         final markup = '[2025-05-30]--[2025-06-30]';

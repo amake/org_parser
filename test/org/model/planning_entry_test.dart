@@ -12,5 +12,7 @@ void main() {
     expect(planningLine.contains('CLOCK'), isTrue);
     expect(planningLine.contains('あ'), isFalse);
     expect(planningLine.toMarkup(), markup);
+    expect(planningLine.toPlainText(),
+        'CLOCK: 2021-01-23 Sat 09:30--2021-01-23 Sat 10:19');
   });
 }

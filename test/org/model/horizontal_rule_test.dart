@@ -13,6 +13,7 @@ void main() {
       expect(rule.toMarkup(), markup);
       expect(rule.contains('-----'), isTrue);
       expect(rule.contains('あ'), isFalse);
+      expect(rule.toPlainText(), markup);
     });
     test('trailing', () {
       final markup = '''-----${' '}
@@ -22,6 +23,7 @@ void main() {
       expect(rule.toMarkup(), markup);
       expect(rule.contains(' '), isTrue);
       expect(rule.contains('あ'), isFalse);
+      expect(rule.toPlainText(), markup);
     });
   });
 }

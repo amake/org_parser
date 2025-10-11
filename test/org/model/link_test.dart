@@ -13,6 +13,7 @@ void main() {
       expect(link.contains('what?'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), '[lots][of][boxes]');
     });
     test('link with search option', () {
       final markup = '[[foo::1][bar]]';
@@ -21,6 +22,7 @@ void main() {
       expect(link.contains('foo'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), 'bar');
     });
     test('quotes in search option', () {
       final markup = r'[[foo::"\[1\]"][bar]]';
@@ -29,6 +31,7 @@ void main() {
       expect(link.contains('foo'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), 'bar');
     });
     test('no description', () {
       final markup = '[[foo::1]]';
@@ -37,6 +40,7 @@ void main() {
       expect(link.contains('foo'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), 'foo::1');
     });
     test('plain link', () {
       final markup = 'http://example.com';
@@ -45,6 +49,7 @@ void main() {
       expect(link.contains('example'), isTrue);
       expect(link.contains('あ'), isFalse);
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), 'http://example.com');
     });
     test('nested markup', () {
       final markup = '[[foo][*bar*]]';
@@ -54,6 +59,7 @@ void main() {
       expect(nested, isNotNull);
       expect(nested!.node.toMarkup(), '*bar*');
       expect(link.toMarkup(), markup);
+      expect(link.toPlainText(), 'bar');
     });
     test('nested link', () {
       final markup = '[[foo][link with [[https://orgro.org][link]​] inside]]';
@@ -67,6 +73,8 @@ void main() {
         isTrue,
       );
       expect(link.toMarkup(), markup);
+      expect(
+          link.toPlainText(), 'link with [[https://orgro.org][link]] inside');
     });
   });
 }

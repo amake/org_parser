@@ -17,6 +17,7 @@ void main() {
       expect(block.contains('foobar'), isTrue);
       expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
+      expect(block.toPlainText(), markup);
     });
   });
 }

@@ -14,6 +14,7 @@ bar/''';
       expect(markupNode.contains('foo'), isTrue);
       expect(markupNode.contains('あ'), isFalse);
       expect(markupNode.toMarkup(), markup);
+      expect(markupNode.toPlainText(), 'foo\nbar');
     });
   });
 }

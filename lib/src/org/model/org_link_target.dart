@@ -27,4 +27,9 @@ class OrgLinkTarget extends OrgLeafNode {
       ..write(body)
       ..write(trailing);
   }
+
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    buf.write(body);
+  }
 }

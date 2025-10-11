@@ -27,6 +27,17 @@ void main() {
       expect(document.contains('A Headline'), isTrue);
       expect(document.contains('あ'), isFalse);
       expect(document.toMarkup(), doc);
+      expect(document.toPlainText(), '''An introduction.
+
+* A Headline
+
+  Some text. bold
+
+** Sub-Topic 1
+
+** Sub-Topic 2
+
+*** Additional entry''');
     });
     group('footnotes', () {
       test('single blank line continues scope', () {
@@ -48,6 +59,7 @@ biz baz
         expect(footnote.content.children[2], isA<OrgParagraph>());
         expect(footnote.content.children[2].toMarkup(), 'biz baz\n');
         expect(doc.toMarkup(), markup);
+        expect(doc.toPlainText(), '[1] foo bar\n\nbiz baz\n');
       });
       test('double blank line ends scope', () {
         final markup = '''[fn:1] foo bar
@@ -64,6 +76,7 @@ biz baz
         expect(footnote.trailing, '\n\n\n');
         expect(doc.content!.children[1], isA<OrgParagraph>());
         expect(doc.toMarkup(), markup);
+        expect(doc.toPlainText(), '[1] foo bar\n\n\nbiz baz\n');
       });
       test('footnote contains elements', () {
         final markup = '''[fn:1] foo bar

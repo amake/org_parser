@@ -18,6 +18,7 @@ void main() {
       expect(drawer.contains('foo'), isTrue);
       expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
+      expect(drawer.toPlainText(), markup);
     });
     test('simple', () {
       final markup = ''':LOGBOOK:
@@ -29,6 +30,7 @@ a
       expect(drawer.contains('a'), isTrue);
       expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
+      expect(drawer.toPlainText(), markup);
     });
     test('empty', () {
       final markup = ''':FOOBAR:
@@ -38,6 +40,7 @@ a
       expect(drawer.contains('FOOBAR'), isTrue);
       expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
+      expect(drawer.toPlainText(), markup);
     });
   });
 }

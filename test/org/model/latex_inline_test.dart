@@ -13,6 +13,7 @@ void main() {
       expect(latex.contains('i'), isTrue);
       expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
+      expect(latex.toPlainText(), 'i');
     });
     test(r'double-$ delimiter', () {
       final markup = r'$$ a^2 $$';
@@ -21,6 +22,7 @@ void main() {
       expect(latex.contains('a^2'), isTrue);
       expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
+      expect(latex.toPlainText(), 'a^2');
     });
     test('paren delimiter', () {
       final markup = r'\( foo \)';
@@ -29,6 +31,7 @@ void main() {
       expect(latex.contains('foo'), isTrue);
       expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
+      expect(latex.toPlainText(), 'foo');
     });
     test('bracket delimiter', () {
       final markup = r'\[ bar \]';
@@ -37,6 +40,7 @@ void main() {
       expect(latex.contains('bar'), isTrue);
       expect(latex.contains('あ'), isFalse);
       expect(latex.toMarkup(), markup);
+      expect(latex.toPlainText(), 'bar');
     });
   });
 }

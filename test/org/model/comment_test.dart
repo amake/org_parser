@@ -13,6 +13,7 @@ void main() {
       expect(comment.contains('foo'), isTrue);
       expect(comment.contains('あ'), isFalse);
       expect(comment.toMarkup(), markup);
+      expect(comment.toPlainText(), markup);
     });
   });
 }

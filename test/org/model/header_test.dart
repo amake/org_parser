@@ -7,12 +7,13 @@ void main() {
     final definition = OrgParserDefinition();
     final parser = definition.buildFrom(definition.headline()).end();
     test('full', () {
-      final markup = '** TODO [#A] Title foo bar :biz:baz:';
+      final markup = '** TODO [#A] Title foo *bar* :biz:baz:';
       final result = parser.parse(markup);
       final headline = result.value as OrgHeadline;
       expect(headline.contains('Title foo'), isTrue);
       expect(headline.contains('あ'), isFalse);
       expect(headline.toMarkup(), markup);
+      expect(headline.toPlainText(), '** TODO [#A] Title foo bar :biz:baz:');
     });
     test('empty', () {
       final markup = '* ';
@@ -21,6 +22,7 @@ void main() {
       expect(headline.contains('*'), isTrue);
       expect(headline.contains('あ'), isFalse);
       expect(headline.toMarkup(), markup);
+      expect(headline.toPlainText(), markup);
     });
     test('non-ASCII tags', () {
       final markup = '* TODO foo :あ:';
@@ -30,6 +32,7 @@ void main() {
       expect(headline.contains('お'), isFalse);
       expect(headline.tags!.values, ['あ']);
       expect(headline.toMarkup(), markup);
+      expect(headline.toPlainText(), markup);
     });
     group('tag inheritance', () {
       test('children have no tags', () {
@@ -61,6 +64,7 @@ void main() {
         expect(childSection.tagsWithInheritance(result), ["school", "history"]);
         expect(childSection.tags, ["history"]);
         expect(parentSection.toMarkup(), markup);
+        expect(parentSection.toPlainText(), markup);
       });
       test('no tags', () {
         final markup = """
@@ -74,6 +78,7 @@ void main() {
         expect(childSection.tagsWithInheritance(result), isEmpty);
         expect(childSection.tags, isEmpty);
         expect(parentSection.toMarkup(), markup);
+        expect(parentSection.toPlainText(), markup);
       });
       test('only child tags', () {
         final markup = """
@@ -87,6 +92,7 @@ void main() {
         expect(childSection.tagsWithInheritance(result), ["history"]);
         expect(childSection.tags, ["history"]);
         expect(parentSection.toMarkup(), markup);
+        expect(parentSection.toPlainText(), markup);
       });
       test('multi level inheritance', () {
         final markup = """
@@ -105,6 +111,7 @@ void main() {
             thirdSection.tagsWithInheritance(result), ["tag1", "tag2", "tag3"]);
         expect(thirdSection.tags, ["tag3"]);
         expect(firstSection.toMarkup(), markup);
+        expect(firstSection.toPlainText(), markup);
       });
     });
   });

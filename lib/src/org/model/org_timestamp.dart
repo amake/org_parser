@@ -50,8 +50,14 @@ class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
 
   @override
   void _toMarkupImpl(OrgSerializer buf) {
+    buf.write(prefix);
+    _toPlainTextImpl(buf);
+    buf.write(suffix);
+  }
+
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
     buf
-      ..write(prefix)
       ..write(date.year)
       ..write('-')
       ..write(date.month)
@@ -73,7 +79,6 @@ class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
       buf.write(' ');
       buf.write(repeaterOrDelay.join(' '));
     }
-    buf.write(suffix);
   }
 
   @override
@@ -193,8 +198,14 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
 
   @override
   void _toMarkupImpl(OrgSerializer buf) {
+    buf.write(prefix);
+    _toPlainTextImpl(buf);
+    buf.write(suffix);
+  }
+
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
     buf
-      ..write(prefix)
       ..write(date.year)
       ..write('-')
       ..write(date.month)
@@ -218,7 +229,6 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
       buf.write(' ');
       buf.write(repeaterOrDelay.join(' '));
     }
-    buf.write(suffix);
   }
 
   @override

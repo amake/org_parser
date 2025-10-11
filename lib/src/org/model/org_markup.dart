@@ -56,6 +56,11 @@ class OrgMarkup extends OrgParentNode {
   }
 
   @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    buf.visit(content);
+  }
+
+  @override
   List<OrgNode> get children => [content];
 
   @override

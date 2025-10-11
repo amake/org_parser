@@ -21,4 +21,11 @@ class OrgEntity extends OrgLeafNode {
       ..write(name)
       ..write(trailing);
   }
+
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    buf
+      ..write(leading)
+      ..write(name);
+  }
 }

@@ -13,6 +13,7 @@ void main() {
       expect(footnote.contains('foo'), isTrue);
       expect(footnote.contains('あ'), isFalse);
       expect(footnote.toMarkup(), markup);
+      expect(footnote.toPlainText(), '[1] foo bar biz baz');
     });
   });
 }

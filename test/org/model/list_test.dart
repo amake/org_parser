@@ -13,6 +13,7 @@ void main() {
       expect(list.contains('foo'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), markup);
     });
     test('multiple lines', () {
       final markup = '''- foo
@@ -23,6 +24,7 @@ void main() {
       expect(list.contains('bar'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), markup);
     });
     test('multiline item', () {
       final markup = '''- foo
@@ -34,6 +36,7 @@ void main() {
       expect(list.contains('bar'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), markup);
     });
     test('multiline item with eol white space', () {
       final markup = '  - foo\n'
@@ -45,6 +48,7 @@ void main() {
       expect(list.contains('bar'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), markup);
     });
     test('complex', () {
       final markup = '''30. [@30] foo
@@ -60,6 +64,10 @@ void main() {
       expect(list.contains('bazinga'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), '''30. foo
+   - bar :: baz
+     blah
+   - [ ] bazinga''');
     });
     test('item with block', () {
       final markup = '''- foo
@@ -71,6 +79,7 @@ void main() {
       expect(list.contains('echo bar'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), markup);
     });
     test('with tag', () {
       final markup = '- ~foo~ ::';
@@ -79,6 +88,7 @@ void main() {
       expect(list.contains('foo'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), '- foo ::');
     });
     test('with following meta', () {
       final markup = '''- ~foo~ ::
@@ -88,6 +98,8 @@ void main() {
       expect(list.contains('bar'), isTrue);
       expect(list.contains('あ'), isFalse);
       expect(list.toMarkup(), markup);
+      expect(list.toPlainText(), '''- foo ::
+  #+vindex: bar''');
     });
     group('toggle checkbox', () {
       final list = parser.parse('''

@@ -111,6 +111,16 @@ class OrgFootnoteReference extends OrgParentNode {
     buf.write(trailing);
   }
 
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    buf
+      ..write('[')
+      ..write(name ?? '')
+      ..write(definition?.delimiter ?? '');
+    if (definition != null) buf.visit(definition!.value);
+    buf.write(trailing);
+  }
+
   OrgFootnoteReference copyWith({
     bool? isDefinition,
     String? leading,

@@ -17,6 +17,7 @@ void main() {
       expect(block.contains("echo 'foo'"), isTrue);
       expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
+      expect(block.toPlainText(), markup);
     });
     group('source block', () {
       test('simple', () {
@@ -30,6 +31,7 @@ void main() {
         expect(block.contains("echo 'foo'"), isTrue);
         expect(block.contains('あ'), isFalse);
         expect(block.toMarkup(), markup);
+        expect(block.toPlainText(), markup);
       });
       test('empty', () {
         final markup = '''#+begin_src
@@ -38,6 +40,7 @@ void main() {
         final block = result.value as OrgSrcBlock;
         expect(block.contains('あ'), isFalse);
         expect(block.toMarkup(), markup);
+        expect(block.toPlainText(), markup);
       });
     });
   });

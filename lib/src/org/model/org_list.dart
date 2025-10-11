@@ -218,6 +218,7 @@ class OrgListOrderedItem extends OrgListItem {
 
   @override
   String toString() => 'OrgListOrderedItem';
+
   @override
   void _toMarkupImpl(OrgSerializer buf) {
     buf
@@ -229,6 +230,19 @@ class OrgListOrderedItem extends OrgListItem {
         ..write(counterSet!)
         ..write(' ');
     }
+    if (checkbox != null) {
+      buf
+        ..write(checkbox!)
+        ..write(' ');
+    }
+    if (body != null) buf.visit(body!);
+  }
+
+  @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    buf
+      ..write(indent)
+      ..write(bullet);
     if (checkbox != null) {
       buf
         ..write(checkbox!)

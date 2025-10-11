@@ -18,5 +18,6 @@ void main() {
     expect(latex.contains(r'\begin{matrix}'), isTrue);
     expect(latex.contains(r'あ'), isFalse);
     expect(latex.toMarkup(), markup);
+    expect(latex.toPlainText(), markup);
   });
 }

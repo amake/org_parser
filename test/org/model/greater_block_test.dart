@@ -16,5 +16,10 @@ void main() {
     expect(block.contains('bizbaz'), isTrue);
     expect(block.contains('foo ~bar~'), false);
     expect(block.toMarkup(), markup);
+    expect(block.toPlainText(), '''#+begin_center
+  foo bar
+  bizbaz
+#+end_center
+''');
   });
 }

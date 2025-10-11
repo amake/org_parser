@@ -12,6 +12,7 @@ void main() {
       expect(target.contains('!'), isTrue);
       expect(target.contains('あ'), isFalse);
       expect(target.toMarkup(), markup);
+      expect(target.toPlainText(), '!');
     });
     test('multiple workds', () {
       final markup = '<<foo bar>>';
@@ -19,6 +20,7 @@ void main() {
       expect(target.contains('foo'), isTrue);
       expect(target.contains('あ'), isFalse);
       expect(target.toMarkup(), markup);
+      expect(target.toPlainText(), 'foo bar');
     });
   });
 }

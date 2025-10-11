@@ -17,12 +17,17 @@ void main() {
       expect(table.contains('bar'), isTrue);
       expect(table.contains('*bar*'), isFalse);
       expect(table.toMarkup(), markup);
+      expect(table.toPlainText(), '''  | foo | bar | baz |
+  |-----+-----+-----|
+  |   1 |   2 |   3 |
+''');
     });
     test('empty', () {
       final markup = '||';
       final result = parser.parse(markup);
       final table = result.value as OrgTable;
       expect(table.toMarkup(), markup);
+      expect(table.toPlainText(), markup);
     });
   });
 }

@@ -14,6 +14,7 @@ void main() {
       expect(block.contains('sh'), isTrue);
       expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
+      expect(block.toPlainText(), 'echo "foo"');
     });
     test('with args', () {
       final markup = '''src_ruby[:exports code]{println "foo"}''';
@@ -24,6 +25,7 @@ void main() {
       expect(block.contains(':exports'), isTrue);
       expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
+      expect(block.toPlainText(), 'println "foo"');
     });
   });
 }

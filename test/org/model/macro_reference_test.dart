@@ -13,6 +13,7 @@ void main() {
       expect(ref.contains('name'), isTrue);
       expect(ref.contains('あ'), isFalse);
       expect(ref.toMarkup(), markup);
+      expect(ref.toPlainText(), markup);
     });
     test('simple', () {
       final markup = '{{{foobar}}}';
@@ -21,6 +22,7 @@ void main() {
       expect(ref.contains('foobar'), isTrue);
       expect(ref.contains('あ'), isFalse);
       expect(ref.toMarkup(), markup);
+      expect(ref.toPlainText(), markup);
     });
   });
 }

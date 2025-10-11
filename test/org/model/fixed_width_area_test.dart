@@ -15,6 +15,7 @@ void main() {
       expect(area.contains('foo'), isTrue);
       expect(area.contains('あ'), isFalse);
       expect(area.toMarkup(), markup);
+      expect(area.toPlainText(), markup);
     });
     test('empty', () {
       final markup = ': ';
@@ -23,6 +24,7 @@ void main() {
       expect(area.contains(':'), isTrue);
       expect(area.contains('あ'), isFalse);
       expect(area.toMarkup(), markup);
+      expect(area.toPlainText(), markup);
     });
   });
 }

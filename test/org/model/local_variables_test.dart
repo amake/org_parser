@@ -15,6 +15,7 @@ void main() {
       expect(lvars.contains('foo'), isTrue);
       expect(lvars.contains('あ'), isFalse);
       expect(lvars.toMarkup(), markup);
+      expect(lvars.toPlainText(), markup);
     });
     test('with suffix', () {
       final markup = '''# Local Variables: #
@@ -25,6 +26,7 @@ void main() {
       expect(lvars.contains('foo'), isTrue);
       expect(lvars.contains('あ'), isFalse);
       expect(lvars.toMarkup(), markup);
+      expect(lvars.toPlainText(), markup);
     });
   });
 }

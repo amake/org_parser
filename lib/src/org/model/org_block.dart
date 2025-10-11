@@ -142,6 +142,15 @@ class OrgInlineSrcBlock extends OrgLeafNode {
   }
 
   @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    var b = body;
+    if (b.startsWith('{') && b.endsWith('}')) {
+      b = b.substring(1, b.length - 1);
+    }
+    buf.write(b);
+  }
+
+  @override
   bool contains(Pattern pattern) =>
       leading.contains(pattern) ||
       language.contains(pattern) ||

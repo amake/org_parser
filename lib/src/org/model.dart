@@ -52,6 +52,11 @@ class OrgSerializer {
   String toString() => _buf.toString();
 }
 
+class OrgPlainTextSerializer extends OrgSerializer {
+  @override
+  void visit(OrgNode node) => node._toPlainTextImpl(this);
+}
+
 /// The base type of all Org AST objects
 abstract class OrgNode {
   /// The children of this node. May be empty (no children) or null (an object
@@ -116,6 +121,13 @@ abstract class OrgNode {
   }
 
   void _toMarkupImpl(OrgSerializer buf);
+
+  String toPlainText({OrgPlainTextSerializer? serializer}) {
+    serializer ??= OrgPlainTextSerializer();
+    return toMarkup(serializer: serializer);
+  }
+
+  void _toPlainTextImpl(OrgSerializer buf) => _toMarkupImpl(buf);
 }
 
 sealed class OrgLeafNode extends OrgNode {

@@ -13,6 +13,7 @@ void main() {
       expect(entity.contains('frac12'), isTrue);
       expect(entity.contains('あ'), isFalse);
       expect(entity.toMarkup(), markup);
+      expect(entity.toPlainText(), r'\frac12');
     });
     test('with terminator', () {
       final markup = r'\foobar{}';
@@ -21,6 +22,7 @@ void main() {
       expect(entity.contains('foobar'), isTrue);
       expect(entity.contains('あ'), isFalse);
       expect(entity.toMarkup(), markup);
+      expect(entity.toPlainText(), r'\foobar');
     });
   });
 }

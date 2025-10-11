@@ -76,4 +76,9 @@ class OrgLatexInline extends OrgLeafNode {
       ..write(content)
       ..write(trailingDecoration);
   }
+
+  @override
+  _toPlainTextImpl(OrgSerializer buf) {
+    buf.write(content.trim());
+  }
 }

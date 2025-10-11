@@ -13,6 +13,7 @@ void main() {
       expect(target.contains('foo'), isTrue);
       expect(target.contains('あ'), isFalse);
       expect(target.toMarkup(), markup);
+      expect(target.toPlainText(), markup);
     });
     test('found in content', () {
       final doc = OrgDocument.parse('''

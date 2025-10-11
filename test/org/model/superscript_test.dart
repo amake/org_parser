@@ -13,6 +13,7 @@ void main() {
       expect(sup.contains('b2'), isTrue);
       expect(sup.contains('あ'), isFalse);
       expect(sup.toMarkup(), '^{a1 {b2}}');
+      expect(sup.toPlainText(), '^{a1 {b2}}');
     });
   });
 }

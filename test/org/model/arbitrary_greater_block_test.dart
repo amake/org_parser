@@ -16,5 +16,10 @@ void main() {
     expect(block.contains('bizbaz'), isTrue);
     expect(block.contains('あ'), isFalse);
     expect(block.toMarkup(), markup);
+    expect(block.toPlainText(), '''#+begin_blah
+  foo bar
+  bizbaz
+#+end_blah
+''');
   });
 }

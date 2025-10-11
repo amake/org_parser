@@ -13,6 +13,7 @@ void main() {
       expect(named.contains('1'), isTrue);
       expect(named.contains('あ'), isFalse);
       expect(named.toMarkup(), markup);
+      expect(named.toPlainText(), '[1]');
     });
     test('with definition', () {
       final markup = '[fn:: who /what/ why]';
@@ -21,6 +22,7 @@ void main() {
       expect(anonymous.contains('who'), isTrue);
       expect(anonymous.contains('あ'), isFalse);
       expect(anonymous.toMarkup(), markup);
+      expect(anonymous.toPlainText(), '[: who what why]');
     });
     test('with name', () {
       final markup = '[fn:abc123: when /where/ how]';
@@ -29,6 +31,7 @@ void main() {
       expect(inline.contains('abc123'), isTrue);
       expect(inline.contains('あ'), isFalse);
       expect(inline.toMarkup(), markup);
+      expect(inline.toPlainText(), '[abc123: when where how]');
     });
   });
 }

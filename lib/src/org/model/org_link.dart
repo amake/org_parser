@@ -74,6 +74,15 @@ class OrgBracketLink extends OrgParentNode with OrgLink {
   }
 
   @override
+  void _toPlainTextImpl(OrgSerializer buf) {
+    if (description == null) {
+      buf.write(location);
+    } else {
+      buf.visit(description!);
+    }
+  }
+
+  @override
   List<OrgNode> get children => description == null ? const [] : [description!];
 
   @override
