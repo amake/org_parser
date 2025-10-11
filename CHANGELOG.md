@@ -1,3 +1,6 @@
+## [9.11.0]
+- Add `OrgNode.toPlainText` for stripping "inline" markup as much as possible
+
 ## [9.10.0]
 - Add coderef URL utilities
 
