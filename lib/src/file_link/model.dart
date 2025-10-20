@@ -11,6 +11,9 @@ class OrgFileLink {
   OrgFileLink(this.scheme, this.body, this.extra);
   final String? scheme;
   final String body;
+
+  /// Also referred to as "search option" in the Org manual:
+  /// https://orgmode.org/manual/Search-Options.html
   final String? extra;
 
   /// Whether the file linked to is indicated by a relative path (as opposed to

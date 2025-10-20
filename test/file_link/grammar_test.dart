@@ -32,6 +32,13 @@ void main() {
           ['attachment:', 'foo.png', null],
         );
       });
+      test('id', () {
+        final result = parser.parse('id:6B60EF09-5A42-433A-BDD3-552809FBE1D8');
+        expect(
+          result.value,
+          ['id:', '6B60EF09-5A42-433A-BDD3-552809FBE1D8', null],
+        );
+      });
     });
     group('with extra', () {
       test('other file with line number', () {
@@ -53,6 +60,12 @@ void main() {
       test('local file', () {
         final result = parser.parse('file:::*task title');
         expect(result.value, ['file:', '', '*task title']);
+      });
+      test('id with regex', () {
+        final result = parser
+            .parse('id:6B60EF09-5A42-433A-BDD3-552809FBE1D8::/some regex/');
+        expect(result.value,
+            ['id:', '6B60EF09-5A42-433A-BDD3-552809FBE1D8', '/some regex/']);
       });
     });
     group('without scheme', () {
