@@ -32,4 +32,8 @@ class OrgFileLink {
         body ?? this.body,
         extra ?? this.extra,
       );
+
+  @override
+  String toString({bool withExtra = true}) =>
+      '${scheme ?? ''}$body${extra != null && withExtra ? '::${extra!}' : ''}';
 }
