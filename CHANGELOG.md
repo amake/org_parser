@@ -1,3 +1,8 @@
+## [10.0.0]
+- `isOrg*Url` / `parseOrg*Url` functions are renamed from `*Url` to `*Search`
+- `OrgFileLink.parse` now recognizes `id:` links
+- Add `OrgFileLink.toString`
+
 ## [9.11.0]
 - Add `OrgNode.toPlainText` for stripping "inline" markup as much as possible
 
