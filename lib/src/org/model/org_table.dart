@@ -204,14 +204,18 @@ class OrgTableCell extends OrgParentNode {
 
   bool get isEmpty => content.children.isEmpty;
 
-  bool get isNumeric {
-    if (content.children.length == 1) {
-      final onlyContent = content.children.first;
-      if (onlyContent is OrgPlainText) {
-        return _orgTableNumberRegexp.hasMatch(onlyContent.content);
-      }
-    }
-    return false;
+  bool get isNumeric => _isNumeric(content);
+
+  bool _isNumeric(OrgContent content) {
+    if (content.children.length != 1) return false;
+    final onlyContent = content.children.first;
+    return switch (onlyContent) {
+      // This is maybe a bit hacky to handle just these specific types, but we
+      // are trying to avoid serializing back to markup here.
+      OrgMarkup() => _isNumeric(onlyContent.content),
+      OrgPlainText() => _orgTableNumberRegexp.hasMatch(onlyContent.content),
+      _ => false,
+    };
   }
 
   @override

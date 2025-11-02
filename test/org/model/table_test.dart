@@ -9,8 +9,8 @@ void main() {
     test('simple', () {
       final markup = '''  | foo | *bar* | baz |
   |-----+-----+-----|
-  |   1 |   2 |   3 |
-  |   1 |   2 | buz |
+  |   1 | ~2~ |   3 |
+  |   1 | +2+ | buz |
 ''';
       final result = parser.parse(markup);
       final table = result.value as OrgTable;
@@ -20,8 +20,8 @@ void main() {
       expect(table.toMarkup(), markup);
       expect(table.toPlainText(), '''  | foo | bar | baz |
   |-----+-----+-----|
-  |   1 |   2 |   3 |
-  |   1 |   2 | buz |
+  |   1 | 2 |   3 |
+  |   1 | 2 | buz |
 ''');
       expect(table.columnCount, 3);
       expect(table.columnIsNumeric(0), isTrue);
