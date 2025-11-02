@@ -1,3 +1,7 @@
+## [10.0.1]
+- Fix parsing of table cells containing `+`
+- Improve detection of numeric table cells
+
 ## [10.0.0]
 - `isOrg*Url` / `parseOrg*Url` functions are renamed from `*Url` to `*Search`
 - `OrgFileLink.parse` now recognizes `id:` links
