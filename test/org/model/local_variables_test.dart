@@ -28,5 +28,15 @@ void main() {
       expect(lvars.toMarkup(), markup);
       expect(lvars.toPlainText(), markup);
     });
+    test('empty', () {
+      final markup = '''# Local Variables:
+# End:''';
+      final result = parser.parse(markup);
+      final lvars = result.value as OrgLocalVariables;
+      expect(lvars.contains('foo'), isFalse);
+      expect(lvars.contains('あ'), isFalse);
+      expect(lvars.toMarkup(), markup);
+      expect(lvars.toPlainText(), markup);
+    });
   });
 }
