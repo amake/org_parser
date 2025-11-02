@@ -229,6 +229,9 @@ class OrgTableCell extends OrgParentNode {
       ..write(trailing);
   }
 
+  // TODO(aaron): Ideally _toPlainTextImpl here would fix up the table layout to
+  // make up for width changes when serializing to plain text.
+
   @override
   String toString() => 'OrgTableCell';
 
