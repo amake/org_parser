@@ -10,6 +10,7 @@ void main() {
       final markup = '''  | foo | *bar* | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
+  |   1 |   2 | buz |
 ''';
       final result = parser.parse(markup);
       final table = result.value as OrgTable;
@@ -20,7 +21,13 @@ void main() {
       expect(table.toPlainText(), '''  | foo | bar | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
+  |   1 |   2 | buz |
 ''');
+      expect(table.columnCount, 3);
+      expect(table.columnIsNumeric(0), isTrue);
+      expect(table.columnIsNumeric(1), isTrue);
+      expect(table.columnIsNumeric(2), isFalse);
+      expect(() => table.columnIsNumeric(3), throwsRangeError);
     });
     test('empty', () {
       final markup = '||';
@@ -28,6 +35,9 @@ void main() {
       final table = result.value as OrgTable;
       expect(table.toMarkup(), markup);
       expect(table.toPlainText(), markup);
+      expect(table.columnCount, 1);
+      expect(table.columnIsNumeric(0), isFalse);
+      expect(() => table.columnIsNumeric(1), throwsRangeError);
     });
   });
 }

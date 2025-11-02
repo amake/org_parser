@@ -32,5 +32,27 @@ void main() {
       final row0 = table.rows[0] as OrgTableCellRow;
       expect(row0.cells[0].content.children.isEmpty, isTrue);
     });
+    test('With non-markup plus in cell', () {
+      // https://github.com/amake/orgro/issues/175
+      final result = parser.parse('''  |-------+------|
+| +Text | Text |
+|-------+------|
+|   +5+ |  -10 |
+|-------+------|
+''');
+      final table = result.value as OrgTable;
+      expect(table.columnCount, 2);
+      expect(table.rows[0], isA<OrgTableDividerRow>());
+      final row1 = table.rows[1] as OrgTableCellRow;
+      final cell0 = row1.cells[0].content.children[0] as OrgPlainText;
+      expect(cell0.content, '+Text');
+      final row4 = table.rows[3] as OrgTableCellRow;
+      final cell0Row4 = row4.cells[0].content.children[0] as OrgMarkup;
+      final cell0Row4Content =
+          cell0Row4.content.children.single as OrgPlainText;
+      expect(cell0Row4Content.content, '5');
+      expect(cell0Row4.leadingDecoration, '+');
+      expect(cell0Row4.trailingDecoration, '+');
+    });
   });
 }

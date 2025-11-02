@@ -545,8 +545,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   @override
   Parser tableCellContents() => super
       .tableCellContents()
-      .castList<OrgNode>()
-      .map((elems) => OrgContent(elems));
+      .map((value) => OrgContent(textRunParser.parse(value as String).value));
 
   @override
   Parser horizontalRule() =>

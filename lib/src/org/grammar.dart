@@ -582,7 +582,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser tableCellContents() {
     final end = ref0(tableCellTrailing) | lineEnd();
-    return ref1(textRun, end).starLazy(end);
+    return any().starLazy(end).flatten(message: 'Table cell content expected');
   }
 
   Parser tableRowRule() =>
