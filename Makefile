@@ -4,6 +4,11 @@ SHELL := /usr/bin/env bash
 test: ## Run all tests
 test: test-unit test-example test-roundtrip
 
+.PHONY: test-watch
+test-watch:
+	fswatch -0 -e '*~$$' -e '/\.#' -e '#$$' lib test \
+		| xargs -0 -I {} bash -c 'dart test $$([[ {} =~ test/.* ]] && echo {})'
+
 .PHONY: test-unit
 test-unit:
 	dart test --chain-stack-traces
