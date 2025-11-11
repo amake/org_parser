@@ -1,3 +1,6 @@
+## [10.0.3]
+- Improve handling of table edge cases
+
 ## [10.0.2]
 - Fix parsing of table.el-style dividers
 
