@@ -1,3 +1,6 @@
+## [10.0.2]
+- Fix parsing of table.el-style dividers
+
 ## [10.0.1]
 - Fix parsing of table cells containing `+`
 - Improve detection of numeric table cells
