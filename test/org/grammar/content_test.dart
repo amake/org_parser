@@ -39,6 +39,38 @@ bazinga''');
         ]
       ]);
     });
+    group('markup', () {
+      test('markup edge case', () {
+        // https://github.com/amake/orgro/issues/177
+        final result = parser.parse('''+- Some text here+
+- Some text here''');
+        expect(result.value, [
+          [
+            '',
+            [
+              ['+', '- Some text here', '+'],
+              '\n'
+            ],
+            ''
+          ],
+          [
+            [
+              [
+                '',
+                '-',
+                [
+                  ' ',
+                  null,
+                  null,
+                  ['Some text here']
+                ]
+              ]
+            ],
+            ''
+          ]
+        ]);
+      });
+    });
     group('link', () {
       test('bare HTTP URL', () {
         final result = parser.parse('a http://example.com b');

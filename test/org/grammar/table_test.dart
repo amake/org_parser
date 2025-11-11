@@ -3,9 +3,9 @@ import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void main() {
+  final grammar = OrgContentGrammarDefinition();
+  final parser = grammar.buildFrom(grammar.table()).end();
   test('table', () {
-    final grammar = OrgContentGrammarDefinition();
-    final parser = grammar.buildFrom(grammar.table()).end();
     final result = parser.parse('''  | foo | bar | baz |
   |-----+-----+-----|
   |   1 |   2 |   3 |
@@ -39,8 +39,6 @@ void main() {
   });
   test('table containing plus', () {
     // https://github.com/amake/orgro/issues/175
-    final grammar = OrgContentGrammarDefinition();
-    final parser = grammar.buildFrom(grammar.table()).end();
     final result = parser.parse('''  |-------+------|
 | +Text | Text |
 |-------+------|
@@ -73,5 +71,29 @@ void main() {
       ],
       ''
     ]);
+  });
+  test('minimal table', () {
+    final result = parser.parse('+-+');
+    expect(result.value, [
+      [
+        ['', '+-+', '']
+      ],
+      ''
+    ]);
+  });
+  test('minimal table 2', () {
+    // This doesn't look valid but `table-recognize` accepts it.
+    final result = parser.parse('+--');
+    expect(result.value, [
+      [
+        ['', '+--', '']
+      ],
+      ''
+    ]);
+  });
+  test('invalid', () {
+    // https://github.com/amake/orgro/issues/177
+    final result = parser.parse('''+- Some text here+''');
+    expect(result, isA<Failure>());
   });
 }

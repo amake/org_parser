@@ -591,9 +591,13 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
           .flatten(message: 'Trailing line content expected') &
       ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
+  // This grammar can actually be customized in table.el; see
+  // `table-cell-*-char(s)`. See `table-recognize` for where they are combined
+  // for parsing purposes.
   Parser tableDotElDivider() =>
       ref0(indent).flatten(message: 'Table.el divider indent expected') &
-      (string('+-') & anyOf('+-').starString())
+      // At least three characters required
+      (string('+-') & anyOf('+-').plusString())
           .flatten(message: 'Table divider expected') &
       ref0(lineTrailing).flatten(message: 'Trailing line content expected');
 
