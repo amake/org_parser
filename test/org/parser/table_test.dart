@@ -31,6 +31,9 @@ void main() {
       final table = result.value as OrgTable;
       final row0 = table.rows[0] as OrgTableCellRow;
       expect(row0.cells[0].content.children.isEmpty, isTrue);
+      expect(table.rectangular, isTrue);
+      expect(table.columnCount, 1);
+      expect(table.columnIsNumeric(0), isFalse);
     });
     test('With non-markup plus in cell', () {
       // https://github.com/amake/orgro/issues/175
@@ -42,6 +45,7 @@ void main() {
 ''');
       final table = result.value as OrgTable;
       expect(table.columnCount, 2);
+      expect(table.rectangular, isTrue);
       expect(table.rows[0], isA<OrgTableDividerRow>());
       final row1 = table.rows[1] as OrgTableCellRow;
       final cell0 = row1.cells[0].content.children[0] as OrgPlainText;
@@ -53,6 +57,26 @@ void main() {
       expect(cell0Row4Content.content, '5');
       expect(cell0Row4.leadingDecoration, '+');
       expect(cell0Row4.trailingDecoration, '+');
+    });
+    test('no columns', () {
+      final result = parser.parse('+-+');
+      final table = result.value as OrgTable;
+      expect(table.rows[0], isA<OrgTableDividerRow>());
+      expect(table.columnCount, 0);
+      expect(table.rectangular, isFalse);
+      expect(() => table.columnIsNumeric(0), throwsRangeError);
+    });
+    test('uneven rows', () {
+      final result = parser.parse('''| a | b | c |
+|---+---+---|
+| 1 | 2 |
+| 3 | 4 | 5 |
+''');
+      final table = result.value as OrgTable;
+      expect(table.columnCount, 3);
+      expect(table.rectangular, isFalse);
+      expect(table.columnIsNumeric(2), isTrue);
+      expect(table.rows.length, 4);
     });
   });
 }

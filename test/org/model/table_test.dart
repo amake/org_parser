@@ -38,6 +38,7 @@ void main() {
       expect(table.columnCount, 1);
       expect(table.columnIsNumeric(0), isFalse);
       expect(() => table.columnIsNumeric(1), throwsRangeError);
+      expect(() => table.columnIsNumeric(-1), throwsRangeError);
     });
   });
 }

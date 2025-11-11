@@ -40,24 +40,35 @@ class OrgTable extends OrgParentNode with OrgElement {
           .whereType<OrgTableCellRow>()
           .map((row) => row.cellCount)
           .toSet()
-          .length <
-      2;
+          .length ==
+      1;
 
   /// The maximum number of columns in any row of the table
-  int get columnCount =>
-      rows.whereType<OrgTableCellRow>().map((row) => row.cellCount).reduce(max);
+  int get columnCount {
+    final cellRows = rows
+        .whereType<OrgTableCellRow>()
+        .map((row) => row.cellCount)
+        .toList(growable: false);
+    return cellRows.isEmpty ? 0 : cellRows.reduce(max);
+  }
 
   /// Determine whether the column number [colIdx] should be treated as a
   /// numeric column. A certain percentage of non-numeric cells are tolerated.
+  ///
+  /// This value is not meaningful if [colIdx] is out of range for the table.
   bool columnIsNumeric(int colIdx) {
     final cells = rows
         .whereType<OrgTableCellRow>()
-        .map((row) => row.cells[colIdx])
+        .map((row) => colIdx >= row.cells.length ? null : row.cells[colIdx])
         .toList(growable: false);
+    if (cells.every((c) => c == null)) {
+      throw RangeError.range(
+          colIdx, 0, columnCount, 'No such column in any row', null);
+    }
     final totalCount = cells.length;
-    final emptyCount = cells.where((c) => c.isEmpty).length;
+    final emptyCount = cells.where((c) => c == null || c.isEmpty).length;
     final nonEmptyCount = totalCount - emptyCount;
-    final numberCount = cells.where((c) => c.isNumeric).length;
+    final numberCount = cells.where((c) => c?.isNumeric == true).length;
     return numberCount / nonEmptyCount >= _orgTableNumberFraction;
   }
 
@@ -203,6 +214,7 @@ class OrgTableCell extends OrgParentNode {
       copyWith(content: children.single as OrgContent);
 
   bool get isEmpty => content.children.isEmpty;
+  bool get isNotEmpty => !isEmpty;
 
   bool get isNumeric => _isNumeric(content);
 
