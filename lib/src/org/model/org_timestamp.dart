@@ -50,6 +50,31 @@ class OrgTimestampModifier extends OrgLeafNode {
   String toString() => 'OrgTimestampModifier';
 }
 
+const _weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+extension OrgModifierUtils on DateTime {
+  DateTime addModifier(int value, String unit) => switch (unit) {
+        'h' => copyWith(hour: hour + value),
+        'd' => copyWith(day: day + value),
+        'w' => copyWith(day: day + (value * 7)),
+        'm' => copyWith(month: month + value),
+        'y' => copyWith(year: year + value),
+        _ => throw UnimplementedError('Unknown unit: $unit'),
+      };
+
+  OrgDate toOrgDate() => (
+        year: year.toString().padLeft(4, '0'),
+        month: month.toString().padLeft(2, '0'),
+        day: day.toString().padLeft(2, '0'),
+        dayName: _weekdayNames[weekday - 1],
+      );
+
+  OrgTime toOrgTime() => (
+        hour: hour.toString().padLeft(2, '0'),
+        minute: minute.toString().padLeft(2, '0'),
+      );
+}
+
 typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
@@ -90,7 +115,38 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
   @override
   bool get hasDelay => modifiers.any((m) => m.isDelay);
 
-  OrgSimpleTimestamp bumpRepetition() => this; // TODO(aaron)
+  OrgSimpleTimestamp bumpRepetition([DateTime? now]) {
+    if (!repeats) return this;
+    now ??= DateTime.now();
+    final repeater = modifiers.firstWhere((m) => m.isRepeater);
+    final value = int.parse(repeater.value);
+    var newDateTime = dateTime;
+    switch (repeater.prefix) {
+      case '+':
+        newDateTime = newDateTime.addModifier(value, repeater.unit);
+      case '++':
+        // If already in the future, bump once. Otherwise bump until in the
+        // future.
+        do {
+          newDateTime = newDateTime.addModifier(value, repeater.unit);
+        } while (newDateTime.isBefore(now));
+      case '.+':
+        newDateTime = now.addModifier(value, repeater.unit);
+        if (repeater.unit != 'h') {
+          // Preserve the time of day for non-hourly repeaters
+          newDateTime = newDateTime.copyWith(
+            hour: dateTime.hour,
+            minute: dateTime.minute,
+          );
+        }
+      default:
+        throw UnimplementedError('Unknown repeater prefix: ${repeater.prefix}');
+    }
+    return copyWith(
+      date: newDateTime.toOrgDate(),
+      time: time == null ? null : newDateTime.toOrgTime(),
+    );
+  }
 
   @override
   String toString() => 'OrgSimpleTimestamp';
