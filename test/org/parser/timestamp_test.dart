@@ -1,6 +1,18 @@
 import 'package:org_parser/src/org/org.dart';
-import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/petitparser.dart' hide predicate;
 import 'package:test/test.dart';
+
+Matcher matchesModifier(OrgTimestampModifier modifier) =>
+    predicate<OrgTimestampModifier>(
+      (m) =>
+          m.prefix == modifier.prefix &&
+          m.value == modifier.value &&
+          m.unit == modifier.unit &&
+          m.suffix?.delimiter == modifier.suffix?.delimiter &&
+          m.suffix?.value == modifier.suffix?.value &&
+          m.suffix?.unit == modifier.suffix?.unit,
+      'matches modifier ${modifier.toMarkup()}',
+    );
 
 void main() {
   group('timestamps', () {
@@ -15,7 +27,7 @@ void main() {
       expect(result.date.day, '12');
       expect(result.date.dayName, 'Wed');
       expect(result.time, isNull);
-      expect(result.repeaterOrDelay, isEmpty);
+      expect(result.modifiers, isEmpty);
       expect(result.suffix, '>');
     });
     test('date without day of week', () {
@@ -26,7 +38,7 @@ void main() {
       expect(result.date.day, '12');
       expect(result.date.dayName, isNull);
       expect(result.time, isNull);
-      expect(result.repeaterOrDelay, isEmpty);
+      expect(result.modifiers, isEmpty);
       expect(result.suffix, '>');
     });
     test('date and time', () {
@@ -40,7 +52,7 @@ void main() {
       expect(result.time, isNotNull);
       expect(result.time!.hour, '8');
       expect(result.time!.minute, '34');
-      expect(result.repeaterOrDelay, isEmpty);
+      expect(result.modifiers, isEmpty);
       expect(result.suffix, '>');
     });
     test('date and time without day of week', () {
@@ -54,7 +66,7 @@ void main() {
       expect(result.time, isNotNull);
       expect(result.time!.hour, '8');
       expect(result.time!.minute, '34');
-      expect(result.repeaterOrDelay, isEmpty);
+      expect(result.modifiers, isEmpty);
       expect(result.suffix, '>');
     });
     test('with repeater', () {
@@ -68,7 +80,10 @@ void main() {
       expect(result.time, isNotNull);
       expect(result.time!.hour, '8');
       expect(result.time!.minute, '34');
-      expect(result.repeaterOrDelay, ['+1w']);
+      expect(result.modifiers.single.prefix, '+');
+      expect(result.modifiers.single.value, '1');
+      expect(result.modifiers.single.unit, 'w');
+      expect(result.modifiers.single.suffix, isNull);
       expect(result.suffix, '>');
     });
     test('with multiple repeaters', () {
@@ -82,7 +97,10 @@ void main() {
       expect(result.time, isNotNull);
       expect(result.time!.hour, '8');
       expect(result.time!.minute, '34');
-      expect(result.repeaterOrDelay, ['+1w', '--2d']);
+      expect(result.modifiers, [
+        matchesModifier(OrgTimestampModifier('+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '2', 'd', null))
+      ]);
       expect(result.suffix, '>');
     });
     test('inactive', () {
@@ -96,7 +114,10 @@ void main() {
       expect(result.time, isNotNull);
       expect(result.time!.hour, '18');
       expect(result.time!.minute, '34');
-      expect(result.repeaterOrDelay, ['.+1w', '--12d']);
+      expect(result.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
       expect(result.suffix, ']');
     });
     test('time range', () {
@@ -112,7 +133,10 @@ void main() {
       expect(result.timeStart.minute, '34');
       expect(result.timeEnd.hour, '19');
       expect(result.timeEnd.minute, '35');
-      expect(result.repeaterOrDelay, ['.+1w', '--12d']);
+      expect(result.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
       expect(result.suffix, ']');
     });
     test('time range without day of week', () {
@@ -127,7 +151,10 @@ void main() {
       expect(result.timeStart.minute, '34');
       expect(result.timeEnd.hour, '19');
       expect(result.timeEnd.minute, '35');
-      expect(result.repeaterOrDelay, ['.+1w', '--12d']);
+      expect(result.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
       expect(result.suffix, ']');
     });
     test('date range', () {
@@ -142,7 +169,10 @@ void main() {
       expect(result.start.date.dayName, 'Wed');
       expect(result.start.time!.hour, '18');
       expect(result.start.time!.minute, '34');
-      expect(result.start.repeaterOrDelay, ['.+1w', '--12d']);
+      expect(result.start.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
       expect(result.start.suffix, ']');
       expect(result.delimiter, '--');
       expect(result.end.prefix, '[');
@@ -152,7 +182,10 @@ void main() {
       expect(result.end.date.dayName, 'Wed');
       expect(result.end.time!.hour, '18');
       expect(result.end.time!.minute, '34');
-      expect(result.end.repeaterOrDelay, ['.+1w', '--12d']);
+      expect(result.end.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
       expect(result.end.suffix, ']');
     });
     test('sexp', () {

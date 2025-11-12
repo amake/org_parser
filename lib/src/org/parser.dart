@@ -567,11 +567,10 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           prefix as String,
           date as OrgDate,
           time as OrgTime?,
-          repeaterOrDelays as List<dynamic>,
+          modifiers as List<dynamic>,
           suffix as String
         ] = value;
-        return OrgSimpleTimestamp(
-            prefix, date, time, repeaterOrDelays.cast(), suffix);
+        return OrgSimpleTimestamp(prefix, date, time, modifiers.cast(), suffix);
       });
 
   @override
@@ -586,8 +585,32 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser repeaterOrDelay() =>
-      super.repeaterOrDelay().flatten(message: 'Repeater or delay expected');
+  Parser minMaxRepeater() => super.minMaxRepeater().map((values) {
+        final prefix = values[0] as String;
+        final value = values[1] as String;
+        final unit = values[2] as String;
+        final delimiter = values[3] as String;
+        final suffixValue = values[4] as String;
+        final suffixUnit = values[5] as String;
+        return OrgTimestampModifier(prefix, value, unit,
+            (delimiter: delimiter, value: suffixValue, unit: suffixUnit));
+      });
+
+  @override
+  Parser repeater() => super.repeater().map((values) {
+        final prefix = values[0] as String;
+        final value = values[1] as String;
+        final unit = values[2] as String;
+        return OrgTimestampModifier(prefix, value, unit, null);
+      });
+
+  @override
+  Parser delay() => super.delay().map((values) {
+        final prefix = values[0] as String;
+        final value = values[1] as String;
+        final unit = values[2] as String;
+        return OrgTimestampModifier(prefix, value, unit, null);
+      });
 
   @override
   Parser timestampTimeRange(bool active) =>
@@ -596,7 +619,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           prefix as String,
           date as OrgDate,
           range as List<dynamic>,
-          repeaterOrDelays as List<dynamic>,
+          modifiers as List<dynamic>,
           suffix as String
         ] = value;
         final [timeStart as OrgTime, _ as String, timeEnd as OrgTime] = range;
@@ -605,7 +628,7 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
           date,
           timeStart,
           timeEnd,
-          repeaterOrDelays.cast(),
+          modifiers.cast(),
           suffix,
         );
       });

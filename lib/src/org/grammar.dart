@@ -695,12 +695,10 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
   Parser minMaxRepeater() =>
       ref0(repeaterMark) &
       digit().plusString(message: 'Expected number') &
-      ref0(minMaxRepeatUnit) &
+      ref0(repeatOrDelayUnit) &
       char('/') &
       digit().plusString(message: 'Expected number') &
-      ref0(minMaxRepeatUnit);
-
-  Parser minMaxRepeatUnit() => anyOf('dwmy');
+      ref0(repeatOrDelayUnit);
 
   Parser repeater() =>
       ref0(repeaterMark) &

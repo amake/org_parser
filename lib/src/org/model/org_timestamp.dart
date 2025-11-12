@@ -11,31 +11,86 @@ class OrgDiaryTimestamp extends OrgLeafNode with SingleContentElement {
   String toString() => 'OrgDiaryTimestamp';
 }
 
+class OrgTimestampModifier extends OrgLeafNode {
+  OrgTimestampModifier(this.prefix, this.value, this.unit, this.suffix);
+
+  final String prefix;
+  final String value;
+  final String unit;
+  final ({String delimiter, String value, String unit})? suffix;
+
+  bool get isRepeater => prefix == '+' || prefix == '.+' || prefix == '++';
+  bool get isDelay => prefix == '-' || prefix == '--';
+
+  @override
+  void _toMarkupImpl(OrgSerializer buf) {
+    buf
+      ..write(prefix)
+      ..write(value)
+      ..write(unit);
+    if (suffix != null) {
+      buf
+        ..write(suffix!.delimiter)
+        ..write(suffix!.value)
+        ..write(suffix!.unit);
+    }
+  }
+
+  @override
+  bool contains(Pattern pattern) =>
+      prefix.contains(pattern) ||
+      value.contains(pattern) ||
+      unit.contains(pattern) ||
+      (suffix != null &&
+          (suffix!.delimiter.contains(pattern) ||
+              suffix!.value.contains(pattern) ||
+              suffix!.unit.contains(pattern)));
+
+  @override
+  String toString() => 'OrgTimestampModifier';
+}
+
 typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
 sealed class OrgTimestamp extends OrgNode {
   bool get isActive;
+  bool get repeats;
+  bool get hasDelay;
 }
 
 /// A timestamp, like `[2020-05-05 Tue]`
-class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
+class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
   OrgSimpleTimestamp(
     this.prefix,
     this.date,
     this.time,
-    Iterable<String> repeaterOrDelay,
+    Iterable<OrgTimestampModifier> modifiers,
     this.suffix,
-  ) : repeaterOrDelay = List.unmodifiable(repeaterOrDelay);
+  ) : modifiers = List.unmodifiable(modifiers);
 
   final String prefix;
   final OrgDate date;
   final OrgTime? time;
-  final List<String> repeaterOrDelay;
+  final List<OrgTimestampModifier> modifiers;
   final String suffix;
 
   @override
+  List<OrgNode> get children => modifiers;
+
+  @override
+  OrgSimpleTimestamp fromChildren(List<OrgNode> children) => copyWith(
+        modifiers: children.cast<OrgTimestampModifier>(),
+      );
+
+  @override
   bool get isActive => prefix == '<' && suffix == '>';
+  @override
+  bool get repeats => modifiers.any((m) => m.isRepeater);
+  @override
+  bool get hasDelay => modifiers.any((m) => m.isDelay);
+
+  OrgSimpleTimestamp bumpRepetition() => this; // TODO(aaron)
 
   @override
   String toString() => 'OrgSimpleTimestamp';
@@ -75,9 +130,12 @@ class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
         ..write(':')
         ..write(time!.minute);
     }
-    if (repeaterOrDelay.isNotEmpty) {
+    if (modifiers.isNotEmpty) {
       buf.write(' ');
-      buf.write(repeaterOrDelay.join(' '));
+      for (var i = 0; i < modifiers.length; i++) {
+        if (i > 0) buf.write(' ');
+        buf.visit(modifiers[i]);
+      }
     }
   }
 
@@ -90,21 +148,21 @@ class OrgSimpleTimestamp extends OrgLeafNode implements OrgTimestamp {
       date.dayName?.contains(pattern) == true ||
       time?.hour.contains(pattern) == true ||
       time?.minute.contains(pattern) == true ||
-      repeaterOrDelay.any((item) => item.contains(pattern)) ||
+      modifiers.any((item) => item.contains(pattern)) ||
       suffix.contains(pattern);
 
   OrgSimpleTimestamp copyWith({
     String? prefix,
     OrgDate? date,
     OrgTime? time,
-    Iterable<String>? repeaterOrDelay,
+    Iterable<OrgTimestampModifier>? modifiers,
     String? suffix,
   }) =>
       OrgSimpleTimestamp(
         prefix ?? this.prefix,
         date ?? this.date,
         time ?? this.time,
-        repeaterOrDelay ?? this.repeaterOrDelay,
+        modifiers ?? this.modifiers,
         suffix ?? this.suffix,
       );
 }
@@ -118,6 +176,10 @@ class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
 
   @override
   bool get isActive => start.isActive && end.isActive;
+  @override
+  bool get repeats => start.repeats || end.repeats;
+  @override
+  bool get hasDelay => start.hasDelay || end.hasDelay;
 
   @override
   List<OrgNode> get children => [start, end];
@@ -157,25 +219,37 @@ class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
       );
 }
 
-class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
+class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   OrgTimeRangeTimestamp(
     this.prefix,
     this.date,
     this.timeStart,
     this.timeEnd,
-    Iterable<String> repeaterOrDelay,
+    Iterable<OrgTimestampModifier> modifiers,
     this.suffix,
-  ) : repeaterOrDelay = List.unmodifiable(repeaterOrDelay);
+  ) : modifiers = List.unmodifiable(modifiers);
 
   final String prefix;
   final OrgDate date;
   final OrgTime timeStart;
   final OrgTime timeEnd;
-  final List<String> repeaterOrDelay;
+  final List<OrgTimestampModifier> modifiers;
   final String suffix;
 
   @override
+  List<OrgNode> get children => modifiers;
+
+  @override
+  OrgTimeRangeTimestamp fromChildren(List<OrgNode> children) => copyWith(
+        modifiers: children.cast<OrgTimestampModifier>(),
+      );
+
+  @override
   bool get isActive => prefix == '<' && suffix == '>';
+  @override
+  bool get repeats => modifiers.any((m) => m.isRepeater);
+  @override
+  bool get hasDelay => modifiers.any((m) => m.isDelay);
 
   DateTime get startDateTime => DateTime(
         int.parse(date.year),
@@ -225,9 +299,12 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
       ..write(timeEnd.hour)
       ..write(':')
       ..write(timeEnd.minute);
-    if (repeaterOrDelay.isNotEmpty) {
+    if (modifiers.isNotEmpty) {
       buf.write(' ');
-      buf.write(repeaterOrDelay.join(' '));
+      for (var i = 0; i < modifiers.length; i++) {
+        if (i > 0) buf.write(' ');
+        buf.visit(modifiers[i]);
+      }
     }
   }
 
@@ -242,7 +319,7 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
       timeStart.minute.contains(pattern) ||
       timeEnd.hour.contains(pattern) ||
       timeEnd.minute.contains(pattern) ||
-      repeaterOrDelay.contains(pattern) ||
+      modifiers.any((m) => m.contains(pattern)) ||
       suffix.contains(pattern);
 
   OrgTimeRangeTimestamp copyWith({
@@ -250,7 +327,7 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
     OrgDate? date,
     OrgTime? timeStart,
     OrgTime? timeEnd,
-    Iterable<String>? repeaterOrDelay,
+    Iterable<OrgTimestampModifier>? modifiers,
     String? suffix,
   }) =>
       OrgTimeRangeTimestamp(
@@ -258,7 +335,7 @@ class OrgTimeRangeTimestamp extends OrgLeafNode implements OrgTimestamp {
         date ?? this.date,
         timeStart ?? this.timeStart,
         timeEnd ?? this.timeEnd,
-        repeaterOrDelay ?? this.repeaterOrDelay,
+        modifiers ?? this.modifiers,
         suffix ?? this.suffix,
       );
 }
