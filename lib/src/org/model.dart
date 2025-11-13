@@ -163,6 +163,22 @@ sealed class OrgParentNode extends OrgNode {
   List<OrgNode> get children;
 
   OrgParentNode fromChildren(List<OrgNode> children);
+
+  /// Obtain a zipper starting at the root of this node. The zipper can be used
+  /// to edit the node; call [ZipperLocation.commit] to obtain a new node with
+  /// the edits applied.
+  OrgZipper edit() => ZipperLocation.root(
+        sectionP: (obj) => obj is OrgParentNode,
+        node: this,
+        getChildren: (obj) => obj.children,
+        makeSection: (node, children) => node.fromChildren(children),
+      );
+
+  /// Obtain a zipper for the specified [node], which is presumed to be a
+  /// descendant of this node. Returns null if the node is not found. The zipper
+  /// can be used to edit this node; call [ZipperLocation.commit] to obtain a
+  /// new node with the edits applied.
+  OrgZipper? editNode(OrgNode node) => edit().find(node);
 }
 
 /// A node potentially containing [OrgSection]s
@@ -195,22 +211,6 @@ sealed class OrgTree extends OrgParentNode {
     }
     return true;
   }
-
-  /// Obtain a zipper starting at the root of this tree. The zipper can be used
-  /// to edit the tree; call [ZipperLocation.commit] to obtain a new tree with
-  /// the edits applied.
-  OrgZipper edit() => ZipperLocation.root(
-        sectionP: (obj) => obj is OrgParentNode,
-        node: this,
-        getChildren: (obj) => obj.children,
-        makeSection: (node, children) => node.fromChildren(children),
-      );
-
-  /// Obtain a zipper for the specified [node], which is presumed to be in this
-  /// tree. Returns null if the node is not found. The zipper can be used to
-  /// edit the tree; call [ZipperLocation.commit] to obtain a new tree with the
-  /// edits applied.
-  OrgZipper? editNode(OrgNode node) => edit().find(node);
 
   /// Get the ID properties from this section's PROPERTIES drawer, if any.
   List<String> get ids => getProperties(':ID:');
