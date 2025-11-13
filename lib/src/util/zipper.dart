@@ -51,11 +51,34 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
   /// Navigate to the node that satisfies [predicate]. Returns null if no such
   /// node is not found.
   ZipperLocation<ZR, ZI, ZS>? findWhere(bool Function(dynamic) predicate) {
+    ZipperLocation<ZR, ZI, ZS>? result;
+    visit((location) {
+      if (predicate(location.node)) {
+        result = location;
+        return (false, null);
+      }
+      return (true, null);
+    });
+    return result;
+  }
+
+  /// Visit all nodes in the tree, starting from this location. The [visitor]
+  /// accepts the visited location, and should return a tuple (bool, location?) where:
+  /// - The bool indicates whether to continue the traversal
+  /// - The location replaces the location supplied to the visitor. This allows
+  ///   the visitor to modify the tree during traversal.
+  ///
+  /// The return value is the last location visited.
+  ZipperLocation<ZR, ZI, ZS> visit(
+    (bool, ZipperLocation<ZR, ZI, ZS>?) Function(ZipperLocation<ZR, ZI, ZS>)
+        visitor,
+  ) {
     var location = this;
     while (true) {
-      if (predicate(location.node)) {
-        return location;
-      }
+      final (cont, newLocation) = visitor(location);
+      location = newLocation ?? location;
+      if (!cont) return location;
+
       if (location.canGoDown()) {
         location = location.goDown();
         continue;
@@ -70,7 +93,9 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
         if (location.canGoUp()) {
           location = location.goUp();
         } else {
-          return null;
+          // Retraced back to the top. Traversal complete; return the last
+          // location
+          return location;
         }
         if (location.canGoRight()) {
           location = location.goRight();
