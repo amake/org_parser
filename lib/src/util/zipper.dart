@@ -35,12 +35,12 @@ extension ZipperExt<ZR, ZI extends ZR, ZS extends ZR>
   }
 
   /// Return the root node of this zipper, thereby "applying" any changes made.
-  ZR commit() {
+  T commit<T extends ZR>() {
     var location = this;
     while (location.path is! TopPath) {
       location = location.goUp();
     }
-    return location.node as ZR;
+    return location.node as T;
   }
 
   /// Navigate to the supplied [node], which is presumed to be a child in the
