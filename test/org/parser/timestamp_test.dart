@@ -162,31 +162,70 @@ void main() {
           .parse(
               '[2020-03-11 Wed 18:34 .+1w --12d]--[2020-03-12 Wed 18:34 .+1w --12d]')
           .value as OrgDateRangeTimestamp;
-      expect(result.start.prefix, '[');
-      expect(result.start.date.year, '2020');
-      expect(result.start.date.month, '03');
-      expect(result.start.date.day, '11');
-      expect(result.start.date.dayName, 'Wed');
-      expect(result.start.time!.hour, '18');
-      expect(result.start.time!.minute, '34');
-      expect(result.start.modifiers, [
+      final start = result.start as OrgSimpleTimestamp;
+      expect(start.prefix, '[');
+      expect(start.date.year, '2020');
+      expect(start.date.month, '03');
+      expect(start.date.day, '11');
+      expect(start.date.dayName, 'Wed');
+      expect(start.time!.hour, '18');
+      expect(start.time!.minute, '34');
+      expect(start.modifiers, [
         matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
         matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
       ]);
-      expect(result.start.suffix, ']');
+      expect(start.suffix, ']');
       expect(result.delimiter, '--');
-      expect(result.end.prefix, '[');
-      expect(result.end.date.year, '2020');
-      expect(result.end.date.month, '03');
-      expect(result.end.date.day, '12');
-      expect(result.end.date.dayName, 'Wed');
-      expect(result.end.time!.hour, '18');
-      expect(result.end.time!.minute, '34');
-      expect(result.end.modifiers, [
+      final end = result.end as OrgSimpleTimestamp;
+      expect(end.prefix, '[');
+      expect(end.date.year, '2020');
+      expect(end.date.month, '03');
+      expect(end.date.day, '12');
+      expect(end.date.dayName, 'Wed');
+      expect(end.time!.hour, '18');
+      expect(end.time!.minute, '34');
+      expect(end.modifiers, [
         matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
         matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
       ]);
-      expect(result.end.suffix, ']');
+      expect(end.suffix, ']');
+    });
+    test('date range with time range', () {
+      final result = parser
+          .parse(
+              '[2020-03-11 Wed 18:34-19:34 .+1w --12d]--[2020-03-12 Wed 18:34-19:34 .+1w --12d]')
+          .value as OrgDateRangeTimestamp;
+      final start = result.start as OrgTimeRangeTimestamp;
+      expect(start.prefix, '[');
+      expect(start.date.year, '2020');
+      expect(start.date.month, '03');
+      expect(start.date.day, '11');
+      expect(start.date.dayName, 'Wed');
+      expect(start.timeStart.hour, '18');
+      expect(start.timeStart.minute, '34');
+      expect(start.timeEnd.hour, '19');
+      expect(start.timeEnd.minute, '34');
+      expect(start.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
+      expect(start.suffix, ']');
+      expect(result.delimiter, '--');
+      final end = result.end as OrgTimeRangeTimestamp;
+      expect(end.prefix, '[');
+      expect(end.date.year, '2020');
+      expect(end.date.month, '03');
+      expect(end.date.day, '12');
+      expect(end.date.dayName, 'Wed');
+      expect(end.timeStart.hour, '18');
+      expect(end.timeStart.minute, '34');
+      expect(end.timeEnd.hour, '19');
+      expect(end.timeEnd.minute, '34');
+      expect(end.modifiers, [
+        matchesModifier(OrgTimestampModifier('.+', '1', 'w', null)),
+        matchesModifier(OrgTimestampModifier('--', '12', 'd', null))
+      ]);
+      expect(end.suffix, ']');
     });
     test('sexp', () {
       final result =

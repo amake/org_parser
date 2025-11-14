@@ -639,7 +639,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (active ? char('>') : char(']'));
 
   Parser timestampRange(bool active) =>
-      ref1(timestampTimeRange, active) | ref1(timestampDateRange, active);
+      ref1(timestampDateRange, active) | ref1(timestampTimeRange, active);
 
   Parser timestampTimeRange(bool active) =>
       (active ? char('<') : char('[')) &
@@ -649,9 +649,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       (active ? char('>') : char(']'));
 
   Parser timestampDateRange(bool active) =>
-      ref1(timestampSimple, active) &
+      (ref1(timestampTimeRange, active) | ref1(timestampSimple, active)) &
       char('-').repeatString(1, 3, message: 'Expected timestamp separator') &
-      ref1(timestampSimple, active);
+      (ref1(timestampTimeRange, active) | ref1(timestampSimple, active));
 
   Parser date() =>
       ref0(year) &

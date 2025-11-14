@@ -11,6 +11,7 @@ void main() {
     final planningLine = result.value as OrgPlanningEntry;
     expect(planningLine.keyword.content, 'CLOCK:');
     final value = planningLine.value as OrgDateRangeTimestamp;
-    expect(value.start.date.year, '2021');
+    final start = value.start as OrgSimpleTimestamp;
+    expect(start.date.year, '2021');
   });
 }

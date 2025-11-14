@@ -577,9 +577,9 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser timestampDateRange(bool active) =>
       super.timestampDateRange(active).castList<dynamic>().map((value) {
         final [
-          start as OrgSimpleTimestamp,
+          start as OrgTimestamp,
           delimiter as String,
-          end as OrgSimpleTimestamp
+          end as OrgTimestamp
         ] = value;
         return OrgDateRangeTimestamp(start, delimiter, end);
       });

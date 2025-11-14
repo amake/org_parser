@@ -236,11 +236,15 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
 }
 
 class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
-  OrgDateRangeTimestamp(this.start, this.delimiter, this.end);
+  OrgDateRangeTimestamp(this.start, this.delimiter, this.end)
+      : assert(start is! OrgDateRangeTimestamp,
+            'Nested date range timestamps are not allowed'),
+        assert(end is! OrgDateRangeTimestamp,
+            'Nested date range timestamps are not allowed');
 
-  final OrgSimpleTimestamp start;
+  final OrgTimestamp start;
   final String delimiter;
-  final OrgSimpleTimestamp end;
+  final OrgTimestamp end;
 
   @override
   bool get isActive => start.isActive && end.isActive;
@@ -284,9 +288,9 @@ class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
       );
 
   OrgDateRangeTimestamp copyWith({
-    OrgSimpleTimestamp? start,
+    OrgTimestamp? start,
     String? delimiter,
-    OrgSimpleTimestamp? end,
+    OrgTimestamp? end,
   }) =>
       OrgDateRangeTimestamp(
         start ?? this.start,
