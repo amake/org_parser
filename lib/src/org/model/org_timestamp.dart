@@ -22,6 +22,37 @@ class OrgTimestampModifier extends OrgLeafNode {
   bool get isRepeater => prefix == '+' || prefix == '.+' || prefix == '++';
   bool get isDelay => prefix == '-' || prefix == '--';
 
+  DateTime apply(DateTime dateTime, [DateTime? now]) {
+    now ??= DateTime.now();
+    final value = int.parse(this.value);
+    var newDateTime = dateTime;
+    switch (prefix) {
+      case '+':
+        newDateTime = newDateTime.addModifier(value, unit);
+      case '++':
+        // If already in the future, bump once. Otherwise bump until in the
+        // future.
+        do {
+          newDateTime = newDateTime.addModifier(value, unit);
+        } while (newDateTime.isBefore(now));
+      case '.+':
+        newDateTime = now.addModifier(value, unit);
+        if (unit != 'h') {
+          // Preserve the time of day for non-hourly repeaters
+          newDateTime = newDateTime.copyWith(
+            hour: dateTime.hour,
+            minute: dateTime.minute,
+          );
+        }
+      case '-':
+      case '--':
+        newDateTime = newDateTime.addModifier(-value, unit);
+      default:
+        throw UnimplementedError('Unknown repeater prefix: $prefix');
+    }
+    return newDateTime;
+  }
+
   @override
   void _toMarkupImpl(OrgSerializer buf) {
     buf
@@ -82,6 +113,8 @@ sealed class OrgTimestamp extends OrgNode {
   bool get isActive;
   bool get repeats;
   bool get hasDelay;
+
+  OrgTimestamp bumpRepetition([DateTime? now]);
 }
 
 /// A timestamp, like `[2020-05-05 Tue]`
@@ -115,33 +148,12 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
   @override
   bool get hasDelay => modifiers.any((m) => m.isDelay);
 
+  @override
   OrgSimpleTimestamp bumpRepetition([DateTime? now]) {
     if (!repeats) return this;
-    now ??= DateTime.now();
     final repeater = modifiers.firstWhere((m) => m.isRepeater);
-    final value = int.parse(repeater.value);
-    var newDateTime = dateTime;
-    switch (repeater.prefix) {
-      case '+':
-        newDateTime = newDateTime.addModifier(value, repeater.unit);
-      case '++':
-        // If already in the future, bump once. Otherwise bump until in the
-        // future.
-        do {
-          newDateTime = newDateTime.addModifier(value, repeater.unit);
-        } while (newDateTime.isBefore(now));
-      case '.+':
-        newDateTime = now.addModifier(value, repeater.unit);
-        if (repeater.unit != 'h') {
-          // Preserve the time of day for non-hourly repeaters
-          newDateTime = newDateTime.copyWith(
-            hour: dateTime.hour,
-            minute: dateTime.minute,
-          );
-        }
-      default:
-        throw UnimplementedError('Unknown repeater prefix: ${repeater.prefix}');
-    }
+    if (repeater.unit == 'h' && time == null) return this;
+    final newDateTime = repeater.apply(dateTime, now);
     return copyWith(
       date: newDateTime.toOrgDate(),
       time: time == null ? null : newDateTime.toOrgTime(),
@@ -238,6 +250,14 @@ class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   bool get hasDelay => start.hasDelay || end.hasDelay;
 
   @override
+  OrgTimestamp bumpRepetition([DateTime? now]) => repeats
+      ? copyWith(
+          start: start.bumpRepetition(now),
+          end: end.bumpRepetition(now),
+        )
+      : this;
+
+  @override
   List<OrgNode> get children => [start, end];
 
   @override
@@ -322,6 +342,27 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
         int.parse(timeEnd.hour),
         int.parse(timeEnd.minute),
       );
+
+  @override
+  OrgTimestamp bumpRepetition([DateTime? now]) {
+    if (!repeats) return this;
+    final repeater = modifiers.firstWhere((m) => m.isRepeater);
+    final newStartTime = repeater.apply(startDateTime, now);
+    var newEndTime = repeater.apply(endDateTime, now);
+    if (newStartTime.isAtSameMomentAs(newEndTime)) {
+      return OrgSimpleTimestamp(prefix, newStartTime.toOrgDate(),
+          newStartTime.toOrgTime(), modifiers, suffix);
+    }
+    if (newStartTime.isAfter(newEndTime)) {
+      final duration = endDateTime.difference(startDateTime);
+      newEndTime = newStartTime.add(duration);
+    }
+    return copyWith(
+      date: newStartTime.toOrgDate(),
+      timeStart: newStartTime.toOrgTime(),
+      timeEnd: newEndTime.toOrgTime(),
+    );
+  }
 
   @override
   String toString() => 'OrgTimeRangeTimestamp';
