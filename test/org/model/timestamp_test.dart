@@ -120,8 +120,10 @@ void main() {
       expect(result.start.hasDelay, isTrue);
       expect(result.end.repeats, isTrue);
       expect(result.end.hasDelay, isTrue);
-      expect(result.start.dateTime, DateTime(2020, 03, 11, 18, 34));
-      expect(result.end.dateTime, DateTime(2020, 03, 12, 18, 34));
+      final start = result.start as OrgSimpleTimestamp;
+      expect(start.dateTime, DateTime(2020, 03, 11, 18, 34));
+      final end = result.end as OrgSimpleTimestamp;
+      expect(end.dateTime, DateTime(2020, 03, 12, 18, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(),
           '2020-03-11 Wed 18:34 .+1w --12d--2020-03-12 Wed 18:34 .+1w --12d');
@@ -188,168 +190,348 @@ void main() {
           predicate((String markup) {
             final result = parser.parse(markup).value as OrgTimestamp;
             final bumped = result.bumpRepetition(now);
-            return bumped.toMarkup() == expected;
+            final actual = bumped.toMarkup();
+            expect(actual, expected);
+            return actual == expected;
           }, "bumps to '$expected'");
       test('Non-bumpable', () {
         final markup = '<2020-03-12 Wed 8:34 --2d>';
         expect(markup, bumpsTo(markup));
       });
-      group('Simple bump (+)', () {
-        test('hour', () {
-          expect('<2020-03-12 Wed 8:34 +1h --2d>',
-              bumpsTo('<2020-03-12 Thu 09:34 +1h --2d>'));
+      group('Simple timestamp', () {
+        group('Simple bump (+)', () {
+          test('hour', () {
+            expect('<2020-03-12 Wed 8:34 +1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:34 +1h --2d>'));
+          });
+          test('hour with no time', () {
+            final markup = '<2020-03-12 Wed +1h --2d>';
+            expect(markup, bumpsTo(markup));
+          });
+          test('hours', () {
+            expect('<2020-03-12 Wed 8:34 +3h --2d>',
+                bumpsTo('<2020-03-12 Thu 11:34 +3h --2d>'));
+          });
+          test('day', () {
+            expect('<2020-03-12 Wed 8:34 +1d --2d>',
+                bumpsTo('<2020-03-13 Fri 08:34 +1d --2d>'));
+          });
+          test('days', () {
+            expect('<2020-03-12 Wed 8:34 +3d --2d>',
+                bumpsTo('<2020-03-15 Sun 08:34 +3d --2d>'));
+          });
+          test('week', () {
+            expect('<2020-03-12 Wed 8:34 +1w --2d>',
+                bumpsTo('<2020-03-19 Thu 08:34 +1w --2d>'));
+          });
+          test('weeks', () {
+            expect('<2020-03-12 Wed 8:34 +2w --2d>',
+                bumpsTo('<2020-03-26 Thu 08:34 +2w --2d>'));
+          });
+          test('month', () {
+            expect('<2020-03-12 Wed 8:34 +1m --2d>',
+                bumpsTo('<2020-04-12 Sun 08:34 +1m --2d>'));
+          });
+          test('months', () {
+            expect('<2020-03-12 Wed 8:34 +2m --2d>',
+                bumpsTo('<2020-05-12 Tue 08:34 +2m --2d>'));
+          });
+          test('year', () {
+            expect('<2020-03-12 Wed 8:34 +1y --2d>',
+                bumpsTo('<2021-03-12 Fri 08:34 +1y --2d>'));
+          });
+          test('years', () {
+            expect('<2020-03-12 Wed 8:34 +2y --2d>',
+                bumpsTo('<2022-03-12 Sat 08:34 +2y --2d>'));
+          });
         });
-        test('hours', () {
-          expect('<2020-03-12 Wed 8:34 +3h --2d>',
-              bumpsTo('<2020-03-12 Thu 11:34 +3h --2d>'));
+        group('Bump past now (++)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 12, 10, 00);
+            expect('<2020-03-12 Wed 8:34 ++1h --2d>',
+                bumpsTo('<2020-03-12 Thu 10:34 ++1h --2d>', now));
+          });
+          test('hours', () {
+            final now = DateTime(2020, 03, 12, 12, 00);
+            expect('<2020-03-12 Wed 8:34 ++3h --2d>',
+                bumpsTo('<2020-03-12 Thu 14:34 ++3h --2d>', now));
+          });
+          test('day', () {
+            final now = DateTime(2020, 03, 14, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++1d --2d>',
+                bumpsTo('<2020-03-14 Sat 08:34 ++1d --2d>', now));
+          });
+          test('days', () {
+            final now = DateTime(2020, 03, 16, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++3d --2d>',
+                bumpsTo('<2020-03-18 Wed 08:34 ++3d --2d>', now));
+          });
+          test('week', () {
+            final now = DateTime(2020, 03, 20, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++1w --2d>',
+                bumpsTo('<2020-03-26 Thu 08:34 ++1w --2d>', now));
+          });
+          test('weeks', () {
+            final now = DateTime(2020, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++2w --2d>',
+                bumpsTo('<2020-04-09 Thu 08:34 ++2w --2d>', now));
+          });
+          test('month', () {
+            final now = DateTime(2020, 05, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++1m --2d>',
+                bumpsTo('<2020-05-12 Tue 08:34 ++1m --2d>', now));
+          });
+          test('months', () {
+            final now = DateTime(2020, 06, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++2m --2d>',
+                bumpsTo('<2020-07-12 Sun 08:34 ++2m --2d>', now));
+          });
+          test('year', () {
+            final now = DateTime(2021, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++1y --2d>',
+                bumpsTo('<2022-03-12 Sat 08:34 ++1y --2d>', now));
+          });
+          test('years', () {
+            final now = DateTime(2023, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 ++2y --2d>',
+                bumpsTo('<2024-03-12 Tue 08:34 ++2y --2d>', now));
+          });
+          test('future', () {
+            // Now is in the past of the timestamp, so just bump once.
+            final now = DateTime(2020, 03, 12, 8, 00);
+            expect('<2020-03-12 Wed 8:34 ++1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:34 ++1h --2d>', now));
+          });
         });
-        test('day', () {
-          expect('<2020-03-12 Wed 8:34 +1d --2d>',
-              bumpsTo('<2020-03-13 Fri 08:34 +1d --2d>'));
-        });
-        test('days', () {
-          expect('<2020-03-12 Wed 8:34 +3d --2d>',
-              bumpsTo('<2020-03-15 Sun 08:34 +3d --2d>'));
-        });
-        test('week', () {
-          expect('<2020-03-12 Wed 8:34 +1w --2d>',
-              bumpsTo('<2020-03-19 Thu 08:34 +1w --2d>'));
-        });
-        test('weeks', () {
-          expect('<2020-03-12 Wed 8:34 +2w --2d>',
-              bumpsTo('<2020-03-26 Thu 08:34 +2w --2d>'));
-        });
-        test('month', () {
-          expect('<2020-03-12 Wed 8:34 +1m --2d>',
-              bumpsTo('<2020-04-12 Sun 08:34 +1m --2d>'));
-        });
-        test('months', () {
-          expect('<2020-03-12 Wed 8:34 +2m --2d>',
-              bumpsTo('<2020-05-12 Tue 08:34 +2m --2d>'));
-        });
-        test('year', () {
-          expect('<2020-03-12 Wed 8:34 +1y --2d>',
-              bumpsTo('<2021-03-12 Fri 08:34 +1y --2d>'));
-        });
-        test('years', () {
-          expect('<2020-03-12 Wed 8:34 +2y --2d>',
-              bumpsTo('<2022-03-12 Sat 08:34 +2y --2d>'));
+        group('Bump from now (.+)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 13, 10, 00);
+            expect('<2020-03-12 Wed 8:34 .+1h --2d>',
+                bumpsTo('<2020-03-13 Fri 11:00 .+1h --2d>', now));
+          });
+          test('hours', () {
+            final now = DateTime(2020, 03, 13, 12, 00);
+            expect('<2020-03-12 Wed 8:34 .+3h --2d>',
+                bumpsTo('<2020-03-13 Fri 15:00 .+3h --2d>', now));
+          });
+          test('day', () {
+            final now = DateTime(2020, 03, 14, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+1d --2d>',
+                bumpsTo('<2020-03-15 Sun 08:34 .+1d --2d>', now));
+          });
+          test('days', () {
+            final now = DateTime(2020, 03, 16, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+3d --2d>',
+                bumpsTo('<2020-03-19 Thu 08:34 .+3d --2d>', now));
+          });
+          test('week', () {
+            final now = DateTime(2020, 03, 20, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+1w --2d>',
+                bumpsTo('<2020-03-27 Fri 08:34 .+1w --2d>', now));
+          });
+          test('weeks', () {
+            final now = DateTime(2020, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+2w --2d>',
+                bumpsTo('<2020-04-15 Wed 08:34 .+2w --2d>', now));
+          });
+          test('month', () {
+            final now = DateTime(2020, 05, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+1m --2d>',
+                bumpsTo('<2020-06-01 Mon 08:34 .+1m --2d>', now));
+          });
+          test('months', () {
+            final now = DateTime(2020, 06, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+2m --2d>',
+                bumpsTo('<2020-08-01 Sat 08:34 .+2m --2d>', now));
+          });
+          test('year', () {
+            final now = DateTime(2021, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+1y --2d>',
+                bumpsTo('<2022-04-01 Fri 08:34 .+1y --2d>', now));
+          });
+          test('years', () {
+            final now = DateTime(2023, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34 .+2y --2d>',
+                bumpsTo('<2025-04-01 Tue 08:34 .+2y --2d>', now));
+          });
+          test('future', () {
+            // Now is in the past of the timestamp
+            final now = DateTime(2020, 03, 12, 8, 00);
+            expect('<2020-03-12 Wed 8:34 .+1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:00 .+1h --2d>', now));
+          });
         });
       });
-      group('Bump past now (++)', () {
-        test('hour', () {
-          final now = DateTime(2020, 03, 12, 10, 00);
-          expect('<2020-03-12 Wed 8:34 ++1h --2d>',
-              bumpsTo('<2020-03-12 Thu 10:34 ++1h --2d>', now));
+      group('Time range timestamp', () {
+        group('Simple bump (+)', () {
+          test('hour', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:34-10:34 +1h --2d>'));
+          });
+          test('hours', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +3h --2d>',
+                bumpsTo('<2020-03-12 Thu 11:34-12:34 +3h --2d>'));
+          });
+          test('day', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +1d --2d>',
+                bumpsTo('<2020-03-13 Fri 08:34-09:34 +1d --2d>'));
+          });
+          test('week', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +1w --2d>',
+                bumpsTo('<2020-03-19 Thu 08:34-09:34 +1w --2d>'));
+          });
+          test('month', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +1m --2d>',
+                bumpsTo('<2020-04-12 Sun 08:34-09:34 +1m --2d>'));
+          });
+          test('year', () {
+            expect('<2020-03-12 Wed 8:34-9:34 +1y --2d>',
+                bumpsTo('<2021-03-12 Fri 08:34-09:34 +1y --2d>'));
+          });
         });
-        test('hours', () {
-          final now = DateTime(2020, 03, 12, 12, 00);
-          expect('<2020-03-12 Wed 8:34 ++3h --2d>',
-              bumpsTo('<2020-03-12 Thu 14:34 ++3h --2d>', now));
+        group('Bump past now (++)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 12, 10, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1h --2d>',
+                bumpsTo('<2020-03-12 Thu 10:34 ++1h --2d>', now));
+          });
+          test('hours', () {
+            final now = DateTime(2020, 03, 12, 12, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++3h --2d>',
+                bumpsTo('<2020-03-12 Thu 14:34-15:34 ++3h --2d>', now));
+          });
+          test('day', () {
+            final now = DateTime(2020, 03, 14, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1d --2d>',
+                bumpsTo('<2020-03-14 Sat 08:34-09:34 ++1d --2d>', now));
+          });
+          test('week', () {
+            final now = DateTime(2020, 03, 20, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1w --2d>',
+                bumpsTo('<2020-03-26 Thu 08:34-09:34 ++1w --2d>', now));
+          });
+          test('month', () {
+            final now = DateTime(2020, 05, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1m --2d>',
+                bumpsTo('<2020-05-12 Tue 08:34-09:34 ++1m --2d>', now));
+          });
+          test('year', () {
+            final now = DateTime(2021, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1y --2d>',
+                bumpsTo('<2022-03-12 Sat 08:34-09:34 ++1y --2d>', now));
+          });
+          test('future', () {
+            // Now is in the past of the timestamp, so just bump once.
+            final now = DateTime(2020, 03, 12, 8, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 ++1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:34-10:34 ++1h --2d>', now));
+          });
         });
-        test('day', () {
-          final now = DateTime(2020, 03, 14, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++1d --2d>',
-              bumpsTo('<2020-03-14 Sat 08:34 ++1d --2d>', now));
-        });
-        test('days', () {
-          final now = DateTime(2020, 03, 16, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++3d --2d>',
-              bumpsTo('<2020-03-18 Wed 08:34 ++3d --2d>', now));
-        });
-        test('week', () {
-          final now = DateTime(2020, 03, 20, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++1w --2d>',
-              bumpsTo('<2020-03-26 Thu 08:34 ++1w --2d>', now));
-        });
-        test('weeks', () {
-          final now = DateTime(2020, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++2w --2d>',
-              bumpsTo('<2020-04-09 Thu 08:34 ++2w --2d>', now));
-        });
-        test('month', () {
-          final now = DateTime(2020, 05, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++1m --2d>',
-              bumpsTo('<2020-05-12 Tue 08:34 ++1m --2d>', now));
-        });
-        test('months', () {
-          final now = DateTime(2020, 06, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++2m --2d>',
-              bumpsTo('<2020-07-12 Sun 08:34 ++2m --2d>', now));
-        });
-        test('year', () {
-          final now = DateTime(2021, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++1y --2d>',
-              bumpsTo('<2022-03-12 Sat 08:34 ++1y --2d>', now));
-        });
-        test('years', () {
-          final now = DateTime(2023, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 ++2y --2d>',
-              bumpsTo('<2024-03-12 Tue 08:34 ++2y --2d>', now));
-        });
-        test('future', () {
-          // Now is in the past of the timestamp, so just bump once.
-          final now = DateTime(2020, 03, 12, 8, 00);
-          expect('<2020-03-12 Wed 8:34 ++1h --2d>',
-              bumpsTo('<2020-03-12 Thu 09:34 ++1h --2d>', now));
+        group('Bump from now (.+)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 13, 10, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1h --2d>',
+                bumpsTo('<2020-03-13 Fri 11:00 .+1h --2d>', now));
+          });
+          test('hours', () {
+            final now = DateTime(2020, 03, 13, 12, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+3h --2d>',
+                bumpsTo('<2020-03-13 Fri 15:00 .+3h --2d>', now));
+          });
+          test('day', () {
+            final now = DateTime(2020, 03, 14, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1d --2d>',
+                bumpsTo('<2020-03-15 Sun 08:34-09:34 .+1d --2d>', now));
+          });
+          test('week', () {
+            final now = DateTime(2020, 03, 20, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1w --2d>',
+                bumpsTo('<2020-03-27 Fri 08:34-09:34 .+1w --2d>', now));
+          });
+          test('month', () {
+            final now = DateTime(2020, 05, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1m --2d>',
+                bumpsTo('<2020-06-01 Mon 08:34-09:34 .+1m --2d>', now));
+          });
+          test('year', () {
+            final now = DateTime(2021, 04, 01, 08, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1y --2d>',
+                bumpsTo('<2022-04-01 Fri 08:34-09:34 .+1y --2d>', now));
+          });
+          test('future', () {
+            // Now is in the past of the timestamp
+            final now = DateTime(2020, 03, 12, 8, 00);
+            expect('<2020-03-12 Wed 8:34-9:34 .+1h --2d>',
+                bumpsTo('<2020-03-12 Thu 09:00 .+1h --2d>', now));
+          });
         });
       });
-      group('Bump from now (.+)', () {
-        test('hour', () {
-          final now = DateTime(2020, 03, 13, 10, 00);
-          expect('<2020-03-12 Wed 8:34 .+1h --2d>',
-              bumpsTo('<2020-03-13 Fri 11:00 .+1h --2d>', now));
+      group('Date range timestamp', () {
+        group('Simple bump (+)', () {
+          test('hour', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +1h --2d>--<2020-03-14 Fri 10:34-11:34 +1h --2d>',
+                bumpsTo(
+                    '<2020-03-12 Thu 09:34-10:34 +1h --2d>--<2020-03-14 Sat 11:34-12:34 +1h --2d>'));
+          });
+          test('hours', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +3h --2d>--<2020-03-14 Fri 10:34-11:34 +3h --2d>',
+                bumpsTo(
+                    '<2020-03-12 Thu 11:34-12:34 +3h --2d>--<2020-03-14 Sat 13:34-14:34 +3h --2d>'));
+          });
+          test('day', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +1d --2d>--<2020-03-14 Fri 10:34-11:34 +1d --2d>',
+                bumpsTo(
+                    '<2020-03-13 Fri 08:34-09:34 +1d --2d>--<2020-03-15 Sun 10:34-11:34 +1d --2d>'));
+          });
+          test('week', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +1w --2d>--<2020-03-14 Fri 10:34-11:34 +1w --2d>',
+                bumpsTo(
+                    '<2020-03-19 Thu 08:34-09:34 +1w --2d>--<2020-03-21 Sat 10:34-11:34 +1w --2d>'));
+          });
+          test('month', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +1m --2d>--<2020-03-14 Fri 10:34-11:34 +1m --2d>',
+                bumpsTo(
+                    '<2020-04-12 Sun 08:34-09:34 +1m --2d>--<2020-04-14 Tue 10:34-11:34 +1m --2d>'));
+          });
+          test('year', () {
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 +1y --2d>--<2020-03-14 Fri 10:34-11:34 +1y --2d>',
+                bumpsTo(
+                    '<2021-03-12 Fri 08:34-09:34 +1y --2d>--<2021-03-14 Sun 10:34-11:34 +1y --2d>'));
+          });
         });
-        test('hours', () {
-          final now = DateTime(2020, 03, 13, 12, 00);
-          expect('<2020-03-12 Wed 8:34 .+3h --2d>',
-              bumpsTo('<2020-03-13 Fri 15:00 .+3h --2d>', now));
+        group('Bump past now (++)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 12, 10, 00);
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 ++1h --2d>--<2020-03-14 Fri 10:34-11:34 ++1h --2d>',
+                bumpsTo(
+                    '<2020-03-12 Thu 10:34 ++1h --2d>--<2020-03-14 Sat 11:34-12:34 ++1h --2d>',
+                    now));
+          });
+          test('day', () {
+            final now = DateTime(2020, 03, 14, 08, 00);
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 ++1d --2d>--<2020-03-14 Fri 10:34-11:34 ++1d --2d>',
+                bumpsTo(
+                    '<2020-03-14 Sat 08:34-09:34 ++1d --2d>--<2020-03-15 Sun 10:34-11:34 ++1d --2d>',
+                    now));
+          });
         });
-        test('day', () {
-          final now = DateTime(2020, 03, 14, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+1d --2d>',
-              bumpsTo('<2020-03-15 Sun 08:34 .+1d --2d>', now));
-        });
-        test('days', () {
-          final now = DateTime(2020, 03, 16, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+3d --2d>',
-              bumpsTo('<2020-03-19 Thu 08:34 .+3d --2d>', now));
-        });
-        test('week', () {
-          final now = DateTime(2020, 03, 20, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+1w --2d>',
-              bumpsTo('<2020-03-27 Fri 08:34 .+1w --2d>', now));
-        });
-        test('weeks', () {
-          final now = DateTime(2020, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+2w --2d>',
-              bumpsTo('<2020-04-15 Wed 08:34 .+2w --2d>', now));
-        });
-        test('month', () {
-          final now = DateTime(2020, 05, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+1m --2d>',
-              bumpsTo('<2020-06-01 Mon 08:34 .+1m --2d>', now));
-        });
-        test('months', () {
-          final now = DateTime(2020, 06, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+2m --2d>',
-              bumpsTo('<2020-08-01 Sat 08:34 .+2m --2d>', now));
-        });
-        test('year', () {
-          final now = DateTime(2021, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+1y --2d>',
-              bumpsTo('<2022-04-01 Fri 08:34 .+1y --2d>', now));
-        });
-        test('years', () {
-          final now = DateTime(2023, 04, 01, 08, 00);
-          expect('<2020-03-12 Wed 8:34 .+2y --2d>',
-              bumpsTo('<2025-04-01 Tue 08:34 .+2y --2d>', now));
-        });
-        test('future', () {
-          // Now is in the past of the timestamp
-          final now = DateTime(2020, 03, 12, 8, 00);
-          expect('<2020-03-12 Wed 8:34 .+1h --2d>',
-              bumpsTo('<2020-03-12 Thu 09:00 .+1h --2d>', now));
+        group('Bump from now (.+)', () {
+          test('hour', () {
+            final now = DateTime(2020, 03, 13, 10, 00);
+            expect(
+                '<2020-03-12 Wed 8:34-9:34 .+1h --2d>--<2020-03-14 Fri 10:34-11:34 .+1h --2d>',
+                bumpsTo(
+                    '<2020-03-13 Fri 11:00 .+1h --2d>--<2020-03-13 Fri 11:00 .+1h --2d>',
+                    now));
+          });
         });
       });
     });
