@@ -1,5 +1,5 @@
 import 'package:org_parser/src/org/org.dart';
-import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/petitparser.dart' hide predicate;
 import 'package:test/test.dart';
 
 void main() {
@@ -184,232 +184,172 @@ void main() {
       });
     });
     group('bump', () {
+      Matcher bumpsTo(String expected, [DateTime? now]) =>
+          predicate((String markup) {
+            final result = parser.parse(markup).value as OrgTimestamp;
+            final bumped = result.bumpRepetition(now);
+            return bumped.toMarkup() == expected;
+          }, "bumps to '$expected'");
       test('Non-bumpable', () {
         final markup = '<2020-03-12 Wed 8:34 --2d>';
-        final result = parser.parse(markup).value as OrgSimpleTimestamp;
-        final bumped = result.bumpRepetition();
-        expect(bumped.toMarkup(), markup);
+        expect(markup, bumpsTo(markup));
       });
       group('Simple bump (+)', () {
         test('hour', () {
-          final markup = '<2020-03-12 Wed 8:34 +1h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 09:34 +1h --2d>');
+          expect('<2020-03-12 Wed 8:34 +1h --2d>',
+              bumpsTo('<2020-03-12 Thu 09:34 +1h --2d>'));
         });
         test('hours', () {
-          final markup = '<2020-03-12 Wed 8:34 +3h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 11:34 +3h --2d>');
+          expect('<2020-03-12 Wed 8:34 +3h --2d>',
+              bumpsTo('<2020-03-12 Thu 11:34 +3h --2d>'));
         });
         test('day', () {
-          final markup = '<2020-03-12 Wed 8:34 +1d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-13 Fri 08:34 +1d --2d>');
+          expect('<2020-03-12 Wed 8:34 +1d --2d>',
+              bumpsTo('<2020-03-13 Fri 08:34 +1d --2d>'));
         });
         test('days', () {
-          final markup = '<2020-03-12 Wed 8:34 +3d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-15 Sun 08:34 +3d --2d>');
+          expect('<2020-03-12 Wed 8:34 +3d --2d>',
+              bumpsTo('<2020-03-15 Sun 08:34 +3d --2d>'));
         });
         test('week', () {
-          final markup = '<2020-03-12 Wed 8:34 +1w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-19 Thu 08:34 +1w --2d>');
+          expect('<2020-03-12 Wed 8:34 +1w --2d>',
+              bumpsTo('<2020-03-19 Thu 08:34 +1w --2d>'));
         });
         test('weeks', () {
-          final markup = '<2020-03-12 Wed 8:34 +2w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-03-26 Thu 08:34 +2w --2d>');
+          expect('<2020-03-12 Wed 8:34 +2w --2d>',
+              bumpsTo('<2020-03-26 Thu 08:34 +2w --2d>'));
         });
         test('month', () {
-          final markup = '<2020-03-12 Wed 8:34 +1m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-04-12 Sun 08:34 +1m --2d>');
+          expect('<2020-03-12 Wed 8:34 +1m --2d>',
+              bumpsTo('<2020-04-12 Sun 08:34 +1m --2d>'));
         });
         test('months', () {
-          final markup = '<2020-03-12 Wed 8:34 +2m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2020-05-12 Tue 08:34 +2m --2d>');
+          expect('<2020-03-12 Wed 8:34 +2m --2d>',
+              bumpsTo('<2020-05-12 Tue 08:34 +2m --2d>'));
         });
         test('year', () {
-          final markup = '<2020-03-12 Wed 8:34 +1y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2021-03-12 Fri 08:34 +1y --2d>');
+          expect('<2020-03-12 Wed 8:34 +1y --2d>',
+              bumpsTo('<2021-03-12 Fri 08:34 +1y --2d>'));
         });
         test('years', () {
-          final markup = '<2020-03-12 Wed 8:34 +2y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition();
-          expect(bumped.toMarkup(), '<2022-03-12 Sat 08:34 +2y --2d>');
+          expect('<2020-03-12 Wed 8:34 +2y --2d>',
+              bumpsTo('<2022-03-12 Sat 08:34 +2y --2d>'));
         });
       });
       group('Bump past now (++)', () {
         test('hour', () {
           final now = DateTime(2020, 03, 12, 10, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 10:34 ++1h --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1h --2d>',
+              bumpsTo('<2020-03-12 Thu 10:34 ++1h --2d>', now));
         });
         test('hours', () {
           final now = DateTime(2020, 03, 12, 12, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++3h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 14:34 ++3h --2d>');
+          expect('<2020-03-12 Wed 8:34 ++3h --2d>',
+              bumpsTo('<2020-03-12 Thu 14:34 ++3h --2d>', now));
         });
         test('day', () {
           final now = DateTime(2020, 03, 14, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-14 Sat 08:34 ++1d --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1d --2d>',
+              bumpsTo('<2020-03-14 Sat 08:34 ++1d --2d>', now));
         });
         test('days', () {
           final now = DateTime(2020, 03, 16, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++3d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-18 Wed 08:34 ++3d --2d>');
+          expect('<2020-03-12 Wed 8:34 ++3d --2d>',
+              bumpsTo('<2020-03-18 Wed 08:34 ++3d --2d>', now));
         });
         test('week', () {
           final now = DateTime(2020, 03, 20, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-26 Thu 08:34 ++1w --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1w --2d>',
+              bumpsTo('<2020-03-26 Thu 08:34 ++1w --2d>', now));
         });
         test('weeks', () {
           final now = DateTime(2020, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++2w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-04-09 Thu 08:34 ++2w --2d>');
+          expect('<2020-03-12 Wed 8:34 ++2w --2d>',
+              bumpsTo('<2020-04-09 Thu 08:34 ++2w --2d>', now));
         });
         test('month', () {
           final now = DateTime(2020, 05, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-05-12 Tue 08:34 ++1m --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1m --2d>',
+              bumpsTo('<2020-05-12 Tue 08:34 ++1m --2d>', now));
         });
         test('months', () {
           final now = DateTime(2020, 06, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++2m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-07-12 Sun 08:34 ++2m --2d>');
+          expect('<2020-03-12 Wed 8:34 ++2m --2d>',
+              bumpsTo('<2020-07-12 Sun 08:34 ++2m --2d>', now));
         });
         test('year', () {
           final now = DateTime(2021, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2022-03-12 Sat 08:34 ++1y --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1y --2d>',
+              bumpsTo('<2022-03-12 Sat 08:34 ++1y --2d>', now));
         });
         test('years', () {
           final now = DateTime(2023, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++2y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2024-03-12 Tue 08:34 ++2y --2d>');
+          expect('<2020-03-12 Wed 8:34 ++2y --2d>',
+              bumpsTo('<2024-03-12 Tue 08:34 ++2y --2d>', now));
         });
         test('future', () {
           // Now is in the past of the timestamp, so just bump once.
           final now = DateTime(2020, 03, 12, 8, 00);
-          final markup = '<2020-03-12 Wed 8:34 ++1h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 09:34 ++1h --2d>');
+          expect('<2020-03-12 Wed 8:34 ++1h --2d>',
+              bumpsTo('<2020-03-12 Thu 09:34 ++1h --2d>', now));
         });
       });
       group('Bump from now (.+)', () {
         test('hour', () {
           final now = DateTime(2020, 03, 13, 10, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-13 Fri 11:00 .+1h --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1h --2d>',
+              bumpsTo('<2020-03-13 Fri 11:00 .+1h --2d>', now));
         });
         test('hours', () {
           final now = DateTime(2020, 03, 13, 12, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+3h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-13 Fri 15:00 .+3h --2d>');
+          expect('<2020-03-12 Wed 8:34 .+3h --2d>',
+              bumpsTo('<2020-03-13 Fri 15:00 .+3h --2d>', now));
         });
         test('day', () {
           final now = DateTime(2020, 03, 14, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-15 Sun 08:34 .+1d --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1d --2d>',
+              bumpsTo('<2020-03-15 Sun 08:34 .+1d --2d>', now));
         });
         test('days', () {
           final now = DateTime(2020, 03, 16, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+3d --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-19 Thu 08:34 .+3d --2d>');
+          expect('<2020-03-12 Wed 8:34 .+3d --2d>',
+              bumpsTo('<2020-03-19 Thu 08:34 .+3d --2d>', now));
         });
         test('week', () {
           final now = DateTime(2020, 03, 20, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-27 Fri 08:34 .+1w --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1w --2d>',
+              bumpsTo('<2020-03-27 Fri 08:34 .+1w --2d>', now));
         });
         test('weeks', () {
           final now = DateTime(2020, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+2w --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-04-15 Wed 08:34 .+2w --2d>');
+          expect('<2020-03-12 Wed 8:34 .+2w --2d>',
+              bumpsTo('<2020-04-15 Wed 08:34 .+2w --2d>', now));
         });
         test('month', () {
           final now = DateTime(2020, 05, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-06-01 Mon 08:34 .+1m --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1m --2d>',
+              bumpsTo('<2020-06-01 Mon 08:34 .+1m --2d>', now));
         });
         test('months', () {
           final now = DateTime(2020, 06, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+2m --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-08-01 Sat 08:34 .+2m --2d>');
+          expect('<2020-03-12 Wed 8:34 .+2m --2d>',
+              bumpsTo('<2020-08-01 Sat 08:34 .+2m --2d>', now));
         });
         test('year', () {
           final now = DateTime(2021, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2022-04-01 Fri 08:34 .+1y --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1y --2d>',
+              bumpsTo('<2022-04-01 Fri 08:34 .+1y --2d>', now));
         });
         test('years', () {
           final now = DateTime(2023, 04, 01, 08, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+2y --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2025-04-01 Tue 08:34 .+2y --2d>');
+          expect('<2020-03-12 Wed 8:34 .+2y --2d>',
+              bumpsTo('<2025-04-01 Tue 08:34 .+2y --2d>', now));
         });
         test('future', () {
           // Now is in the past of the timestamp
           final now = DateTime(2020, 03, 12, 8, 00);
-          final markup = '<2020-03-12 Wed 8:34 .+1h --2d>';
-          final result = parser.parse(markup).value as OrgSimpleTimestamp;
-          final bumped = result.bumpRepetition(now);
-          expect(bumped.toMarkup(), '<2020-03-12 Thu 09:00 .+1h --2d>');
+          expect('<2020-03-12 Wed 8:34 .+1h --2d>',
+              bumpsTo('<2020-03-12 Thu 09:00 .+1h --2d>', now));
         });
       });
     });
