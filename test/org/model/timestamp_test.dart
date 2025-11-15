@@ -409,7 +409,7 @@ void main() {
           test('hour', () {
             final now = DateTime(2020, 03, 12, 10, 00);
             expect('<2020-03-12 Wed 8:34-9:34 ++1h --2d>',
-                bumpsTo('<2020-03-12 Thu 10:34 ++1h --2d>', now));
+                bumpsTo('<2020-03-12 Thu 10:34-11:34 ++1h --2d>', now));
           });
           test('hours', () {
             final now = DateTime(2020, 03, 12, 12, 00);
@@ -447,12 +447,12 @@ void main() {
           test('hour', () {
             final now = DateTime(2020, 03, 13, 10, 00);
             expect('<2020-03-12 Wed 8:34-9:34 .+1h --2d>',
-                bumpsTo('<2020-03-13 Fri 11:00 .+1h --2d>', now));
+                bumpsTo('<2020-03-13 Fri 11:00-12:00 .+1h --2d>', now));
           });
           test('hours', () {
             final now = DateTime(2020, 03, 13, 12, 00);
             expect('<2020-03-12 Wed 8:34-9:34 .+3h --2d>',
-                bumpsTo('<2020-03-13 Fri 15:00 .+3h --2d>', now));
+                bumpsTo('<2020-03-13 Fri 15:00-16:00 .+3h --2d>', now));
           });
           test('day', () {
             final now = DateTime(2020, 03, 14, 08, 00);
@@ -478,7 +478,7 @@ void main() {
             // Now is in the past of the timestamp
             final now = DateTime(2020, 03, 12, 8, 00);
             expect('<2020-03-12 Wed 8:34-9:34 .+1h --2d>',
-                bumpsTo('<2020-03-12 Thu 09:00 .+1h --2d>', now));
+                bumpsTo('<2020-03-12 Thu 09:00-10:00 .+1h --2d>', now));
           });
         });
       });
@@ -527,7 +527,7 @@ void main() {
             expect(
                 '<2020-03-12 Wed 8:34-9:34 ++1h --2d>--<2020-03-14 Fri 10:34-11:34 ++1h --2d>',
                 bumpsTo(
-                    '<2020-03-12 Thu 10:34 ++1h --2d>--<2020-03-14 Sat 11:34-12:34 ++1h --2d>',
+                    '<2020-03-12 Thu 10:34-11:34 ++1h --2d>--<2020-03-14 Sat 11:34-12:34 ++1h --2d>',
                     now));
           });
           test('day', () {
@@ -545,7 +545,7 @@ void main() {
             expect(
                 '<2020-03-12 Wed 8:34-9:34 .+1h --2d>--<2020-03-14 Fri 10:34-11:34 .+1h --2d>',
                 bumpsTo(
-                    '<2020-03-13 Fri 11:00 .+1h --2d>--<2020-03-13 Fri 11:00 .+1h --2d>',
+                    '<2020-03-13 Fri 11:00-12:00 .+1h --2d>--<2020-03-13 Fri 11:00-12:00 .+1h --2d>',
                     now));
           });
         });

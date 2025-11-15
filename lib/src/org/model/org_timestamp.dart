@@ -114,6 +114,7 @@ sealed class OrgTimestamp extends OrgNode {
   bool get repeats;
   bool get hasDelay;
 
+  // See `org-auto-repeat-maybe`, `org-timestamp-change`
   OrgTimestamp bumpRepetition([DateTime? now]);
 }
 
@@ -357,19 +358,12 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   }
 
   @override
-  OrgTimestamp bumpRepetition([DateTime? now]) {
+  OrgTimeRangeTimestamp bumpRepetition([DateTime? now]) {
     if (!repeats) return this;
     final repeater = modifiers.firstWhere((m) => m.isRepeater);
     final newStartTime = repeater.apply(startDateTime, now);
-    var newEndTime = repeater.apply(endDateTime, now);
-    if (newStartTime.isAtSameMomentAs(newEndTime)) {
-      return OrgSimpleTimestamp(prefix, newStartTime.toOrgDate(),
-          newStartTime.toOrgTime(), modifiers, suffix);
-    }
-    if (newStartTime.isAfter(newEndTime)) {
-      final duration = endDateTime.difference(startDateTime);
-      newEndTime = newStartTime.add(duration);
-    }
+    final duration = endDateTime.difference(startDateTime);
+    final newEndTime = newStartTime.add(duration);
     return copyWith(
       date: newStartTime.toOrgDate(),
       timeStart: newStartTime.toOrgTime(),
