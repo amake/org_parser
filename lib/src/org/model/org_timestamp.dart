@@ -339,13 +339,22 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
         int.parse(timeStart.minute),
       );
 
-  DateTime get endDateTime => DateTime(
-        int.parse(date.year),
-        int.parse(date.month),
-        int.parse(date.day),
-        int.parse(timeEnd.hour),
-        int.parse(timeEnd.minute),
-      );
+  DateTime get endDateTime {
+    var day = int.parse(date.day);
+    final startHour = int.parse(timeStart.hour);
+    final endHour = int.parse(timeEnd.hour);
+    if (endHour < startHour) {
+      // Time range crosses midnight, bump the day
+      day += 1;
+    }
+    return DateTime(
+      int.parse(date.year),
+      int.parse(date.month),
+      day,
+      endHour,
+      int.parse(timeEnd.minute),
+    );
+  }
 
   @override
   OrgTimestamp bumpRepetition([DateTime? now]) {

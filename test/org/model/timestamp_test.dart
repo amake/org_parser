@@ -104,6 +104,22 @@ void main() {
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 18:34-19:35 .+1w --12d');
     });
+    test('time range across midnight', () {
+      final markup = '[2020-03-12 Wed 18:34-00:35 .+1w --12d]';
+      final result = parser.parse(markup).value as OrgTimeRangeTimestamp;
+      expect(result.contains('2020'), isTrue);
+      expect(result.contains('Wed'), isTrue);
+      expect(result.contains('.+'), isTrue);
+      expect(result.contains('12'), isTrue);
+      expect(result.contains('あ'), isFalse);
+      expect(result.isActive, isFalse);
+      expect(result.repeats, isTrue);
+      expect(result.hasDelay, isTrue);
+      expect(result.startDateTime, DateTime(2020, 03, 12, 18, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 13, 00, 35));
+      expect(result.toMarkup(), markup);
+      expect(result.toPlainText(), '2020-03-12 Wed 18:34-00:35 .+1w --12d');
+    });
     test('date range', () {
       final markup =
           '[2020-03-11 Wed 18:34 .+1w --12d]--[2020-03-12 Wed 18:34 .+1w --12d]';
