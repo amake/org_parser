@@ -16,7 +16,7 @@ void main() {
       final drawer = result.value as OrgDrawer;
       expect(drawer.header, ':foo:\n');
       expect(drawer.properties().length, 2);
-      final body = drawer.body as OrgContent;
+      final body = drawer.body;
       final property = body.children[0] as OrgProperty;
       expect(property.key, ':bar:');
       final value = property.value.children[0] as OrgPlainText;
@@ -32,7 +32,7 @@ a
       final drawer = result.value as OrgDrawer;
       expect(drawer.header, ':LOGBOOK:\n');
       expect(drawer.properties().isEmpty, isTrue);
-      final body = drawer.body as OrgContent;
+      final body = drawer.body;
       final text = body.children[0] as OrgPlainText;
       expect(text.content, 'a\n');
     });
@@ -52,7 +52,7 @@ a
 :END:''');
       final drawer = result.value as OrgDrawer;
       expect(drawer.properties().isEmpty, isTrue);
-      final body = drawer.body as OrgContent;
+      final body = drawer.body;
       expect(body.children.isEmpty, isTrue);
     });
   });

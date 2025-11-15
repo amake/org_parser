@@ -19,7 +19,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
   @override
   final String indent;
   final String header;
-  final OrgNode body;
+  final OrgContent body;
   final String footer;
   @override
   final String trailing;
@@ -29,7 +29,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
 
   @override
   OrgDrawer fromChildren(List<OrgNode> children) =>
-      copyWith(body: children.single);
+      copyWith(body: children.single as OrgContent);
 
   /// Get a list of [OrgProperty] nodes contained within this block. Optionally
   /// filter the result to include only properties with the specified [key].
@@ -44,6 +44,29 @@ class OrgDrawer extends OrgParentNode with OrgElement {
       return true;
     });
     return result;
+  }
+
+  // TODO(aaron): We could also support appending, etc.
+  OrgDrawer setProperty(OrgProperty property) {
+    var didReplace = false;
+    var newBody = body.edit().visit((location) {
+      final node = location.node;
+      if (node is! OrgProperty) return (true, null);
+      if (node.key.toUpperCase() != property.key.toUpperCase()) {
+        return (true, null);
+      }
+      location = location.replace(property);
+      didReplace = true;
+      return (true, location);
+    }).commit<OrgContent>();
+
+    if (!didReplace) {
+      newBody = newBody.copyWith(
+        children: [...newBody.children, property],
+      );
+    }
+
+    return copyWith(body: newBody);
   }
 
   @override
@@ -68,7 +91,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
   OrgDrawer copyWith({
     String? indent,
     String? header,
-    OrgNode? body,
+    OrgContent? body,
     String? footer,
     String? trailing,
     String? id,

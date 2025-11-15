@@ -42,5 +42,54 @@ a
       expect(drawer.toMarkup(), markup);
       expect(drawer.toPlainText(), markup);
     });
+    group('editing', () {
+      test('add to empty', () {
+        final markup = ''':FOOBAR:
+:END:''';
+        final result = parser.parse(markup);
+        final drawer = result.value as OrgDrawer;
+        final updated = drawer.setProperty(OrgProperty(
+            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+        expect(updated.toMarkup(), ''':FOOBAR:
+:bizz: buzz
+:END:''');
+      });
+      test('add to empty with indent', () {
+        final markup = '''  :FOOBAR:
+  :END:''';
+        final result = parser.parse(markup);
+        final drawer = result.value as OrgDrawer;
+        final updated = drawer.setProperty(OrgProperty(
+            '  ', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+        expect(updated.toMarkup(), '''  :FOOBAR:
+  :bizz: buzz
+  :END:''');
+      });
+      test('add', () {
+        final markup = ''':FOOBAR:
+:bazz: fizz
+:END:''';
+        final result = parser.parse(markup);
+        final drawer = result.value as OrgDrawer;
+        final updated = drawer.setProperty(OrgProperty(
+            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+        expect(updated.toMarkup(), ''':FOOBAR:
+:bazz: fizz
+:bizz: buzz
+:END:''');
+      });
+      test('replace', () {
+        final markup = ''':FOOBAR:
+:bizz: fizz
+:END:''';
+        final result = parser.parse(markup);
+        final drawer = result.value as OrgDrawer;
+        final updated = drawer.setProperty(OrgProperty(
+            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+        expect(updated.toMarkup(), ''':FOOBAR:
+:bizz: buzz
+:END:''');
+      });
+    });
   });
 }
