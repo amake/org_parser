@@ -7,11 +7,13 @@ abstract class DecryptedContentSerializer {
 
 class OrgDecryptedContent extends OrgTree {
   static OrgDecryptedContent fromDecryptedResult(
+    int level,
     String cleartext,
     DecryptedContentSerializer serializer,
   ) {
     final parsed = OrgDocument.parse(cleartext);
     return OrgDecryptedContent(
+      level,
       serializer,
       parsed.content,
       parsed.sections,
@@ -20,6 +22,7 @@ class OrgDecryptedContent extends OrgTree {
   }
 
   OrgDecryptedContent(
+    this.level,
     this.serializer,
     super.content,
     super.sections,
@@ -27,6 +30,9 @@ class OrgDecryptedContent extends OrgTree {
   );
 
   final DecryptedContentSerializer serializer;
+
+  @override
+  final int level;
 
   @override
   void _toMarkupImpl(OrgSerializer buf) => buf.write(serializer.toMarkup(this));
@@ -54,12 +60,14 @@ class OrgDecryptedContent extends OrgTree {
   }
 
   OrgDecryptedContent copyWith({
+    int? level,
     DecryptedContentSerializer? serializer,
     OrgContent? content,
     Iterable<OrgSection>? sections,
     String? id,
   }) =>
       OrgDecryptedContent(
+        level ?? this.level,
         serializer ?? this.serializer,
         content ?? this.content,
         sections ?? this.sections,

@@ -32,6 +32,9 @@ class OrgDocument extends OrgTree {
   OrgDocument(super.content, super.sections, [super.id]);
 
   @override
+  int get level => 0;
+
+  @override
   String toString() => 'OrgDocument';
 
   OrgDocument copyWith({

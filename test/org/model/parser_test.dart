@@ -504,6 +504,7 @@ content''');
 * bar
 baz''';
         final content = OrgDecryptedContent.fromDecryptedResult(
+          1,
           cleartext,
           _TestDCSerializer((c) => c.toCleartextMarkup()),
         );
@@ -515,6 +516,7 @@ baz''';
 * bar
 baz''';
         final content = OrgDecryptedContent.fromDecryptedResult(
+          1,
           cleartext,
           _TestDCSerializer((c) => 'bazinga'),
         );

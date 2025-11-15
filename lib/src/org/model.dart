@@ -212,6 +212,8 @@ sealed class OrgTree extends OrgParentNode {
     return true;
   }
 
+  int get level;
+
   /// Get the ID properties from this section's PROPERTIES drawer, if any.
   List<String> get ids => getProperties(':ID:');
 

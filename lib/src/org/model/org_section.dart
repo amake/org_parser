@@ -48,6 +48,7 @@ class OrgSection extends OrgTree {
     );
   }
 
+  @override
   int get level => headline.level;
 
   /// A section may be empty if it has no content or sub-sections
