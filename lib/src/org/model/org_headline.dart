@@ -74,8 +74,7 @@ class OrgHeadline extends OrgParentNode {
           'current keyword ${keyword!.value} not in todo settings');
     }
     if (currStateIdx == allStates.length - 1) {
-      return OrgHeadline(
-          stars, null, priority, title, rawTitle, tags, trailing, id);
+      return withoutKeyword();
     }
     final nextState = allStates[currStateIdx + 1];
     return copyWith(keyword: (
@@ -153,4 +152,8 @@ class OrgHeadline extends OrgParentNode {
         trailing ?? this.trailing,
         id ?? this.id,
       );
+
+  OrgHeadline withoutKeyword() => keyword == null
+      ? this
+      : OrgHeadline(stars, null, priority, title, rawTitle, tags, trailing);
 }

@@ -47,6 +47,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
   }
 
   // TODO(aaron): We could also support appending, etc.
+  // TODO(aaron): Consider fixing up the property indentation to match
   OrgDrawer setProperty(OrgProperty property) {
     var didReplace = false;
     var newBody = body.edit().visit((location) {
@@ -104,6 +105,9 @@ class OrgDrawer extends OrgParentNode with OrgElement {
         trailing ?? this.trailing,
         id ?? this.id,
       );
+
+  OrgNode ensureTrailingNewline() =>
+      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }
 
 /// A property in a drawer, like
