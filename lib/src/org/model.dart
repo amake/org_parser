@@ -258,6 +258,59 @@ sealed class OrgTree extends OrgParentNode {
     return result;
   }
 
+  T setProperty<T extends OrgTree>(OrgProperty property) {
+    final newTree = _ensurePropertiesDrawer();
+    final drawer = newTree._propertiesDrawer!;
+    return newTree
+        .editNode(drawer)!
+        .replace(drawer.setProperty(property))
+        .commit<T>();
+  }
+
+  OrgTree _ensurePropertiesDrawer() {
+    if (_propertiesDrawer != null) return this;
+
+    final indent = level > 0 ? ' ' * (level + 1) : '';
+    final drawer = OrgDrawer(
+      indent,
+      ':PROPERTIES:\n',
+      OrgContent([]),
+      '$indent:END:',
+      '\n',
+    );
+
+    if (content == null) {
+      return _ensureContent(content: OrgContent([drawer]));
+    }
+
+    final found = content!.find<OrgPlanningEntry>(
+        (entry) => entry.keyword.content == 'SCHEDULED:');
+
+    // If there are planning entries, insert the drawer after the first entry's
+    // paragraph.
+    if (found != null) {
+      final paragraph =
+          found.path.reversed.whereType<OrgParagraph>().singleOrNull;
+      // Only skip past SCHEDULED: entry paragraph if it is immediately after
+      // the headline (i.e., first child of content)
+      if (paragraph != null && paragraph.body.children.first == found.node) {
+        final newContent = content!
+            .editNode(paragraph)!
+            .replace(paragraph.ensureTrailingNewline())
+            .insertRight(drawer)
+            .commit<OrgContent>();
+        return _ensureContent(content: newContent);
+      }
+    }
+
+    // Otherwise, insert the drawer at the start of the content
+    final newContent = content!.copyWith(
+      children: [drawer, ...content!.children],
+    );
+
+    return _ensureContent(content: newContent);
+  }
+
   /// Find the immediate parent [OrgSection] or [OrgDocument] of the specified
   /// [node].
   OrgTree? findContainingTree<T extends OrgNode>(T node,
@@ -313,6 +366,8 @@ sealed class OrgTree extends OrgParentNode {
       buf.visit(child);
     }
   }
+
+  OrgTree _ensureContent({required OrgContent content});
 }
 
 mixin SingleContentElement {

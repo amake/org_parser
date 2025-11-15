@@ -49,6 +49,10 @@ class OrgDocument extends OrgTree {
       );
 
   @override
+  OrgDocument _ensureContent({required OrgContent content}) =>
+      copyWith(content: content);
+
+  @override
   OrgDocument fromChildren(List<OrgNode> children) {
     if (children.isEmpty) {
       return copyWith(content: null, sections: []);

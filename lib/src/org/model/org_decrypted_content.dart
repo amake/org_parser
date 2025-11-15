@@ -73,4 +73,8 @@ class OrgDecryptedContent extends OrgTree {
         sections ?? this.sections,
         id ?? this.id,
       );
+
+  @override
+  OrgDecryptedContent _ensureContent({required OrgContent content}) =>
+      copyWith(content: content);
 }

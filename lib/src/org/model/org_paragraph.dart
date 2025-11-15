@@ -45,4 +45,7 @@ class OrgParagraph extends OrgParentNode with OrgElement {
         trailing ?? this.trailing,
         id ?? this.id,
       );
+
+  OrgParagraph ensureTrailingNewline() =>
+      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }

@@ -68,6 +68,13 @@ class OrgSection extends OrgTree {
       );
 
   @override
+  OrgSection _ensureContent({required OrgContent content}) => copyWith(
+      headline: headline.trailing?.contains('\n') == true
+          ? headline
+          : headline.copyWith(trailing: '\n'),
+      content: content);
+
+  @override
   bool contains(Pattern pattern, {bool includeChildren = true}) =>
       headline.contains(pattern) ||
       super.contains(pattern, includeChildren: includeChildren);
