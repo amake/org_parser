@@ -109,13 +109,19 @@ extension OrgModifierUtils on DateTime {
 typedef OrgDate = ({String year, String month, String day, String? dayName});
 typedef OrgTime = ({String hour, String minute});
 
-sealed class OrgTimestamp extends OrgNode {
+sealed class OrgTimestamp extends OrgNode implements Comparable<OrgTimestamp> {
   bool get isActive;
   bool get repeats;
   bool get hasDelay;
 
   // See `org-auto-repeat-maybe`, `org-timestamp-change`
   OrgTimestamp bumpRepetition([DateTime? now]);
+
+  DateTime get startDateTime;
+  DateTime get endDateTime;
+
+  @override
+  int compareTo(OrgTimestamp other);
 }
 
 /// A timestamp, like `[2020-05-05 Tue]`
@@ -171,6 +177,15 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
         time == null ? 0 : int.parse(time!.hour),
         time == null ? 0 : int.parse(time!.minute),
       );
+
+  @override
+  DateTime get startDateTime => dateTime;
+  @override
+  DateTime get endDateTime => dateTime;
+
+  @override
+  int compareTo(OrgTimestamp other) =>
+      startDateTime.compareTo(other.startDateTime);
 
   @override
   void _toMarkupImpl(OrgSerializer buf) {
@@ -255,6 +270,24 @@ class OrgDateRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   bool get hasDelay => start.hasDelay || end.hasDelay;
 
   @override
+  DateTime get startDateTime {
+    final a = start.startDateTime;
+    final b = end.startDateTime;
+    return a.isBefore(b) ? a : b;
+  }
+
+  @override
+  DateTime get endDateTime {
+    final a = start.endDateTime;
+    final b = end.endDateTime;
+    return a.isAfter(b) ? a : b;
+  }
+
+  @override
+  int compareTo(OrgTimestamp other) =>
+      startDateTime.compareTo(other.startDateTime);
+
+  @override
   OrgTimestamp bumpRepetition([DateTime? now]) => repeats
       ? copyWith(
           start: start.bumpRepetition(now),
@@ -332,6 +365,7 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   @override
   bool get hasDelay => modifiers.any((m) => m.isDelay);
 
+  @override
   DateTime get startDateTime => DateTime(
         int.parse(date.year),
         int.parse(date.month),
@@ -340,6 +374,7 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
         int.parse(timeStart.minute),
       );
 
+  @override
   DateTime get endDateTime {
     var day = int.parse(date.day);
     final startHour = int.parse(timeStart.hour);
@@ -356,6 +391,10 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
       int.parse(timeEnd.minute),
     );
   }
+
+  @override
+  int compareTo(OrgTimestamp other) =>
+      startDateTime.compareTo(other.startDateTime);
 
   @override
   OrgTimeRangeTimestamp bumpRepetition([DateTime? now]) {

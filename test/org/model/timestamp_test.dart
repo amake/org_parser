@@ -201,6 +201,53 @@ void main() {
         expect(type, isNotEmpty);
       });
     });
+    group('comparisons', () {
+      test('simple', () {
+        final t1 = parser.parse('<2020-03-12 Wed 8:34>').value as OrgTimestamp;
+        final t2 = parser.parse('<2020-03-12 Wed 9:34>').value as OrgTimestamp;
+        expect(t1.compareTo(t1), 0);
+        expect(t1.compareTo(t2), -1);
+        expect(t2.compareTo(t1), 1);
+      });
+      test('time range', () {
+        final t1 =
+            parser.parse('<2020-03-12 Wed 8:34-9:34>').value as OrgTimestamp;
+        final t2 =
+            parser.parse('<2020-03-12 Wed 9:34-10:34>').value as OrgTimestamp;
+        expect(t1.compareTo(t1), 0);
+        expect(t1.compareTo(t2), -1);
+        expect(t2.compareTo(t1), 1);
+      });
+      test('date range', () {
+        final t1 = parser
+            .parse('[2020-03-12 Wed 8:34]--[2020-03-13 Thu 9:34]')
+            .value as OrgTimestamp;
+        final t2 = parser
+            .parse('[2020-03-12 Wed 9:34]--[2020-03-13 Thu 10:34]')
+            .value as OrgTimestamp;
+        expect(t1.compareTo(t1), 0);
+        expect(t1.compareTo(t2), -1);
+        expect(t2.compareTo(t1), 1);
+      });
+      test('mixed', () {
+        final simple =
+            parser.parse('<2020-03-12 Wed 8:34>').value as OrgTimestamp;
+        final timeRange =
+            parser.parse('<2020-03-12 Wed 9:34-10:34>').value as OrgTimestamp;
+        final dateRange = parser
+            .parse('[2020-03-12 Wed 11:34]--[2020-03-13 Thu 9:34]')
+            .value as OrgTimestamp;
+        expect(simple.compareTo(simple), 0);
+        expect(simple.compareTo(timeRange), -1);
+        expect(simple.compareTo(dateRange), -1);
+        expect(timeRange.compareTo(simple), 1);
+        expect(timeRange.compareTo(timeRange), 0);
+        expect(timeRange.compareTo(dateRange), -1);
+        expect(dateRange.compareTo(simple), 1);
+        expect(dateRange.compareTo(timeRange), 1);
+        expect(dateRange.compareTo(dateRange), 0);
+      });
+    });
     group('bump', () {
       Matcher bumpsTo(String expected, [DateTime? now]) =>
           predicate((String markup) {
