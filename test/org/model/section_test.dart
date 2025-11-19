@@ -174,9 +174,10 @@ buzz bazz''');
   :END:
 ''');
       });
-      test('with SCHEDULED: with newline', () {
+      test('with SCHEDULED: with newlines', () {
         final result = parser.parse('''* TODO foo
   SCHEDULED: <2024-01-01 Mon>
+
 ''');
         final doc = result.value as OrgDocument;
         final section = doc.sections[0];
@@ -189,6 +190,7 @@ buzz bazz''');
   :PROPERTIES:
   :PRIORITY: A
   :END:
+
 ''');
       });
       test('with SCHEDULED: with more content', () {

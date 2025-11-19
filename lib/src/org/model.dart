@@ -294,10 +294,12 @@ sealed class OrgTree extends OrgParentNode {
       // Only skip past SCHEDULED: entry paragraph if it is immediately after
       // the headline (i.e., first child of content)
       if (paragraph != null && paragraph.body.children.first == found.node) {
+        final replacement = paragraph.copyWith(trailing: '\n');
         final newContent = content!
             .editNode(paragraph)!
-            .replace(paragraph.ensureTrailingNewline())
-            .insertRight(drawer)
+            .replace(replacement)
+            .insertRight(drawer.copyWith(
+                trailing: paragraph.ensureTrailingNewline().trailing))
             .commit<OrgContent>();
         return _ensureContent(content: newContent);
       }

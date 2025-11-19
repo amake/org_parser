@@ -106,7 +106,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
         id ?? this.id,
       );
 
-  OrgNode ensureTrailingNewline() =>
+  OrgDrawer ensureTrailingNewline() =>
       trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }
 
