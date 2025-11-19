@@ -128,7 +128,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       element()..replace(ref0(paragraph), noOpFail());
 
   Parser paragraphEnd() =>
-      endOfInput() | newline().repeatString(2, 2) | ref0(nonParagraphElement);
+      (newline().starString() & endOfInput()) |
+      newline().repeatString(2, 2) |
+      ref0(nonParagraphElement);
 
   Parser textRun([Parser? limit]) => ref0(object) | ref1(plainText, limit);
 

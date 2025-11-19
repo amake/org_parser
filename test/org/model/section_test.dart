@@ -174,6 +174,46 @@ buzz bazz''');
   :END:
 ''');
       });
+      test('with SCHEDULED: with newline', () {
+        final result = parser.parse('''* TODO foo
+  SCHEDULED: <2024-01-01 Mon>
+''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        final updated = section.setProperty(
+          OrgProperty(
+              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+        );
+        expect(updated.toMarkup(), '''* TODO foo
+  SCHEDULED: <2024-01-01 Mon>
+  :PROPERTIES:
+  :PRIORITY: A
+  :END:
+''');
+      });
+      test('with SCHEDULED: with more content', () {
+        final result = parser.parse('''* TODO foo
+  SCHEDULED: <2024-01-01 Mon>
+foo
+''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        final updated = section.setProperty(
+          OrgProperty(
+              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+        );
+        expect(
+            updated.toMarkup(),
+            '''* TODO foo
+  SCHEDULED: <2024-01-01 Mon>
+  :PROPERTIES:
+  :PRIORITY: A
+  :END:
+foo
+''',
+// TODO(aaron): Get full fidelity on this
+            skip: true);
+      });
       test('with invalid SCHEDULED:', () {
         final result = parser.parse('''* TODO foo
 

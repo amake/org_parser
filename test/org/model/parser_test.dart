@@ -257,7 +257,6 @@ content''');
         isA<OrgMarkup>(),
         isA<OrgContent>(),
         isA<OrgPlainText>(),
-        isA<OrgPlainText>(),
       ]);
       expect(doc.toMarkup(), markup);
     });
