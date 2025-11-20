@@ -1,3 +1,15 @@
+## [11.0.0]
+- Improve parsing accuracy of paragraphs, timestamps
+- Parse timestamp modifiers as `OrgTimestampModifier`
+  - `Org*Timestamp.repeaterOrDelay` is now `modifiers`
+- `edit`, `editNode` methods are now available on `OrgParentNode`
+- Add new high-level structured editing features:
+  - `OrgTimestamp.bumpRepetition`
+  - `OrgDrawer.setProperty`
+  - `OrgTree.setProperty`
+  - `OrgSection.addLogNote`
+  - `OrgSection.cycleTodo`
+
 ## [10.0.3]
 - Improve handling of table edge cases
 
