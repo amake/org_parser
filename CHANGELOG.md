@@ -1,3 +1,6 @@
+## [11.0.1]
+- Improve handling of custom TODO states when cycling section
+
 ## [11.0.0]
 - Improve parsing accuracy of paragraphs, timestamps
 - Parse timestamp modifiers as `OrgTimestampModifier`
