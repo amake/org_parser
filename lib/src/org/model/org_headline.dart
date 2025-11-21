@@ -156,4 +156,14 @@ class OrgHeadline extends OrgParentNode {
   OrgHeadline withoutKeyword() => keyword == null
       ? this
       : OrgHeadline(stars, null, priority, title, rawTitle, tags, trailing);
+
+  bool keywordIsEndState(List<OrgTodoStates> todoStates) {
+    if (keyword == null) return false;
+    if (keyword!.done) return true;
+    return todoStates
+            .where((t) => t.contains(keyword!.value))
+            .firstOrNull
+            ?.isEndState(keyword!.value) ==
+        true;
+  }
 }

@@ -75,37 +75,47 @@ class OrgSection extends OrgTree {
     headline = headline.edit().visit(visitor).commit<OrgHeadline>();
     content = content?.edit().visit(visitor).commit<OrgContent>();
 
-    if (hasRepeat) {
-      if (headline.keyword?.done == true) {
-        finalKeyword = headline.keyword?.value ?? '';
-        headline = headline.withoutKeyword();
-        if (todoStates.any((t) => t.todo.isNotEmpty)) {
-          headline = headline.cycleTodo(todoStates);
-        }
-      }
-      final indent = level > 0 ? ' ' * (level + 1) : '';
-      final timestamp =
-          OrgSimpleTimestamp('[', now.toOrgDate(), now.toOrgTime(), [], ']');
-      final lastRepeat = OrgProperty(indent, ':LAST_REPEAT:',
-          OrgContent([OrgPlainText(' '), timestamp]), '\n');
-
-      final note = OrgContent([
-        // See org-log-note-headings
-        OrgPlainText(
-            'State ${'"$finalKeyword"'.padRight(12)} from ${'"$previousKeyword"'.padRight(12)}'),
-        timestamp,
-        OrgPlainText('\n'),
-      ]);
+    // TODO(aaron): Handle `org-log-done` = 'time behavior (record DONE time)
+    if (!hasRepeat) {
       return copyWith(
         headline: headline,
         content: content,
-      ).setProperty<OrgSection>(lastRepeat).addLogNote(note);
+      );
     }
-    // TODO(aaron): Handle `org-log-done` = 'time behavior (record DONE time)
+
+    if (headline.keywordIsEndState(todoStates)) {
+      finalKeyword = headline.keyword?.value ?? '';
+      headline = headline.withoutKeyword();
+      if (todoStates.any((t) => t.todo.isNotEmpty)) {
+        headline = headline.cycleTodo(todoStates);
+      }
+    }
+
+    if (finalKeyword == null) {
+      return copyWith(
+        headline: headline,
+        content: content,
+      );
+    }
+
+    final indent = level > 0 ? ' ' * (level + 1) : '';
+    final timestamp =
+        OrgSimpleTimestamp('[', now.toOrgDate(), now.toOrgTime(), [], ']');
+    final lastRepeat = OrgProperty(indent, ':LAST_REPEAT:',
+        OrgContent([OrgPlainText(' '), timestamp]), '\n');
+
+    final note = OrgContent([
+      // See org-log-note-headings
+      OrgPlainText(
+          'State ${'"$finalKeyword"'.padRight(12)} from ${'"$previousKeyword"'.padRight(12)}'),
+      timestamp,
+      OrgPlainText('\n'),
+    ]);
+
     return copyWith(
       headline: headline,
       content: content,
-    );
+    ).setProperty<OrgSection>(lastRepeat).addLogNote(note);
   }
 
   OrgSection addLogNote(OrgContent note) {

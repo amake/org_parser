@@ -39,6 +39,10 @@ class OrgTodoStates {
 
   bool get isEmpty => todo.isEmpty && done.isEmpty;
   bool get isNotEmpty => !isEmpty;
+  bool contains(String keyword) =>
+      todo.contains(keyword) || done.contains(keyword);
+  bool isEndState(String keyword) =>
+      done.contains(keyword) || done.isEmpty && todo.last == keyword;
 
   @override
   String toString() => 'TodoStates[${todo.join(' ')} | ${done.join(' ')}]';
