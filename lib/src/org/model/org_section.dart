@@ -210,11 +210,8 @@ class OrgSection extends OrgTree {
       );
 
   @override
-  OrgSection _ensureContent({required OrgContent content}) => copyWith(
-      headline: headline.trailing?.contains('\n') == true
-          ? headline
-          : headline.copyWith(trailing: '\n'),
-      content: content);
+  OrgSection _ensureContent({required OrgContent content}) =>
+      copyWith(headline: headline.ensureTrailingNewLine(), content: content);
 
   @override
   bool contains(Pattern pattern, {bool includeChildren = true}) =>
@@ -223,4 +220,10 @@ class OrgSection extends OrgTree {
 
   @override
   String toString() => 'OrgSection';
+
+  OrgSection ensureTrailingNewLine() {
+    return content == null
+        ? copyWith(headline: headline.ensureTrailingNewLine())
+        : copyWith(content: content!.ensureTrailingNewLine());
+  }
 }

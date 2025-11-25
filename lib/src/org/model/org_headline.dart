@@ -166,4 +166,7 @@ class OrgHeadline extends OrgParentNode {
             ?.isEndState(keyword!.value) ==
         true;
   }
+
+  OrgHeadline ensureTrailingNewLine() =>
+      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }

@@ -30,4 +30,18 @@ class OrgContent extends OrgParentNode {
 
   OrgContent copyWith({List<OrgNode>? children, String? id}) =>
       OrgContent(children ?? this.children, id ?? this.id);
+
+  OrgContent ensureTrailingNewLine() {
+    if (children.isNotEmpty) {
+      final [...rest, last] = children;
+      if (last is OrgElement) {
+        return copyWith(
+          children: [...rest, last.ensureTrailingNewLine()],
+        );
+      }
+    }
+    return copyWith(
+      children: [...children, OrgParagraph('', OrgContent([]), '\n')],
+    );
+  }
 }
