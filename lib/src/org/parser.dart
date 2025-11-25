@@ -68,7 +68,7 @@ class OrgParserDefinition extends OrgGrammarDefinition {
           priority as List?,
           title as List?,
           tags as List?,
-          trailing as String?
+          trailing as String
         ] = items;
         return OrgHeadline(
             (value: stars[0], trailing: stars[1]),

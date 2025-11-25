@@ -37,7 +37,7 @@ bar
               null,
               'foo',
               null,
-              null
+              ''
             ],
             null
           ]

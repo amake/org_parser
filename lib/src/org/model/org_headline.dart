@@ -45,7 +45,7 @@ class OrgHeadline extends OrgParentNode {
   /// Headline tags, like `:tag1:tag2:`
   final ({String leading, List<String> values, String trailing})? tags;
 
-  final String? trailing;
+  final String trailing;
 
   int get level => stars.value.length;
 
@@ -97,7 +97,7 @@ class OrgHeadline extends OrgParentNode {
       tags?.leading.contains(pattern) == true ||
       tags?.values.any((tag) => tag.contains(pattern)) == true ||
       tags?.trailing.contains(pattern) == true ||
-      trailing?.contains(pattern) == true;
+      trailing.contains(pattern);
 
   @override
   String toString() => 'OrgHeadline';
@@ -129,7 +129,7 @@ class OrgHeadline extends OrgParentNode {
       }
       buf.write(tags!.trailing);
     }
-    buf.write(trailing ?? '');
+    buf.write(trailing);
   }
 
   OrgHeadline copyWith({

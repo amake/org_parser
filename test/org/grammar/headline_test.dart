@@ -18,7 +18,7 @@ void main() {
           null,
           'Title',
           null,
-          null
+          ''
         ],
       );
     });
@@ -36,7 +36,7 @@ void main() {
           null,
           null,
           null,
-          null
+          ''
         ],
       );
     });
@@ -50,7 +50,7 @@ void main() {
           null,
           'Title',
           null,
-          null
+          ''
         ],
       );
     });
@@ -72,7 +72,7 @@ void main() {
           ':',
           null,
         ],
-        null
+        ''
       ]);
     });
   });

@@ -38,7 +38,7 @@ class OrgGrammarDefinition extends GrammarDefinition {
           ref0(priority).optional() &
           ref0(title).optional() &
           ref0(tags).optional() &
-          lineEnd())
+          lineEnd().flatten(message: 'Line end expected'))
       .drop1(0);
 
   Parser stars() => char('*').plusString() & char(' ').plusString();
