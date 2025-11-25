@@ -55,6 +55,7 @@ class OrgBlock extends OrgParentNode with OrgElement {
       ..write(trailing);
   }
 
+  @override
   OrgBlock copyWith({
     String? type,
     String? indent,

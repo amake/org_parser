@@ -89,6 +89,7 @@ class OrgDrawer extends OrgParentNode with OrgElement {
       ..write(trailing);
   }
 
+  @override
   OrgDrawer copyWith({
     String? indent,
     String? header,
@@ -105,9 +106,6 @@ class OrgDrawer extends OrgParentNode with OrgElement {
         trailing ?? this.trailing,
         id ?? this.id,
       );
-
-  OrgDrawer ensureTrailingNewline() =>
-      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }
 
 /// A property in a drawer, like
@@ -147,6 +145,7 @@ class OrgProperty extends OrgParentNode with OrgElement {
   OrgParentNode fromChildren(List<OrgNode> children) =>
       copyWith(value: children.single as OrgContent);
 
+  @override
   OrgProperty copyWith({
     String? indent,
     String? key,

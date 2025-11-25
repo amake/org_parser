@@ -25,4 +25,18 @@ class OrgComment extends OrgLeafNode with OrgElement {
       ..write(content)
       ..write(trailing);
   }
+
+  @override
+  OrgComment copyWith({
+    String? indent,
+    String? start,
+    String? content,
+    String? trailing,
+  }) =>
+      OrgComment(
+        indent ?? this.indent,
+        start ?? this.start,
+        content ?? this.content,
+        trailing ?? this.trailing,
+      );
 }

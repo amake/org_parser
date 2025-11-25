@@ -38,7 +38,9 @@ class OrgFootnote extends OrgParentNode with OrgElement {
       ..write(trailing);
   }
 
+  @override
   OrgFootnote copyWith({
+    String? indent, // ignore
     OrgFootnoteReference? marker,
     OrgContent? content,
     String? trailing,

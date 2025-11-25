@@ -3,10 +3,10 @@ part of '../model.dart';
 class OrgLocalVariables extends OrgLeafNode with OrgElement {
   OrgLocalVariables(
     this.start,
-    Iterable<({String prefix, String content, String suffix})> content,
+    Iterable<({String prefix, String content, String suffix})> entries,
     this.end,
     this.trailing,
-  ) : entries = List.unmodifiable(content);
+  ) : entries = List.unmodifiable(entries);
 
   @override
   final String indent = '';
@@ -38,4 +38,19 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
       ..write(end)
       ..write(trailing);
   }
+
+  @override
+  OrgLocalVariables copyWith({
+    String? indent, // ignore
+    String? start,
+    Iterable<({String prefix, String content, String suffix})>? entries,
+    String? end,
+    String? trailing,
+  }) =>
+      OrgLocalVariables(
+        start ?? this.start,
+        entries ?? this.entries,
+        end ?? this.end,
+        trailing ?? this.trailing,
+      );
 }

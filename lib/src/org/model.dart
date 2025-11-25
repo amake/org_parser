@@ -299,7 +299,7 @@ sealed class OrgTree extends OrgParentNode {
             .editNode(paragraph)!
             .replace(replacement)
             .insertRight(drawer.copyWith(
-                trailing: paragraph.ensureTrailingNewline().trailing))
+                trailing: paragraph.ensureTrailingNewLine().trailing))
             .commit<OrgContent>();
         return _ensureContent(content: newContent);
       }
@@ -384,10 +384,15 @@ mixin SingleContentElement {
   }
 }
 
-mixin OrgElement {
+mixin OrgElement on OrgNode {
   /// Indenting whitespace
   String get indent;
 
   /// Trailing whitespace
   String get trailing;
+
+  OrgElement ensureTrailingNewLine() =>
+      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
+
+  OrgElement copyWith({String? indent, String? trailing});
 }

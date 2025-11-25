@@ -86,7 +86,9 @@ class OrgTable extends OrgParentNode with OrgElement {
     buf.write(trailing);
   }
 
+  @override
   OrgTable copyWith({
+    String? indent, // ignore
     Iterable<OrgTableRow>? rows,
     String? trailing,
     String? id,

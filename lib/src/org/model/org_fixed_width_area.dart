@@ -29,4 +29,16 @@ class OrgFixedWidthArea extends OrgLeafNode with OrgElement {
       ..write(content)
       ..write(trailing);
   }
+
+  @override
+  OrgFixedWidthArea copyWith({
+    String? indent,
+    String? content,
+    String? trailing,
+  }) =>
+      OrgFixedWidthArea(
+        indent ?? this.indent,
+        content ?? this.content,
+        trailing ?? this.trailing,
+      );
 }

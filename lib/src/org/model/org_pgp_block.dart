@@ -36,4 +36,20 @@ class OrgPgpBlock extends OrgLeafNode with OrgElement {
   // Indent finagling consistent with `org-crypt--encrypted-text`
   String toRfc4880() =>
       toMarkup().trim().replaceAll(RegExp('^[ \t]*', multiLine: true), '');
+
+  @override
+  OrgPgpBlock copyWith({
+    String? indent,
+    String? header,
+    String? body,
+    String? footer,
+    String? trailing,
+  }) =>
+      OrgPgpBlock(
+        indent ?? this.indent,
+        header ?? this.header,
+        body ?? this.body,
+        footer ?? this.footer,
+        trailing ?? this.trailing,
+      );
 }

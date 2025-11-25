@@ -49,6 +49,7 @@ class OrgDynamicBlock extends OrgParentNode with OrgElement {
       ..write(trailing);
   }
 
+  @override
   OrgDynamicBlock copyWith({
     String? type,
     String? indent,

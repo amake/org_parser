@@ -46,6 +46,7 @@ class OrgMeta extends OrgParentNode with OrgElement {
   OrgParentNode fromChildren(List<OrgNode> children) =>
       copyWith(value: children.singleOrNull as OrgContent?);
 
+  @override
   OrgMeta copyWith({
     String? indent,
     String? key,

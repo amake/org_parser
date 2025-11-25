@@ -144,7 +144,7 @@ class OrgSection extends OrgTree {
     if (properties != null) {
       final newContent = content!
           .editNode(properties.node)!
-          .replace(properties.node.ensureTrailingNewline())
+          .replace(properties.node.ensureTrailingNewLine())
           .insertRight(log)
           .commit<OrgContent>();
       return _ensureContent(content: newContent);
@@ -163,7 +163,7 @@ class OrgSection extends OrgTree {
       if (paragraph != null && paragraph.body.children.first == planning.node) {
         final newContent = content!
             .editNode(paragraph)!
-            .replace(paragraph.ensureTrailingNewline())
+            .replace(paragraph.ensureTrailingNewLine())
             .insertRight(log)
             .commit<OrgContent>();
         return _ensureContent(content: newContent);

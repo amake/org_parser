@@ -33,6 +33,7 @@ class OrgParagraph extends OrgParentNode with OrgElement {
       ..write(trailing);
   }
 
+  @override
   OrgParagraph copyWith({
     String? indent,
     OrgContent? body,
@@ -45,7 +46,4 @@ class OrgParagraph extends OrgParentNode with OrgElement {
         trailing ?? this.trailing,
         id ?? this.id,
       );
-
-  OrgParagraph ensureTrailingNewline() =>
-      trailing.contains('\n') ? this : copyWith(trailing: '$trailing\n');
 }

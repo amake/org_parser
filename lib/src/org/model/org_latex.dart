@@ -46,6 +46,24 @@ class OrgLatexBlock extends OrgLeafNode with OrgElement {
       ..write(end)
       ..write(trailing);
   }
+
+  @override
+  OrgLatexBlock copyWith({
+    String? environment,
+    String? indent,
+    String? begin,
+    String? content,
+    String? end,
+    String? trailing,
+  }) =>
+      OrgLatexBlock(
+        environment ?? this.environment,
+        indent ?? this.indent,
+        begin ?? this.begin,
+        content ?? this.content,
+        end ?? this.end,
+        trailing ?? this.trailing,
+      );
 }
 
 /// An inline LaTeX snippet, like `$E=mc^2$`

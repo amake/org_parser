@@ -29,4 +29,16 @@ class OrgHorizontalRule extends OrgLeafNode with OrgElement {
       indent.contains(pattern) ||
       content.contains(pattern) ||
       trailing.contains(pattern);
+
+  @override
+  OrgHorizontalRule copyWith({
+    String? indent,
+    String? content,
+    String? trailing,
+  }) =>
+      OrgHorizontalRule(
+        indent ?? this.indent,
+        content ?? this.content,
+        trailing ?? this.trailing,
+      );
 }
