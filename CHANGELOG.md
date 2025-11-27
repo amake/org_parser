@@ -1,3 +1,6 @@
+## [11.1.0]
+- Make `ensureTrailingNewLine` method available on all `OrgElement`s
+
 ## [11.0.1]
 - Improve handling of custom TODO states when cycling section
 
