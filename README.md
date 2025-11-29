@@ -22,12 +22,19 @@ print(doc.children[0].headline.keyword); // TODO
 
 See the [example](./example/example.dart) for more.
 
-# Caveats
+# Features
 
-This parser was developed for an application that is halfway between
-pretty-printing and evaluating/interpreting, so in many cases the parsed
-structure does not split out constituent parts as thoroughly as needed for some
-applications.
+- [Parser](./lib/src/org/parser.dart) and rich, immutable AST for Org markup
+- [Zipper](https://en.wikipedia.org/wiki/Zipper_(data_structure))-based editing
+  facilities for Org AST
+- Extensive test suite, including checks for lossless round-tripping from markup
+  to AST and back
+- [Parser](./lib/src/query/parser.dart) for the [headline matching
+  DSL](https://orgmode.org/manual/Matching-tags-and-properties.html)
+- [Parser](./lib/src/file_link/parser.dart) for [file
+  links](https://orgmode.org/manual/Search-Options.html)
+- [Parser](./lib/src/todo/parser.dart) for and extended handling of the [TODO
+  workflow DSL](https://orgmode.org/manual/Workflow-states.html)
 
 # Supported syntax
 
@@ -73,6 +80,7 @@ applications.
       - [X] bar
         1. baz
         2. buzz
+    - bazinga :: bazonga
     ```
 - Drawers
 
@@ -88,14 +96,16 @@ applications.
 
     [fn:1] Bazinga
     ```
-- Links
+- Links, *including with emphasis in description*
 
     ```org
     [[http://example.com][example]]
 
+    [[http://example.com][example *with* emphasis]]
+
     http://example.com
     ```
-- Emphasis markup
+- Emphasis markup, *including nested emphasis*
 
     ```org
     *bold* /italic/ _underline_ +strikethrough+ ~code~ =verbatim=
@@ -106,6 +116,8 @@ applications.
     [2020-05-05 Tue]
 
     <2020-05-05 Tue 10:00>
+
+    [2020-05-05 Tue]--[2020-05-05 Tue]
     ```
 - Macro references
 
