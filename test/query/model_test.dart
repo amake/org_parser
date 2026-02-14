@@ -147,6 +147,48 @@ void main() {
         rejectsSection('* blah'),
       );
     });
+    test('missing property with ordering operators', () {
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'TODO',
+          operator: '>',
+          value: 'A',
+        ),
+        acceptsSection('* blah'),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '<',
+          value: 'ipsum',
+        ),
+        rejectsSection('* blah'),
+      );
+    });
+    test('non-numeric property with numeric comparison', () {
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '>',
+          value: 1,
+        ),
+        rejectsSection('''* blah
+:PROPERTIES:
+:lorem: ipsum
+:END:'''),
+      );
+      expect(
+        OrgQueryPropertyMatcher(
+          property: 'lorem',
+          operator: '=',
+          value: 0,
+        ),
+        acceptsSection('''* blah
+:PROPERTIES:
+:lorem: ipsum
+:END:'''),
+      );
+    });
     test('case-insensitive key', () {
       expect(
         OrgQueryPropertyMatcher(property: 'todo', operator: '=', value: 'DONE'),

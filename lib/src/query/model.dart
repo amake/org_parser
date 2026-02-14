@@ -68,7 +68,9 @@ class OrgQueryPropertyMatcher extends OrgQueryMatcher {
         if (value is String) {
           return evaluateString(actual, operator, value);
         } else if (actual != null && value is num) {
-          return evaluateNumber(num.parse(actual), operator, value);
+          // Real Org Mode calls `string-to-number` on the actual value, which
+          // returns 0 on failure
+          return evaluateNumber(num.tryParse(actual) ?? 0, operator, value);
         }
     }
     return false;

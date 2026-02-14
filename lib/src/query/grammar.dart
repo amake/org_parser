@@ -55,6 +55,8 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
       .plusLazy(ref0(op))
       .flatten(message: 'Property name expected');
 
+  // TODO(aaron): Support the optional "*" suffix that only matches when the
+  // tested property is present
   Parser op() =>
       string('<=') |
       string('=>') |

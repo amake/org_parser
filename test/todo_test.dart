@@ -310,4 +310,10 @@ void main() {
       expect(result, <OrgTodoStates>[]);
     });
   });
+  group('states', () {
+    test('isEndState empty definitions', () {
+      final states = OrgTodoStates();
+      expect(states.isEndState('DONE'), isFalse);
+    });
+  });
 }
