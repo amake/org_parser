@@ -1,3 +1,6 @@
+## [11.1.1]
+- Minor bug fixes
+
 ## [11.1.0]
 - Make `ensureTrailingNewLine` method available on all `OrgElement`s
 
