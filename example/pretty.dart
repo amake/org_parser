@@ -4,11 +4,24 @@ import 'dart:io';
 import 'package:org_parser/org_parser.dart';
 
 void main(List<String> arguments) async {
-  final markup = arguments.isNotEmpty
-      ? arguments.first
-      : await stdin.transform(utf8.decoder).join();
+  final markup = await getMarkup(arguments);
   final doc = OrgDocument.parse(markup);
   visit(doc);
+}
+
+Future<String> getMarkup(List<String> arguments) async {
+  if (arguments.length > 1) {
+    print('Usage: pretty.dart [file]');
+    exit(1);
+  }
+  if (arguments.isEmpty || arguments.single == '-') {
+    return await stdin.transform(utf8.decoder).join();
+  }
+  final file = File(arguments.single);
+  if (await file.exists()) {
+    return await file.readAsString();
+  }
+  return arguments.single;
 }
 
 void visit(OrgNode node, {int depth = 0}) {
