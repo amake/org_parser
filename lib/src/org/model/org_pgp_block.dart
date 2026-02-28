@@ -3,6 +3,11 @@ part of '../model.dart';
 class OrgPgpBlock extends OrgLeafNode with OrgElement {
   OrgPgpBlock(this.indent, this.header, this.body, this.footer, this.trailing);
 
+  // TODO(aaron): Org Mode doesn't treat PGP blocks as a distinct element.
+  // `org-element-at-point` returns `paragraph` for them. Should we do the same?
+  @override
+  final elementName = 'paragraph';
+
   @override
   final String indent;
   final String header;

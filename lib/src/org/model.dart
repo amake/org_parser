@@ -385,6 +385,9 @@ mixin SingleContentElement {
 }
 
 mixin OrgElement on OrgNode {
+  // See `org-element-all-elements` for possible values
+  String get elementName;
+
   /// Indenting whitespace
   String get indent;
 

@@ -4,6 +4,9 @@ class OrgComment extends OrgLeafNode with OrgElement {
   OrgComment(this.indent, this.start, this.content, this.trailing);
 
   @override
+  final elementName = 'comment';
+
+  @override
   final String indent;
   final String start;
   final String content;

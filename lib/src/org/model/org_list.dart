@@ -9,6 +9,10 @@ part of '../model.dart';
 class OrgList extends OrgParentNode with OrgElement {
   OrgList(Iterable<OrgListItem> items, this.trailing, [super.id])
       : items = List.unmodifiable(items);
+
+  @override
+  final elementName = 'plain-list';
+
   final List<OrgListItem> items;
 
   @override
@@ -53,6 +57,9 @@ class OrgList extends OrgParentNode with OrgElement {
 
 sealed class OrgListItem extends OrgParentNode {
   OrgListItem(this.indent, this.bullet, this.checkbox, this.body, [super.id]);
+
+  // TODO(aaron): In Org Mode a list item is an element
+  final elementName = 'item';
 
   final String indent;
   final String bullet;

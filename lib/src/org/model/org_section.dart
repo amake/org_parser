@@ -15,6 +15,9 @@ class OrgSection extends OrgTree {
     super.sections,
     super.id,
   ]);
+
+  String get elementName => level >= 15 ? 'inlinetask' : 'section';
+
   final OrgHeadline headline;
 
   /// The section's tags. Convenience accessor for tags of [headline].

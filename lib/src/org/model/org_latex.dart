@@ -16,6 +16,9 @@ class OrgLatexBlock extends OrgLeafNode with OrgElement {
     this.trailing,
   );
 
+  @override
+  final elementName = 'latex-environment';
+
   /// The LaTeX environment, like `equation`
   final String environment;
   @override

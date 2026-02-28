@@ -19,6 +19,9 @@ class OrgBlock extends OrgParentNode with OrgElement {
   ]);
 
   @override
+  String get elementName => '$type-block';
+
+  @override
   final String indent;
   final String header;
   final OrgNode body;

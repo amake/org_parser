@@ -9,6 +9,9 @@ class OrgFootnote extends OrgParentNode with OrgElement {
       : assert(marker.isDefinition);
 
   @override
+  final elementName = 'footnote-definition';
+
+  @override
   final String indent = '';
   final OrgFootnoteReference marker;
   final OrgContent content;

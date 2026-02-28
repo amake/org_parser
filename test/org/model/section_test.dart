@@ -346,4 +346,15 @@ foo
 ''');
     });
   });
+  test('inline task', () {
+    final result = parser.parse('''
+* TODO foo
+*************** TODO bar
+''');
+    final doc = result.value as OrgDocument;
+    final section = doc.sections[0];
+    expect(section.elementName, 'section');
+    final subsection = section.sections[0];
+    expect(subsection.elementName, 'inlinetask');
+  });
 }

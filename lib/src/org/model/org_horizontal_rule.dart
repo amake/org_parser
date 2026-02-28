@@ -8,6 +8,9 @@ class OrgHorizontalRule extends OrgLeafNode with OrgElement {
   OrgHorizontalRule(this.indent, this.content, this.trailing);
 
   @override
+  final elementName = 'horizontal-rule';
+
+  @override
   final String indent;
   final String content;
   @override

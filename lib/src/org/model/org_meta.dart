@@ -10,6 +10,9 @@ class OrgMeta extends OrgParentNode with OrgElement {
   OrgMeta(this.indent, this.key, this.value, this.trailing);
 
   @override
+  final elementName = 'keyword';
+
+  @override
   final String indent;
 
   /// The key, including the leading `#+` and trailing `:`.

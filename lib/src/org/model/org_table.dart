@@ -20,6 +20,9 @@ class OrgTable extends OrgParentNode with OrgElement {
   OrgTable(Iterable<OrgTableRow> rows, this.trailing, [super.id])
       : rows = List.unmodifiable(rows);
 
+  @override
+  final elementName = 'table';
+
   final List<OrgTableRow> rows;
 
   @override
@@ -103,6 +106,9 @@ class OrgTable extends OrgParentNode with OrgElement {
 
 sealed class OrgTableRow extends OrgParentNode {
   OrgTableRow(this.indent, this.trailing, [super.id]);
+
+  // TODO(aaron): In Org Mode a table row is an element
+  final elementName = 'table-row';
 
   final String indent;
   final String trailing;

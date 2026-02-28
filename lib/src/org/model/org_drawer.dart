@@ -17,6 +17,18 @@ class OrgDrawer extends OrgParentNode with OrgElement {
   ]);
 
   @override
+  String get elementName => isPropertyDrawer ? 'property-drawer' : 'drawer';
+
+  /// Whether this drawer is a property drawer, which is a special type of drawer
+  //
+  // TODO(aaron): Org Mode actually only considers a drawer to be a property
+  // drawer if it occurs immediately after a headline or at the very top of the
+  // file, but we don't have such contextual information here.
+  bool get isPropertyDrawer =>
+      header.trim().toUpperCase() == ':PROPERTIES:' &&
+      body.children.every((child) => child is OrgProperty);
+
+  @override
   final String indent;
   final String header;
   final OrgContent body;
@@ -114,6 +126,9 @@ class OrgDrawer extends OrgParentNode with OrgElement {
 /// ```
 class OrgProperty extends OrgParentNode with OrgElement {
   OrgProperty(this.indent, this.key, this.value, this.trailing, [super.id]);
+
+  @override
+  final elementName = 'node-property';
 
   @override
   final String indent;

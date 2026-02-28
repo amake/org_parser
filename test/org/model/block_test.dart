@@ -18,6 +18,7 @@ void main() {
       expect(block.contains('あ'), isFalse);
       expect(block.toMarkup(), markup);
       expect(block.toPlainText(), markup);
+      expect(block.elementName, 'example-block');
     });
     group('source block', () {
       test('simple', () {
@@ -32,6 +33,7 @@ void main() {
         expect(block.contains('あ'), isFalse);
         expect(block.toMarkup(), markup);
         expect(block.toPlainText(), markup);
+        expect(block.elementName, 'src-block');
       });
       test('empty', () {
         final markup = '''#+begin_src

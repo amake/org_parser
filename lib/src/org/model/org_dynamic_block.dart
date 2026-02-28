@@ -16,6 +16,9 @@ class OrgDynamicBlock extends OrgParentNode with OrgElement {
   ]);
 
   @override
+  final elementName = 'dynamic-block';
+
+  @override
   final String indent;
   final String header;
   final OrgContent body;

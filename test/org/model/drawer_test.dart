@@ -19,6 +19,7 @@ void main() {
       expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
       expect(drawer.toPlainText(), markup);
+      expect(drawer.elementName, 'drawer');
     });
     test('simple', () {
       final markup = ''':LOGBOOK:
@@ -31,6 +32,20 @@ a
       expect(drawer.contains('あ'), isFalse);
       expect(drawer.toMarkup(), markup);
       expect(drawer.toPlainText(), markup);
+      expect(drawer.elementName, 'drawer');
+    });
+    test('property', () {
+      final markup = ''':PROPERTIES:
+:foo: bar
+:END:
+''';
+      final result = parser.parse(markup);
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.contains('foo'), isTrue);
+      expect(drawer.contains('あ'), isFalse);
+      expect(drawer.toMarkup(), markup);
+      expect(drawer.toPlainText(), markup);
+      expect(drawer.elementName, 'property-drawer');
     });
     test('empty', () {
       final markup = ''':FOOBAR:

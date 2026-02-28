@@ -23,6 +23,9 @@ class OrgHeadline extends OrgParentNode {
                 trailing: tags.trailing
               );
 
+  // TODO(aaron): In Org Mode headlines are elements
+  final elementName = 'headline';
+
   /// Headline stars, like `*** `. Includes trailing spaces.
   final ({String value, String trailing}) stars;
 

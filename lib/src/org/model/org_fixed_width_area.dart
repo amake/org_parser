@@ -8,6 +8,9 @@ class OrgFixedWidthArea extends OrgLeafNode with OrgElement {
   OrgFixedWidthArea(this.indent, this.content, this.trailing);
 
   @override
+  final elementName = 'fixed-width-area';
+
+  @override
   final String indent;
   final String content;
   @override

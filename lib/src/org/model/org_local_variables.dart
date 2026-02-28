@@ -8,6 +8,11 @@ class OrgLocalVariables extends OrgLeafNode with OrgElement {
     this.trailing,
   ) : entries = List.unmodifiable(entries);
 
+  // TODO(aaron): Org Mode just considers this to be a comment (e.g. via
+  // `org-element-at-point`). Should we do the same?
+  @override
+  final elementName = 'comment';
+
   @override
   final String indent = '';
   final String start;
