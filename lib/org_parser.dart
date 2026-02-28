@@ -1,5 +1,6 @@
 export 'src/file_link/file_link.dart';
 export 'src/org/org.dart';
+export 'src/plist/plist.dart';
 export 'src/query/query.dart';
 export 'src/search.dart';
 export 'src/todo/todo.dart';
