@@ -1,3 +1,5 @@
+import 'package:org_parser/src/org/model.dart';
+
 /// Identify queries that point to a section within the current document
 /// (starting with '*')
 bool isOrgLocalSectionSearch(String query) => query.startsWith('*');
@@ -78,4 +80,57 @@ bool isLineNumberSearch(String query) {
 int parseLineNumberSearch(String query) {
   assert(isLineNumberSearch(query));
   return int.parse(query);
+}
+
+extension OrgTreeSearch on OrgTree {
+  /// Find the section with the specified title
+  OrgSection? _sectionSearch(bool Function(OrgSection) predicate) {
+    OrgSection? result;
+    visitSections((section) {
+      if (predicate(section)) {
+        result = section;
+        return false;
+      }
+      return true;
+    });
+    return result;
+  }
+
+  /// Find the section with the specified title
+  OrgSection? sectionWithTitle(String title) =>
+      _sectionSearch((section) => section.headline.rawTitle == title);
+
+  /// Find the section with the specified ID
+  OrgTree? sectionWithId(String id) => ids.contains(id)
+      ? this
+      : _sectionSearch((section) => section.ids.contains(id));
+
+  /// Find the section with the specified custom ID
+  OrgTree? sectionWithCustomId(String customId) => customIds.contains(customId)
+      ? this
+      : _sectionSearch((section) => section.customIds.contains(customId));
+
+  /// Find the section corresponding to [target], which may be one of
+  ///
+  /// - A section title link fragment like `*Foo bar`
+  /// - A CUSTOM_ID link fragment like `#foo-bar`
+  /// - An ID link like `id:abcd1234`
+  ///
+  /// The specified section may not exist in this tree, in which case the result
+  /// will be null.
+  ///
+  /// If [target] is none of the above three types, an [Exception] will be
+  /// thrown.
+  OrgTree? sectionForTarget(String target) {
+    if (isOrgLocalSectionSearch(target)) {
+      return sectionWithTitle(parseOrgLocalSectionSearch(target));
+    } else if (isOrgIdSearch(target)) {
+      return sectionWithId(parseOrgIdSearch(target));
+    } else if (isOrgCustomIdSearch(target)) {
+      return sectionWithCustomId(parseOrgCustomIdSearch(target));
+    } else {
+      throw Exception(
+          'Unknown target type: $target (was not a title or an ID)');
+    }
+  }
 }
