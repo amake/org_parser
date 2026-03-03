@@ -1,3 +1,10 @@
+## [11.2.0]
+- Added `elementName` property to `OrgElement` and a few other node types
+- Added a `plist` parser for e.g. lists of properties on src blocks, keyword
+  lines, etc.
+- Added an extension on `OrgTree` with methods for searching for sections by ID,
+  custom ID, title, etc.
+
 ## [11.1.1]
 - Minor bug fixes
 
