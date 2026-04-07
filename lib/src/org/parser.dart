@@ -192,6 +192,12 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
+  Parser whitespaceOnlyParagraph() => super.whitespaceOnlyParagraph().map((items) {
+        final indent = items[0] as String;
+        return OrgParagraph(indent, OrgContent([]), '');
+      });
+
+  @override
   Parser plainText([Parser? limit]) =>
       super.plainText(limit).map((value) => OrgPlainText(value as String));
 

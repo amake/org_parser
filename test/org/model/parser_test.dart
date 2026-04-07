@@ -552,6 +552,35 @@ baz''', interpretEmbeddedSettings: true);
       final radioLink = doc.find<OrgRadioLink>((_) => true);
       expect(radioLink!.node.content, 'baz');
     });
+    group('whitespace-only content', () {
+      test('round-trips document containing only spaces', () {
+        const markup = ' ';
+        final doc = OrgDocument.parse(markup);
+        final paragraph = doc.content!.children.single as OrgParagraph;
+        expect(paragraph.indent, ' ');
+        expect(paragraph.body.children, isEmpty);
+        expect(doc.toMarkup(), markup);
+      });
+
+      test('round-trips document containing only tabs', () {
+        const markup = '\t';
+        final doc = OrgDocument.parse(markup);
+        final paragraph = doc.content!.children.single as OrgParagraph;
+        expect(paragraph.indent, '\t');
+        expect(paragraph.body.children, isEmpty);
+        expect(doc.toMarkup(), markup);
+      });
+
+      test('round-trips section content ending with spaces only', () {
+        const markup = '* x\n ';
+        final doc = OrgDocument.parse(markup);
+        final paragraph =
+            doc.sections.single.content!.children.single as OrgParagraph;
+        expect(paragraph.indent, ' ');
+        expect(paragraph.body.children, isEmpty);
+        expect(doc.toMarkup(), markup);
+      });
+    });
   });
 }
 

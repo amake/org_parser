@@ -110,6 +110,7 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(localVariables) |
       ref0(pgpBlock) |
       ref0(comment) |
+      ref0(whitespaceOnlyParagraph) |
       ref0(paragraph);
 
   Parser elements() => ref0(element).star();
@@ -123,6 +124,11 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(indent).flatten(message: 'Paragraph indent expected') &
       ref1(textRun, ref0(paragraphEnd)).plusLazy(ref0(paragraphEnd)) &
       ref0(blankLines);
+
+  Parser whitespaceOnlyParagraph() =>
+      (lineStart() & insignificantWhitespace().plusString())
+          .flatten(message: 'Paragraph indent expected') &
+      endOfInput();
 
   Parser nonParagraphElement() =>
       element()..replace(ref0(paragraph), noOpFail());

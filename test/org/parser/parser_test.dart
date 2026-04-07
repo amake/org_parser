@@ -135,5 +135,37 @@ r0SZNYouvk7tY6rDz0Z62WRwOtrBx0D/5T0E9kT3rpnB
         baz buzz''');
       expect(doc.sections[0].headline.keyword?.value, 'TODO');
     });
+    group('whitespace-only content', () {
+      test('document containing only spaces', () {
+        final result = parser.parse(' ');
+        expect(result, isA<Success<dynamic>>());
+        final document = result.value as OrgDocument;
+        final paragraph = document.content!.children.single as OrgParagraph;
+        expect(paragraph.indent, ' ');
+        expect(paragraph.body.children, isEmpty);
+        expect(paragraph.trailing, '');
+      });
+
+      test('document containing only tabs', () {
+        final result = parser.parse('\t');
+        expect(result, isA<Success<dynamic>>());
+        final document = result.value as OrgDocument;
+        final paragraph = document.content!.children.single as OrgParagraph;
+        expect(paragraph.indent, '\t');
+        expect(paragraph.body.children, isEmpty);
+        expect(paragraph.trailing, '');
+      });
+
+      test('section content ending with spaces only', () {
+        final result = parser.parse('* x\n ');
+        expect(result, isA<Success<dynamic>>());
+        final document = result.value as OrgDocument;
+        final paragraph = document.sections.single.content!.children.single
+            as OrgParagraph;
+        expect(paragraph.indent, ' ');
+        expect(paragraph.body.children, isEmpty);
+        expect(paragraph.trailing, '');
+      });
+    });
   });
 }
