@@ -1,3 +1,6 @@
+## [11.2.1]
+- Fix for parsing edge case
+
 ## [11.2.0]
 - Added `elementName` property to `OrgElement` and a few other node types
 - Added a `plist` parser for e.g. lists of properties on src blocks, keyword
