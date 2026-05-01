@@ -199,7 +199,7 @@ void main() {
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''* TODO foo
   :PROPERTIES:
@@ -213,7 +213,7 @@ void main() {
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '   ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '   ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''** TODO foo
    :PROPERTIES:
@@ -228,7 +228,7 @@ buzz bazz''');
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''* TODO foo
   :PROPERTIES:
@@ -243,7 +243,7 @@ buzz bazz''');
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''* TODO foo
   SCHEDULED: <2024-01-01 Mon>
@@ -261,7 +261,7 @@ buzz bazz''');
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''* TODO foo
   SCHEDULED: <2024-01-01 Mon>
@@ -280,7 +280,7 @@ foo
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(
             updated.toMarkup(),
@@ -302,7 +302,7 @@ foo
         final section = doc.sections[0];
         final updated = section.setProperty(
           OrgProperty(
-              '  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+              '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), '''* TODO foo
   :PROPERTIES:
@@ -320,7 +320,8 @@ foo
       final doc = result.value as OrgDocument;
       final section = doc.sections[0];
       final updated = section.setProperty(
-        OrgProperty('  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+        OrgProperty(
+            '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
       );
       expect(updated.toMarkup(), '''* TODO foo
   :PROPERTIES:
@@ -337,7 +338,8 @@ foo
       final doc = result.value as OrgDocument;
       final section = doc.sections[0];
       final updated = section.setProperty(
-        OrgProperty('  ', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+        OrgProperty(
+            '  ', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
       );
       expect(updated.toMarkup(), '''* TODO foo
   :PROPERTIES:

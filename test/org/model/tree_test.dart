@@ -10,7 +10,8 @@ void main() {
         final result = parser.parse('');
         final doc = result.value as OrgDocument;
         final updated = doc.setProperty(
-          OrgProperty('', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+          OrgProperty(
+              '', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), ''':PROPERTIES:
 :PRIORITY: A
@@ -23,7 +24,8 @@ void main() {
 ''');
         final doc = result.value as OrgDocument;
         final updated = doc.setProperty(
-          OrgProperty('', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+          OrgProperty(
+              '', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), ''':PROPERTIES:
 :PRIORITY: A
@@ -37,7 +39,8 @@ void main() {
 ''');
         final doc = result.value as OrgDocument;
         final updated = doc.setProperty(
-          OrgProperty('', ':PRIORITY:', OrgContent([OrgPlainText(' A')]), '\n'),
+          OrgProperty(
+              '', ':PRIORITY:', ' ', OrgContent([OrgPlainText('A')]), '\n'),
         );
         expect(updated.toMarkup(), ''':PROPERTIES:
 :PRIORITY: A

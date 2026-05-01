@@ -229,7 +229,8 @@ sealed class OrgTree extends OrgParentNode {
   List<String> getProperties(String key) =>
       _propertiesDrawer
           ?.properties(key: key)
-          .map<String>((prop) => prop.value.toMarkup().trim())
+          .expand<String>(
+              (prop) => prop.isEmpty ? [] : [prop.value!.toMarkup().trim()])
           .toList(growable: false) ??
       const [];
 

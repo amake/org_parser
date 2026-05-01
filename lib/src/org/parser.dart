@@ -192,7 +192,8 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
       });
 
   @override
-  Parser whitespaceOnlyParagraph() => super.whitespaceOnlyParagraph().map((items) {
+  Parser whitespaceOnlyParagraph() =>
+      super.whitespaceOnlyParagraph().map((items) {
         final indent = items[0] as String;
         return OrgParagraph(indent, OrgContent([]), '');
       });
@@ -805,15 +806,23 @@ class OrgContentParserDefinition extends OrgContentGrammarDefinition {
   Parser property() => super.property().map((values) {
         final indent = values[0] as String;
         final key = values[1] as String;
-        final value = values[2] as String;
+        final value = values[2] as List;
+        final delimiter = value[0] as String;
+        final valueStr = value[1] as String?;
         final trailing = values[3] as String;
-        return OrgProperty(indent, key,
-            OrgContent(textRunParser.parse(value).value), trailing);
+        final valueContent = valueStr != null && valueStr.isNotEmpty
+            ? OrgContent(textRunParser.parse(valueStr).value)
+            : null;
+        return OrgProperty(indent, key, delimiter, valueContent, trailing);
       });
 
   @override
   Parser propertyKey() =>
       super.propertyKey().flatten(message: 'Property key expected');
+
+  @override
+  Parser emptyPropertyValue() =>
+      super.emptyPropertyValue().map((value) => [value, null]);
 
   @override
   Parser footnoteReferenceNamed() =>

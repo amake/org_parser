@@ -9,18 +9,19 @@ void main() {
     test('indented', () {
       final result = parser.parse('''  :foo:
   :bar: baz
+  :bazinga:
   :bizz: buzz
   :end:
 
 ''');
       final drawer = result.value as OrgDrawer;
       expect(drawer.header, ':foo:\n');
-      expect(drawer.properties().length, 2);
+      expect(drawer.properties().length, 3);
       final body = drawer.body;
       final property = body.children[0] as OrgProperty;
       expect(property.key, ':bar:');
-      final value = property.value.children[0] as OrgPlainText;
-      expect(value.content, ' baz');
+      final value = property.value!.children[0] as OrgPlainText;
+      expect(value.content, 'baz');
       expect(drawer.footer, '  :end:');
       expect(drawer.properties().first, property);
     });
@@ -44,7 +45,9 @@ a
       final drawer = result.value as OrgDrawer;
       expect(drawer.header, ':LOGBOOK:\n');
       final property = drawer.properties().first;
-      final value = property.value.children[1] as OrgMarkup;
+      expect(property.isEmpty, isFalse);
+      expect(property.isNotEmpty, isTrue);
+      final value = property.value!.children[0] as OrgMarkup;
       expect(value.toMarkup(), '*bar*');
     });
     test('empty', () {
@@ -54,6 +57,47 @@ a
       expect(drawer.properties().isEmpty, isTrue);
       final body = drawer.body;
       expect(body.children.isEmpty, isTrue);
+    });
+    test('empty property', () {
+      final result = parser.parse(''':FOOBAR:
+:foo:
+:END:''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.properties().length, 1);
+      final body = drawer.body;
+      final property = body.children[0] as OrgProperty;
+      expect(property.key, ':foo:');
+      expect(property.isEmpty, isTrue);
+      expect(property.isNotEmpty, isFalse);
+    });
+    test('whitespace-only property', () {
+      final result = parser.parse(''':FOOBAR:
+:foo:${' '}
+:END:''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.properties().length, 1);
+      final body = drawer.body;
+      final property = body.children[0] as OrgProperty;
+      expect(property.key, ':foo:');
+      expect(property.isEmpty, isTrue);
+      expect(property.isNotEmpty, isFalse);
+    });
+    test('empty and real value property', () {
+      final result = parser.parse(''':FOOBAR:
+:foo:
+:foo: bar
+:END:''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.properties().length, 2);
+      final body = drawer.body;
+      final property = body.children[0] as OrgProperty;
+      expect(property.key, ':foo:');
+      expect(property.isEmpty, isTrue);
+      expect(property.isNotEmpty, isFalse);
+      final property2 = body.children[1] as OrgProperty;
+      expect(property2.key, ':foo:');
+      expect(property2.isEmpty, isFalse);
+      expect(property2.isNotEmpty, isTrue);
     });
   });
 }

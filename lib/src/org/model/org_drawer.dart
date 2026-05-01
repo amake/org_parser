@@ -125,7 +125,8 @@ class OrgDrawer extends OrgParentNode with OrgElement {
 /// :CUSTOM_ID: foobar
 /// ```
 class OrgProperty extends OrgParentNode with OrgElement {
-  OrgProperty(this.indent, this.key, this.value, this.trailing, [super.id]);
+  OrgProperty(this.indent, this.key, this.delimiter, this.value, this.trailing,
+      [super.id]);
 
   @override
   final elementName = 'node-property';
@@ -133,13 +134,21 @@ class OrgProperty extends OrgParentNode with OrgElement {
   @override
   final String indent;
   final String key;
-  final OrgContent value;
+  final String delimiter;
+  final OrgContent? value;
   @override
   final String trailing;
 
+  bool get isEmpty => value?.children.isEmpty ?? true;
+  bool get isNotEmpty => !isEmpty;
+
   @override
   bool contains(Pattern pattern) =>
-      key.contains(pattern) || value.contains(pattern);
+      indent.contains(pattern) ||
+      key.contains(pattern) ||
+      delimiter.contains(pattern) ||
+      value?.contains(pattern) == true ||
+      trailing.contains(pattern);
 
   @override
   String toString() => 'OrgProperty';
@@ -149,12 +158,13 @@ class OrgProperty extends OrgParentNode with OrgElement {
     buf
       ..write(indent)
       ..write(key)
-      ..visit(value)
-      ..write(trailing);
+      ..write(delimiter);
+    if (value != null) buf.visit(value!);
+    buf.write(trailing);
   }
 
   @override
-  List<OrgNode> get children => [value];
+  List<OrgNode> get children => value == null ? const [] : [value!];
 
   @override
   OrgParentNode fromChildren(List<OrgNode> children) =>
@@ -164,6 +174,7 @@ class OrgProperty extends OrgParentNode with OrgElement {
   OrgProperty copyWith({
     String? indent,
     String? key,
+    String? delimiter,
     OrgContent? value,
     String? trailing,
     String? id,
@@ -171,6 +182,7 @@ class OrgProperty extends OrgParentNode with OrgElement {
       OrgProperty(
         indent ?? this.indent,
         key ?? this.key,
+        delimiter ?? this.delimiter,
         value ?? this.value,
         trailing ?? this.trailing,
         id ?? this.id,

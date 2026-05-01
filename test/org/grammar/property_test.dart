@@ -11,13 +11,27 @@ void main() {
       expect(result.value, [
         '',
         [':', 'foo', ':'],
-        ' bar',
+        [' ', 'bar'],
         ''
       ]);
     });
     test('missing value', () {
       final result = parser.parse(':foo:');
-      expect(result, isA<Failure>());
+      expect(result.value, [
+        '',
+        [':', 'foo', ':'],
+        '',
+        ''
+      ]);
+    });
+    test('missing value but trailing whitespace', () {
+      final result = parser.parse(':foo: ');
+      expect(result.value, [
+        '',
+        [':', 'foo', ':'],
+        ' ',
+        ''
+      ]);
     });
     test('missing delimiter', () {
       final result = parser.parse(':foo:blah');

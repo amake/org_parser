@@ -468,6 +468,27 @@ content''');
         final doc = result.value as OrgDocument;
         expect(doc.getProperties(':FOO:'), ['foo', 'bar']);
       });
+      test('empty', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO:
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), isEmpty);
+      });
+      test('some empty', () {
+        final result = parser.parse('''
+:PROPERTIES:
+:FOO:
+:FOO: foo
+:FOO:
+:FOO: bar
+:END:
+''');
+        final doc = result.value as OrgDocument;
+        expect(doc.getProperties(':FOO:'), ['foo', 'bar']);
+      });
       test('inheritance', () {
         final result = parser.parse('''
 :PROPERTIES:

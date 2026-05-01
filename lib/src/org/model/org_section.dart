@@ -104,8 +104,8 @@ class OrgSection extends OrgTree {
     final indent = level > 0 ? ' ' * (level + 1) : '';
     final timestamp =
         OrgSimpleTimestamp('[', now.toOrgDate(), now.toOrgTime(), [], ']');
-    final lastRepeat = OrgProperty(indent, ':LAST_REPEAT:',
-        OrgContent([OrgPlainText(' '), timestamp]), '\n');
+    final lastRepeat = OrgProperty(
+        indent, ':LAST_REPEAT:', ' ', OrgContent([timestamp]), '\n');
 
     final note = OrgContent([
       // See org-log-note-headings

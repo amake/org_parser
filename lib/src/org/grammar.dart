@@ -845,10 +845,17 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
           .plusString(message: 'Property name expected') &
       char(':');
 
-  Parser propertyValue() => (insignificantWhitespace().plus() &
-          whitespace().neg() &
-          any().starLazy(lineEnd()))
-      .flatten(message: 'Property value expected');
+  Parser propertyValue() => ref0(emptyPropertyValue) | ref0(realPropertyValue);
+
+  Parser emptyPropertyValue() => (insignificantWhitespace()
+              .starString(message: 'Empty property value expected') &
+          lineEnd().and())
+      .pick(0);
+
+  Parser realPropertyValue() =>
+      insignificantWhitespace().plusString() &
+      (whitespace().neg() & any().starLazy(lineEnd()))
+          .flatten(message: 'Property value expected');
 
   Parser footnoteReference() =>
       ref0(footnoteReferenceNamed) | ref0(footnoteReferenceInline);

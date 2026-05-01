@@ -64,7 +64,7 @@ a
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
         final updated = drawer.setProperty(OrgProperty(
-            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+            '', ':bizz:', ' ', OrgContent([OrgPlainText('buzz')]), '\n'));
         expect(updated.toMarkup(), ''':FOOBAR:
 :bizz: buzz
 :END:''');
@@ -75,7 +75,7 @@ a
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
         final updated = drawer.setProperty(OrgProperty(
-            '  ', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+            '  ', ':bizz:', ' ', OrgContent([OrgPlainText('buzz')]), '\n'));
         expect(updated.toMarkup(), '''  :FOOBAR:
   :bizz: buzz
   :END:''');
@@ -87,7 +87,7 @@ a
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
         final updated = drawer.setProperty(OrgProperty(
-            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+            '', ':bizz:', ' ', OrgContent([OrgPlainText('buzz')]), '\n'));
         expect(updated.toMarkup(), ''':FOOBAR:
 :bazz: fizz
 :bizz: buzz
@@ -100,7 +100,7 @@ a
         final result = parser.parse(markup);
         final drawer = result.value as OrgDrawer;
         final updated = drawer.setProperty(OrgProperty(
-            '', ':bizz:', OrgContent([OrgPlainText(' buzz')]), '\n'));
+            '', ':bizz:', ' ', OrgContent([OrgPlainText('buzz')]), '\n'));
         expect(updated.toMarkup(), ''':FOOBAR:
 :bizz: buzz
 :END:''');
