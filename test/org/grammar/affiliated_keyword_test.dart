@@ -38,6 +38,30 @@ void main() {
         ''
       ]);
     });
+    test('dual-value', () {
+      final result = parser.parse('#+caption[blah]: foo');
+      expect(result.value, [
+        '',
+        ['#+caption[blah]:', ' foo'],
+        ''
+      ]);
+    });
+    test('dual-value-capable but single-value', () {
+      final result = parser.parse('#+CAPTION: foo');
+      expect(result.value, [
+        '',
+        ['#+CAPTION:', ' foo'],
+        ''
+      ]);
+    });
+    test('dual-value edge case', () {
+      final result = parser.parse('#+caption[:blah]: ]: foo');
+      expect(result.value, [
+        '',
+        ['#+caption[:blah]: ]:', ' foo'],
+        ''
+      ]);
+    }, skip: "I don't think we can support this without backtracking");
     test('not at beginning of line', () {
       final result = parser.parse('''a   #+blah''');
       expect(result, isA<Failure>());

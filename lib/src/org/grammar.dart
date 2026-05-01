@@ -419,7 +419,26 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
       ref0(affiliatedKeywordValue));
 
   Parser affiliatedKeywordKey() =>
+      ref0(affiliatedKeywordDualKey) | ref0(affiliatedKeywordSingleKey);
+
+  Parser affiliatedKeywordSingleKey() =>
       string('#+') & whitespace().neg().starLazy(char(':')) & char(':');
+
+  // See `org-element-dual-keywords`
+  Parser affiliatedKeywordDualKey() =>
+      string('#+') &
+      (string('CAPTION', ignoreCase: true) |
+          string('RESULTS', ignoreCase: true)) &
+      ref0(affiliatedKeywordSecondaryValue).optional() &
+      char(':');
+
+  Parser affiliatedKeywordSecondaryValue() =>
+      char('[') &
+      // TODO(aaron): This end condition handles some edge cases but for full
+      // fidelity to `org-element-affiliated-re` we would need to support
+      // backtracking
+      any().starLazy(string(']:') & (whitespace() | lineEnd())) &
+      char(']');
 
   Parser affiliatedKeywordValue() => any()
       .starLazy(lineEnd())
