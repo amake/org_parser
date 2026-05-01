@@ -1,3 +1,6 @@
+## [11.3.0]
+- Fix handling of empty drawer properties
+
 ## [11.2.1]
 - Fix for parsing edge case
 
