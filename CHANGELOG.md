@@ -1,3 +1,6 @@
+## [11.4.0]
+- Support dual-value affiliated keywords like `#+CAPTION[short]: long`
+
 ## [11.3.1]
 - Fix handling of non-property content in drawers
 
