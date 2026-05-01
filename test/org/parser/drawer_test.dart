@@ -99,5 +99,43 @@ a
       expect(property2.isEmpty, isFalse);
       expect(property2.isNotEmpty, isTrue);
     });
+    test('real and invalid value property', () {
+      final result = parser.parse(''':FOOBAR:
+:foo:k
+:foo: bar
+:END:''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.properties().length, 1);
+      final body = drawer.body;
+      final invalid = body.children[0] as OrgPlainText;
+      expect(invalid.content, ':foo:k\n');
+      final valid = body.children[1] as OrgProperty;
+      expect(valid.key, ':foo:');
+      expect(valid.isEmpty, isFalse);
+      expect(valid.isNotEmpty, isTrue);
+      expect(valid.value!.toMarkup(), 'bar');
+    });
+    test('property and text run', () {
+      final result = parser.parse(''':FOOBAR:
+a *b* /c/
+:foo: bar
+:END:''');
+      final drawer = result.value as OrgDrawer;
+      expect(drawer.properties().length, 1);
+      final body = drawer.body;
+      final first = body.children[0] as OrgPlainText;
+      expect(first.content, 'a ');
+      final second = body.children[1] as OrgMarkup;
+      expect(second.style, OrgStyle.bold);
+      expect(second.toMarkup(), '*b*');
+      final third = body.children[3] as OrgMarkup;
+      expect(third.style, OrgStyle.italic);
+      expect(third.toMarkup(), '/c/');
+      final property = body.children[5] as OrgProperty;
+      expect(property.key, ':foo:');
+      expect(property.isEmpty, isFalse);
+      expect(property.isNotEmpty, isTrue);
+      expect(property.value!.toMarkup(), 'bar');
+    });
   });
 }

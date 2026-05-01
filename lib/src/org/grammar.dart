@@ -818,7 +818,9 @@ class OrgContentGrammarDefinition extends GrammarDefinition {
 
   Parser drawerContent() {
     final end = ref0(drawerEnd);
-    return (ref0(property) | ref0(nonDrawerElements) | ref1(textRun, end))
+    return (ref0(property) |
+            ref0(nonDrawerElements) |
+            ref1(textRun, ref0(property) | ref0(nonDrawerElements) | end))
         .starLazy(end);
   }
 
