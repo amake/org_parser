@@ -1,3 +1,6 @@
+## [11.3.1]
+- Fix handling of non-property content in drawers
+
 ## [11.3.0]
 - Fix handling of empty drawer properties
 
