@@ -17,7 +17,7 @@ class OrgHorizontalRule extends OrgLeafNode with OrgElement {
   final String trailing;
 
   @override
-  String toString() => 'OrgMacroReference';
+  String toString() => 'OrgHorizontalRule';
 
   @override
   void _toMarkupImpl(OrgSerializer buf) {
