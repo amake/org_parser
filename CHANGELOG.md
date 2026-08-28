@@ -1,3 +1,6 @@
+## [11.5.0]
+- Recognize `denote:` scheme in file link parser
+
 ## [11.4.0]
 - Support dual-value affiliated keywords like `#+CAPTION[short]: long`
 
