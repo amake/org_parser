@@ -26,7 +26,7 @@ void main() {
   rm bar
 #+end_examplek
 ''');
-        expect(result, isA<Failure>());
+      expect(result, isA<Failure>());
     });
     group('source block', () {
       test('simple', () {

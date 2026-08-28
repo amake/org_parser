@@ -160,8 +160,8 @@ r0SZNYouvk7tY6rDz0Z62WRwOtrBx0D/5T0E9kT3rpnB
         final result = parser.parse('* x\n ');
         expect(result, isA<Success<dynamic>>());
         final document = result.value as OrgDocument;
-        final paragraph = document.sections.single.content!.children.single
-            as OrgParagraph;
+        final paragraph =
+            document.sections.single.content!.children.single as OrgParagraph;
         expect(paragraph.indent, ' ');
         expect(paragraph.body.children, isEmpty);
         expect(paragraph.trailing, '');

@@ -5,7 +5,8 @@ import 'package:test/test.dart';
 void main() {
   group('arbitrary block', () {
     final definition = OrgContentParserDefinition();
-    final parser = definition.buildFrom(definition.arbitraryGreaterBlock()).end();
+    final parser =
+        definition.buildFrom(definition.arbitraryGreaterBlock()).end();
     test('example block', () {
       final result = parser.parse('''#+begin_example
   echo 'foo'
@@ -67,13 +68,13 @@ void main() {
   rm bar
 #+end_srcc
 ''');
-        final block = result.value as OrgBlock;
-        final body = block.body as OrgContent;
-        expect(block.header, '#+begin_srcc sh\n');
-        expect(body.toMarkup(), '  echo \'foo\'\n  rm bar\n');
-        expect(block.footer, '#+end_srcc');
-        expect(block.trailing, '\n');
-        expect(block.type, 'srcc');
+      final block = result.value as OrgBlock;
+      final body = block.body as OrgContent;
+      expect(block.header, '#+begin_srcc sh\n');
+      expect(body.toMarkup(), '  echo \'foo\'\n  rm bar\n');
+      expect(block.footer, '#+end_srcc');
+      expect(block.trailing, '\n');
+      expect(block.type, 'srcc');
     });
   });
 }
