@@ -11,6 +11,7 @@ class OrgFileLinkGrammarDefinition extends GrammarDefinition {
   Parser scheme() => (string('file:') |
           string('attachment:') |
           string('id:') |
+          string('denote:') |
           anyOf('/.').and())
       .flatten(message: 'Expected link scheme');
 

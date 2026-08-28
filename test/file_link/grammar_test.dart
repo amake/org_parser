@@ -39,6 +39,13 @@ void main() {
           ['id:', '6B60EF09-5A42-433A-BDD3-552809FBE1D8', null],
         );
       });
+      test('denote', () {
+        final result = parser.parse('denote:20260828T184017');
+        expect(
+          result.value,
+          ['denote:', '20260828T184017', null],
+        );
+      });
     });
     group('with extra', () {
       test('other file with line number', () {
@@ -66,6 +73,15 @@ void main() {
             .parse('id:6B60EF09-5A42-433A-BDD3-552809FBE1D8::/some regex/');
         expect(result.value,
             ['id:', '6B60EF09-5A42-433A-BDD3-552809FBE1D8', '/some regex/']);
+      });
+      test('denote with heading', () {
+        final result = parser.parse(
+            'denote:20260828T184017::#h:EA16D438-E04D-4D1F-BF19-01CF02E44E6D');
+        expect(result.value, [
+          'denote:',
+          '20260828T184017',
+          '#h:EA16D438-E04D-4D1F-BF19-01CF02E44E6D'
+        ]);
       });
     });
     group('without scheme', () {
