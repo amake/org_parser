@@ -57,13 +57,16 @@ class OrgSection extends OrgTree {
   /// A section may be empty if it has no content or sub-sections
   bool get isEmpty => content == null && sections.isEmpty;
 
-  OrgSection cycleTodo({List<OrgTodoStates>? todoStates, DateTime? now}) {
+  OrgSection cycleTodo({
+    List<OrgTodoStates>? todoStates,
+    DateTime? now,
+    bool logDone = false,
+  }) {
     now ??= DateTime.now();
     todoStates ??= [defaultTodoStates];
     var hasRepeat = false;
     var content = this.content;
-    final previousKeyword = this.headline.keyword?.value ?? '';
-    String? finalKeyword;
+    final previousKeyword = this.headline.keyword;
     var headline = this.headline.cycleTodo(todoStates);
 
     (bool, OrgZipper?) visitor(OrgZipper location) {
@@ -78,23 +81,37 @@ class OrgSection extends OrgTree {
     headline = headline.edit().visit(visitor).commit<OrgHeadline>();
     content = content?.edit().visit(visitor).commit<OrgContent>();
 
-    // TODO(aaron): Handle `org-log-done` = 'time behavior (record DONE time)
     if (!hasRepeat) {
-      return copyWith(
-        headline: headline,
-        content: content,
-      );
+      final nowDone = headline.keyword?.done == true;
+      final wasAlreadyDone = previousKeyword?.done == true;
+      if (logDone && nowDone && !wasAlreadyDone) {
+        return copyWith(
+          headline: headline,
+          content: content,
+        ).ensureDoneTimestamp(now: now);
+      } else if (logDone && !nowDone && wasAlreadyDone) {
+        return copyWith(
+          headline: headline,
+          content: content,
+        ).removeDoneTimestamp();
+      } else {
+        return copyWith(
+          headline: headline,
+          content: content,
+        );
+      }
     }
 
+    String? finalKeywordValue;
     if (headline.keywordIsEndState(todoStates)) {
-      finalKeyword = headline.keyword?.value ?? '';
+      finalKeywordValue = headline.keyword?.value ?? '';
       headline = headline.withoutKeyword();
       if (todoStates.any((t) => t.todo.isNotEmpty)) {
         headline = headline.cycleTodo(todoStates);
       }
     }
 
-    if (finalKeyword == null) {
+    if (finalKeywordValue == null) {
       return copyWith(
         headline: headline,
         content: content,
@@ -110,7 +127,7 @@ class OrgSection extends OrgTree {
     final note = OrgContent([
       // See org-log-note-headings
       OrgPlainText(
-          'State ${'"$finalKeyword"'.padRight(12)} from ${'"$previousKeyword"'.padRight(12)}'),
+          'State ${'"$finalKeywordValue"'.padRight(12)} from ${'"${previousKeyword?.value ?? ''}"'.padRight(12)}'),
       timestamp,
       OrgPlainText('\n'),
     ]);
@@ -121,7 +138,88 @@ class OrgSection extends OrgTree {
     ).setProperty<OrgSection>(lastRepeat).addLogNote(note);
   }
 
+  OrgSection ensureDoneTimestamp({DateTime? now}) {
+    now ??= DateTime.now();
+    final timestamp =
+        OrgSimpleTimestamp('[', now.toOrgDate(), now.toOrgTime(), [], ']');
+
+    final found = content
+        ?.find<OrgPlanningEntry>((node) => node.keyword.content == 'CLOSED:');
+    if (found != null) {
+      final doneEntry = found.node.copyWith(value: timestamp);
+      final newContent = content!
+          .editNode(found.node)!
+          .replace(doneEntry)
+          .commit<OrgContent>();
+      return _ensureContent(content: newContent);
+    }
+
+    final doneEntry = OrgPlanningEntry(
+      OrgPlanningKeyword('CLOSED:'),
+      ' ',
+      timestamp,
+    );
+
+    final scheduled = content?.find<OrgPlanningEntry>(
+        (node) => node.keyword.content == 'SCHEDULED:');
+    if (scheduled != null) {
+      final newContent = content!
+          .editNode(scheduled.node)!
+          .insertLeft(doneEntry)
+          .insertLeft(OrgPlainText(' '))
+          .commit<OrgContent>();
+      return _ensureContent(content: newContent);
+    }
+
+    // TODO(aaron): Adapting the indent is actually not default behavior; it is
+    // controlled by `org-adapt-indentation` and this implementation is assuming
+    // that it is non-nil, but the default is nil.
+    final indent = level > 0 ? ' ' * (level + 1) : '';
+    final paragraph = OrgParagraph(indent, OrgContent([doneEntry]), '\n');
+
+    if (content == null) {
+      final newContent = OrgContent([paragraph]);
+      return _ensureContent(content: newContent);
+    }
+
+    return _ensureContent(
+        content: content!.copyWith(
+      children: [paragraph, ...content!.children],
+    ));
+  }
+
+  OrgSection removeDoneTimestamp() {
+    if (content == null) return this;
+
+    final found = content!
+        .find<OrgPlanningEntry>((node) => node.keyword.content == 'CLOSED:');
+    if (found == null) return this;
+
+    var newContent = content!.editNode(found.node)!.delete();
+    if (newContent.node case OrgContent(children: [])) {
+      // If the containing paragraph is now empty, delete it as well
+      final parent = newContent.goUp();
+      if (parent.node case OrgParagraph()) {
+        newContent = parent.delete();
+      }
+    } else if (newContent.node case OrgPlainText(content: final rightText)) {
+      // If the CLOSED: entry had a trailing SCHEDULED: entry, trim the spaces
+      // between them
+      if (rightText.trim().isEmpty && newContent.canGoRight()) {
+        final rightNode = newContent.goRight().node;
+        if (rightNode is OrgPlanningEntry &&
+            rightNode.keyword.content == 'SCHEDULED:') {
+          newContent = newContent.delete();
+        }
+      }
+    }
+    return _ensureContent(content: newContent.commit<OrgContent>());
+  }
+
   OrgSection addLogNote(OrgContent note) {
+    // TODO(aaron): Adapting the indent is actually not default behavior; it is
+    // controlled by `org-adapt-indentation` and this implementation is assuming
+    // that it is non-nil, but the default is nil.
     final indent = level > 0 ? ' ' * (level + 1) : '';
     final logItem = OrgListUnorderedItem(indent, '- ', null, null, note);
     final existingLog = _getLogList();

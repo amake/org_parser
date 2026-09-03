@@ -139,6 +139,29 @@ void main() {
   - State "DONE"       from "TODO"      [2024-01-02 Tue 12:34]
 ''');
           });
+          test('next not done with logdone', () {
+            final now = DateTime(2024, 2, 3, 23, 45);
+            final result = parser.parse('''* TODO foo
+  SCHEDULED: <2024-01-01 Mon +1w>
+  :PROPERTIES:
+  :LAST_REPEAT: [2024-01-02 Tue 12:34]
+  :END:
+  - State "DONE"       from "TODO"      [2024-01-02 Tue 12:34]
+''');
+            final doc = result.value as OrgDocument;
+            final section = doc.sections[0];
+            final updated = section.cycleTodo(
+                now: now, todoStates: todoStates, logDone: true);
+            // Repeatable tasks do not get a CLOSED: timestamp when cycling to a
+            // non-done state, even with logDone: true
+            expect(updated.toMarkup(), '''* FEEDBACK foo
+  SCHEDULED: <2024-01-08 Mon +1w>
+  :PROPERTIES:
+  :LAST_REPEAT: [2024-01-02 Tue 12:34]
+  :END:
+  - State "DONE"       from "TODO"      [2024-01-02 Tue 12:34]
+''');
+          });
           test('next just one of done', () {
             final now = DateTime(2024, 2, 3, 23, 45);
             final result = parser.parse('''* VERIFY foo
@@ -185,6 +208,122 @@ void main() {
   :END:
   - State "TODO"       from ""          [2024-02-03 Sat 23:45]
   - State "DONE"       from "TODO"      [2024-01-02 Tue 12:34]
+''');
+          });
+        });
+      });
+    });
+    group('log done', () {
+      test('to done', () {
+        final now = DateTime(2024, 2, 3, 23, 45);
+        final result = parser.parse('''* TODO foo''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        final updated = section.cycleTodo(now: now, logDone: true);
+        expect(updated.toMarkup(), '''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45]
+''');
+      });
+      test('update existing', () {
+        final now = DateTime(2024, 2, 3, 23, 45);
+        final result = parser.parse('''* TODO foo
+  CLOSED: [2023-09-09 Mon 23:45]
+''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        final updated = section.cycleTodo(now: now, logDone: true);
+        expect(updated.toMarkup(), '''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45]
+''');
+      });
+      test('to not done', () {
+        final now = DateTime(2024, 2, 3, 23, 45);
+        final result = parser.parse('''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45]
+''');
+        final doc = result.value as OrgDocument;
+        final section = doc.sections[0];
+        final updated = section.cycleTodo(now: now, logDone: true);
+        expect(updated.toMarkup(), '''* foo
+''');
+      });
+      group('with scheduled', () {
+        test('to done', () {
+          final now = DateTime(2024, 2, 3, 23, 45);
+          final result = parser.parse('''* TODO foo
+  SCHEDULED: [2023-09-09 Mon 23:45]
+''');
+          final doc = result.value as OrgDocument;
+          final section = doc.sections[0];
+          final updated = section.cycleTodo(now: now, logDone: true);
+          expect(updated.toMarkup(), '''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45] SCHEDULED: [2023-09-09 Mon 23:45]
+''');
+        });
+        test('to not done', () {
+          final now = DateTime(2024, 2, 3, 23, 45);
+          final result = parser.parse('''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45] SCHEDULED: [2023-09-09 Mon 23:45]
+''');
+          final doc = result.value as OrgDocument;
+          final section = doc.sections[0];
+          final updated = section.cycleTodo(now: now, logDone: true);
+          expect(updated.toMarkup(), '''* foo
+  SCHEDULED: [2023-09-09 Mon 23:45]
+''');
+        });
+      });
+      group('custom states', () {
+        group('manual example', () {
+          final todoStates = [
+            OrgTodoStates(
+                todo: ['TODO', 'FEEDBACK', 'VERIFY'],
+                done: ['DONE', 'CANCELED'])
+          ];
+          final parser = OrgParserDefinition(todoStates: todoStates).build();
+          test('next not done', () {
+            final now = DateTime(2024, 2, 3, 23, 45);
+            final result = parser.parse('''* TODO foo
+  SCHEDULED: <2024-01-01 Mon>
+''');
+            final doc = result.value as OrgDocument;
+            final section = doc.sections[0];
+            final updated = section.cycleTodo(
+                now: now, todoStates: todoStates, logDone: true);
+            expect(updated.toMarkup(), '''* FEEDBACK foo
+  SCHEDULED: <2024-01-01 Mon>
+''');
+          });
+          test('next just one of done', () {
+            final now = DateTime(2024, 2, 3, 23, 45);
+            final result = parser.parse('''* VERIFY foo
+  SCHEDULED: <2024-01-01 Mon>
+''');
+            final doc = result.value as OrgDocument;
+            final section = doc.sections[0];
+            final updated = section.cycleTodo(
+                now: now, todoStates: todoStates, logDone: true);
+            expect(updated.toMarkup(), '''* DONE foo
+  CLOSED: [2024-02-03 Sat 23:45] SCHEDULED: <2024-01-01 Mon>
+''');
+          });
+        });
+        group('no todo states', () {
+          final todoStates = [
+            OrgTodoStates(todo: [], done: ['TODO'])
+          ];
+          final parser = OrgParserDefinition(todoStates: todoStates).build();
+          test('from empty', () {
+            final now = DateTime(2024, 2, 3, 23, 45);
+            final result = parser.parse('''* foo
+  SCHEDULED: <2024-01-01 Mon>
+''');
+            final doc = result.value as OrgDocument;
+            final section = doc.sections[0];
+            final updated = section.cycleTodo(
+                now: now, todoStates: todoStates, logDone: true);
+            expect(updated.toMarkup(), '''* TODO foo
+  CLOSED: [2024-02-03 Sat 23:45] SCHEDULED: <2024-01-01 Mon>
 ''');
           });
         });
