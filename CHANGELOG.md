@@ -1,3 +1,6 @@
+## [11.6.0]
+- Allow logging CLOSED: timestamps in `OrgSection.cycleTodo`
+
 ## [11.5.0]
 - Recognize `denote:` scheme in file link parser
 
