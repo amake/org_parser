@@ -1,3 +1,6 @@
+## [11.7.0]
+- Add section search utilities `isSectionForTarget` and `targetForSection`
+
 ## [11.6.1]
 - Date-only timestamps are now interpreted as representing the entire specified
   day, i.e. beginning at 00:00 (same as previous behavior) and ending at 00:00
