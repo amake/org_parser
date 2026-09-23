@@ -1,3 +1,8 @@
+## [11.6.1]
+- Date-only timestamps are now interpreted as representing the entire specified
+  day, i.e. beginning at 00:00 (same as previous behavior) and ending at 00:00
+  the next day
+
 ## [11.6.0]
 - Allow logging CLOSED: timestamps in `OrgSection.cycleTodo`
 
