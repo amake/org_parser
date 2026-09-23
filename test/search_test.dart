@@ -40,17 +40,28 @@ void main() {
 ''');
     test('section title', () {
       expect(doc.sectionWithTitle('foo'), doc.sections.first);
+      expect(doc.sectionWithTitle('foo')?.isSectionForTarget('*foo'), isTrue);
       expect(doc.sectionForTarget('*foo'), doc.sections.first);
+      expect(doc.sections.first.targetForSection, '*foo');
     });
     test('ID search', () {
       expect(doc.sectionWithId('bar-id'), doc.sections[0].sections[0]);
+      expect(
+          doc.sectionWithId('bar-id')?.isSectionForTarget('id:bar-id'), isTrue);
       expect(doc.sectionForTarget('id:bar-id'), doc.sections[0].sections[0]);
+      expect(doc.sections[0].sections[0].targetForSection, 'id:bar-id');
     });
     test('custom ID search', () {
       expect(doc.sectionWithCustomId('baz-custom-id'),
           doc.sections[0].sections[1]);
       expect(
+          doc
+              .sectionWithCustomId('baz-custom-id')
+              ?.isSectionForTarget('#baz-custom-id'),
+          isTrue);
+      expect(
           doc.sectionForTarget('#baz-custom-id'), doc.sections[0].sections[1]);
+      expect(doc.sections[0].sections[1].targetForSection, '#baz-custom-id');
     });
   });
 }
