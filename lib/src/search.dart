@@ -133,4 +133,43 @@ extension OrgTreeSearch on OrgTree {
           'Unknown target type: $target (was not a title or an ID)');
     }
   }
+
+  bool isSectionForTarget(String target) {
+    if (isOrgLocalSectionSearch(target)) {
+      final self = this;
+      return self is OrgSection &&
+          self.headline.rawTitle == parseOrgLocalSectionSearch(target);
+    } else if (isOrgIdSearch(target)) {
+      return ids.contains(parseOrgIdSearch(target));
+    } else if (isOrgCustomIdSearch(target)) {
+      return customIds.contains(parseOrgCustomIdSearch(target));
+    } else {
+      throw Exception(
+          'Unknown target type: $target (was not a title or an ID)');
+    }
+  }
+
+  /// Return a target string that can be used to refer to the given section. In order of preference, this will be:
+  ///
+  /// - The first ID of the section, if it has any (like `id:abcd1234`)
+  /// - The first CUSTOM_ID of the section, if it has any (like `#foo-bar`)
+  /// - The title of the section, if it has one (like `*Foo bar`)
+  ///
+  /// If the section has none of these, return null.
+  String? get targetForSection {
+    final id = ids.firstOrNull;
+    if (id != null) {
+      return 'id:$id';
+    }
+    final customId = customIds.firstOrNull;
+    if (customId != null) {
+      return '#$customId';
+    }
+    final self = this;
+    final title = self is OrgSection ? self.headline.rawTitle : null;
+    if (title != null) {
+      return '*$title';
+    }
+    return null;
+  }
 }
