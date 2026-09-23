@@ -16,6 +16,8 @@ void main() {
       expect(result.repeats, isFalse);
       expect(result.hasDelay, isFalse);
       expect(result.dateTime, DateTime(2020, 03, 12));
+      expect(result.startDateTime, DateTime(2020, 03, 12));
+      expect(result.endDateTime, DateTime(2020, 03, 13));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed');
     });
@@ -29,6 +31,8 @@ void main() {
       expect(result.repeats, isFalse);
       expect(result.hasDelay, isFalse);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.startDateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 8:34');
     });
@@ -43,6 +47,8 @@ void main() {
       expect(result.repeats, isTrue);
       expect(result.hasDelay, isFalse);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.startDateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w');
     });
@@ -57,6 +63,8 @@ void main() {
       expect(result.repeats, isTrue);
       expect(result.hasDelay, isFalse);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.startDateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w/2w');
     });
@@ -70,6 +78,8 @@ void main() {
       expect(result.contains('あ'), isFalse);
       expect(result.isActive, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.startDateTime, DateTime(2020, 03, 12, 08, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 12, 08, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 8:34 +1w --2d');
     });
@@ -85,6 +95,8 @@ void main() {
       expect(result.repeats, isTrue);
       expect(result.hasDelay, isTrue);
       expect(result.dateTime, DateTime(2020, 03, 12, 18, 34));
+      expect(result.startDateTime, DateTime(2020, 03, 12, 18, 34));
+      expect(result.endDateTime, DateTime(2020, 03, 12, 18, 34));
       expect(result.toMarkup(), markup);
       expect(result.toPlainText(), '2020-03-12 Wed 18:34 .+1w --12d');
     });

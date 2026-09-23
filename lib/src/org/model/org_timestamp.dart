@@ -181,7 +181,13 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
   @override
   DateTime get startDateTime => dateTime;
   @override
-  DateTime get endDateTime => dateTime;
+  DateTime get endDateTime => time == null
+      ? DateTime(
+          int.parse(date.year),
+          int.parse(date.month),
+          int.parse(date.day) + 1,
+        )
+      : dateTime;
 
   @override
   int compareTo(OrgTimestamp other) =>
