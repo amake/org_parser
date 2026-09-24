@@ -1,3 +1,6 @@
+## [11.7.1]
+- Fix `OrgTimestampModifier.apply` logic for delay-type modifiers
+
 ## [11.7.0]
 - Add section search utilities `isSectionForTarget` and `targetForSection`
 
