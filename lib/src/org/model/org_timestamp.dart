@@ -46,8 +46,20 @@ class OrgTimestampModifier extends OrgLeafNode {
         }
       case '-':
       case '--':
-        // These look like they should be subtracted, but because they mean
-        // "delay" they actually add to the date.
+        // The meaning of these depends on context:
+        //
+        // - `-`: Subtract the specified offset from the original datetime if
+        //   this is a DEADLINE. Add if this is a SCHEDULED.
+        //   https://orgmode.org/manual/Deadlines-and-Scheduling.html
+        //
+        // - `--`: When a SCHEDULED and has a repeater, add the specified offset
+        //   to the original datetime only for the first occurrence.
+        //   https://orgmode.org/manual/Deadlines-and-Scheduling.html
+        //
+        // We don't have that context here so we assume the common case of
+        // *delaying* the dateTime.
+        //
+        // TODO(aaron): Handle the DEADLINE case
         newDateTime = newDateTime.addModifier(value, unit);
       default:
         throw UnimplementedError('Unknown repeater prefix: $prefix');
