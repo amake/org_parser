@@ -611,4 +611,186 @@ void main() {
       });
     });
   });
+  group('modifiers', () {
+    final dt = DateTime(1970, 1, 1, 12, 34);
+    group('repeaters', () {
+      test('+h', () {
+        final modifier = OrgTimestampModifier('+', '1', 'h', null);
+        expect(modifier.toMarkup(), '+1h');
+        expect(modifier.toPlainText(), '+1h');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 1, 13, 34));
+      });
+      test('+d', () {
+        final modifier = OrgTimestampModifier('+', '1', 'd', null);
+        expect(modifier.toMarkup(), '+1d');
+        expect(modifier.toPlainText(), '+1d');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 2, 12, 34));
+      });
+      test('+w', () {
+        final modifier = OrgTimestampModifier('+', '1', 'w', null);
+        expect(modifier.toMarkup(), '+1w');
+        expect(modifier.toPlainText(), '+1w');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 8, 12, 34));
+      });
+      test('+m', () {
+        final modifier = OrgTimestampModifier('+', '1', 'm', null);
+        expect(modifier.toMarkup(), '+1m');
+        expect(modifier.toPlainText(), '+1m');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 2, 1, 12, 34));
+      });
+      test('+y', () {
+        final modifier = OrgTimestampModifier('+', '1', 'y', null);
+        expect(modifier.toMarkup(), '+1y');
+        expect(modifier.toPlainText(), '+1y');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1971, 1, 1, 12, 34));
+      });
+      test('++h', () {
+        final modifier = OrgTimestampModifier('++', '1', 'h', null);
+        expect(modifier.toMarkup(), '++1h');
+        expect(modifier.toPlainText(), '++1h');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 9, 25, 9, 34));
+      });
+      test('++d', () {
+        final modifier = OrgTimestampModifier('++', '1', 'd', null);
+        expect(modifier.toMarkup(), '++1d');
+        expect(modifier.toPlainText(), '++1d');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 9, 25, 12, 34));
+      });
+      test('++w', () {
+        final modifier = OrgTimestampModifier('++', '1', 'w', null);
+        expect(modifier.toMarkup(), '++1w');
+        expect(modifier.toPlainText(), '++1w');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 10, 1, 12, 34));
+      });
+      test('++m', () {
+        final modifier = OrgTimestampModifier('++', '1', 'm', null);
+        expect(modifier.toMarkup(), '++1m');
+        expect(modifier.toPlainText(), '++1m');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 10, 1, 12, 34));
+      });
+      test('++y', () {
+        final modifier = OrgTimestampModifier('++', '1', 'y', null);
+        expect(modifier.toMarkup(), '++1y');
+        expect(modifier.toPlainText(), '++1y');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2027, 1, 1, 12, 34));
+      });
+      test('.+h', () {
+        final modifier = OrgTimestampModifier('.+', '1', 'h', null);
+        expect(modifier.toMarkup(), '.+1h');
+        expect(modifier.toPlainText(), '.+1h');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 9, 25, 10, 0));
+      });
+      test('.+d', () {
+        final modifier = OrgTimestampModifier('.+', '1', 'd', null);
+        expect(modifier.toMarkup(), '.+1d');
+        expect(modifier.toPlainText(), '.+1d');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 9, 26, 12, 34));
+      });
+      test('.+w', () {
+        final modifier = OrgTimestampModifier('.+', '1', 'w', null);
+        expect(modifier.toMarkup(), '.+1w');
+        expect(modifier.toPlainText(), '.+1w');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 10, 2, 12, 34));
+      });
+      test('.+m', () {
+        final modifier = OrgTimestampModifier('.+', '1', 'm', null);
+        expect(modifier.toMarkup(), '.+1m');
+        expect(modifier.toPlainText(), '.+1m');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2026, 10, 25, 12, 34));
+      });
+      test('.+y', () {
+        final modifier = OrgTimestampModifier('.+', '1', 'y', null);
+        expect(modifier.toMarkup(), '.+1y');
+        expect(modifier.toPlainText(), '.+1y');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(2027, 9, 25, 12, 34));
+      });
+    });
+    group('delays', () {
+      test('-h', () {
+        final modifier = OrgTimestampModifier('-', '1', 'h', null);
+        expect(modifier.toMarkup(), '-1h');
+        expect(modifier.toPlainText(), '-1h');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 1, 13, 34));
+      });
+      test('-d', () {
+        final modifier = OrgTimestampModifier('-', '1', 'd', null);
+        expect(modifier.toMarkup(), '-1d');
+        expect(modifier.toPlainText(), '-1d');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 2, 12, 34));
+      });
+      test('-w', () {
+        final modifier = OrgTimestampModifier('-', '1', 'w', null);
+        expect(modifier.toMarkup(), '-1w');
+        expect(modifier.toPlainText(), '-1w');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 8, 12, 34));
+      });
+      test('-m', () {
+        final modifier = OrgTimestampModifier('-', '1', 'm', null);
+        expect(modifier.toMarkup(), '-1m');
+        expect(modifier.toPlainText(), '-1m');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 2, 1, 12, 34));
+      });
+      test('-y', () {
+        final modifier = OrgTimestampModifier('-', '1', 'y', null);
+        expect(modifier.toMarkup(), '-1y');
+        expect(modifier.toPlainText(), '-1y');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1971, 1, 1, 12, 34));
+      });
+      test('--h', () {
+        final modifier = OrgTimestampModifier('--', '1', 'h', null);
+        expect(modifier.toMarkup(), '--1h');
+        expect(modifier.toPlainText(), '--1h');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 1, 13, 34));
+      });
+      test('--d', () {
+        final modifier = OrgTimestampModifier('--', '1', 'd', null);
+        expect(modifier.toMarkup(), '--1d');
+        expect(modifier.toPlainText(), '--1d');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 2, 12, 34));
+      });
+      test('--w', () {
+        final modifier = OrgTimestampModifier('--', '1', 'w', null);
+        expect(modifier.toMarkup(), '--1w');
+        expect(modifier.toPlainText(), '--1w');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 1, 8, 12, 34));
+      });
+      test('--m', () {
+        final modifier = OrgTimestampModifier('--', '1', 'm', null);
+        expect(modifier.toMarkup(), '--1m');
+        expect(modifier.toPlainText(), '--1m');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1970, 2, 1, 12, 34));
+      });
+      test('--y', () {
+        final modifier = OrgTimestampModifier('--', '1', 'y', null);
+        expect(modifier.toMarkup(), '--1y');
+        expect(modifier.toPlainText(), '--1y');
+        final now = DateTime(2026, 9, 25, 9, 0);
+        expect(modifier.apply(dt, now), DateTime(1971, 1, 1, 12, 34));
+      });
+    });
+  });
 }

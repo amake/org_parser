@@ -46,7 +46,9 @@ class OrgTimestampModifier extends OrgLeafNode {
         }
       case '-':
       case '--':
-        newDateTime = newDateTime.addModifier(-value, unit);
+        // These look like they should be subtracted, but because they mean
+        // "delay" they actually add to the date.
+        newDateTime = newDateTime.addModifier(value, unit);
       default:
         throw UnimplementedError('Unknown repeater prefix: $prefix');
     }
