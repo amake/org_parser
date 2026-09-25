@@ -1,3 +1,8 @@
+## [12.0.0]
+- Breaking changes to `OrgTimestampModifier.apply`:
+  - `now` is a keyword argument
+  - Delay-type modifiers' behavior depends on the optional `keyword` argument
+
 ## [11.7.1]
 - Fix `OrgTimestampModifier.apply` logic for delay-type modifiers
 
