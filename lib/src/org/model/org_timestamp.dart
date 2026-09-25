@@ -29,14 +29,18 @@ class OrgTimestampModifier extends OrgLeafNode {
     var newDateTime = dateTime;
     switch (prefix) {
       case '+':
+        // Add the specified offset to the original datetime
+        // https://orgmode.org/manual/Repeated-tasks.html
         newDateTime = newDateTime.addModifier(value, unit);
       case '++':
-        // If already in the future, bump once. Otherwise bump until in the
-        // future.
+        // Add the specified offset enough times to get past *now*
+        // https://orgmode.org/manual/Repeated-tasks.html
         do {
           newDateTime = newDateTime.addModifier(value, unit);
         } while (newDateTime.isBefore(now));
       case '.+':
+        // Add the specified offset to the time the task was completed
+        // https://orgmode.org/manual/Repeated-tasks.html
         newDateTime = now.addModifier(value, unit);
         if (unit != 'h') {
           // Preserve the time of day for non-hourly repeaters
