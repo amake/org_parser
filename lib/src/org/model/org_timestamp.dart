@@ -22,7 +22,7 @@ class OrgTimestampModifier extends OrgLeafNode {
   bool get isRepeater => prefix == '+' || prefix == '.+' || prefix == '++';
   bool get isDelay => prefix == '-' || prefix == '--';
 
-  DateTime apply(DateTime dateTime, [DateTime? now]) {
+  DateTime apply(DateTime dateTime, {DateTime? now}) {
     now ??= DateTime.now();
     final value = int.parse(this.value);
     var newDateTime = dateTime;
@@ -174,7 +174,7 @@ class OrgSimpleTimestamp extends OrgParentNode implements OrgTimestamp {
     if (!repeats) return this;
     final repeater = modifiers.firstWhere((m) => m.isRepeater);
     if (repeater.unit == 'h' && time == null) return this;
-    final newDateTime = repeater.apply(dateTime, now);
+    final newDateTime = repeater.apply(dateTime, now: now);
     return copyWith(
       date: newDateTime.toOrgDate(),
       time: time == null ? null : newDateTime.toOrgTime(),
@@ -420,7 +420,7 @@ class OrgTimeRangeTimestamp extends OrgParentNode implements OrgTimestamp {
   OrgTimeRangeTimestamp bumpRepetition([DateTime? now]) {
     if (!repeats) return this;
     final repeater = modifiers.firstWhere((m) => m.isRepeater);
-    final newStartTime = repeater.apply(startDateTime, now);
+    final newStartTime = repeater.apply(startDateTime, now: now);
     final duration = endDateTime.difference(startDateTime);
     final newEndTime = newStartTime.add(duration);
     return copyWith(
