@@ -721,75 +721,208 @@ void main() {
       });
     });
     group('delays', () {
-      test('-h', () {
-        final modifier = OrgTimestampModifier('-', '1', 'h', null);
-        expect(modifier.toMarkup(), '-1h');
-        expect(modifier.toPlainText(), '-1h');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 1, 13, 34));
+      group('- default', () {
+        test('-h', () {
+          final modifier = OrgTimestampModifier('-', '1', 'h', null);
+          expect(modifier.toMarkup(), '-1h');
+          expect(modifier.toPlainText(), '-1h');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('-d', () {
+          final modifier = OrgTimestampModifier('-', '1', 'd', null);
+          expect(modifier.toMarkup(), '-1d');
+          expect(modifier.toPlainText(), '-1d');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('-w', () {
+          final modifier = OrgTimestampModifier('-', '1', 'w', null);
+          expect(modifier.toMarkup(), '-1w');
+          expect(modifier.toPlainText(), '-1w');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('-m', () {
+          final modifier = OrgTimestampModifier('-', '1', 'm', null);
+          expect(modifier.toMarkup(), '-1m');
+          expect(modifier.toPlainText(), '-1m');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('-y', () {
+          final modifier = OrgTimestampModifier('-', '1', 'y', null);
+          expect(modifier.toMarkup(), '-1y');
+          expect(modifier.toPlainText(), '-1y');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
       });
-      test('-d', () {
-        final modifier = OrgTimestampModifier('-', '1', 'd', null);
-        expect(modifier.toMarkup(), '-1d');
-        expect(modifier.toPlainText(), '-1d');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 2, 12, 34));
+      group('- SCHEDULED:', () {
+        final kw = OrgPlanningKeyword('SCHEDULED:');
+        test('-h', () {
+          final modifier = OrgTimestampModifier('-', '1', 'h', null);
+          expect(modifier.toMarkup(), '-1h');
+          expect(modifier.toPlainText(), '-1h');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 1, 13, 34));
+        });
+        test('-d', () {
+          final modifier = OrgTimestampModifier('-', '1', 'd', null);
+          expect(modifier.toMarkup(), '-1d');
+          expect(modifier.toPlainText(), '-1d');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 2, 12, 34));
+        });
+        test('-w', () {
+          final modifier = OrgTimestampModifier('-', '1', 'w', null);
+          expect(modifier.toMarkup(), '-1w');
+          expect(modifier.toPlainText(), '-1w');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 8, 12, 34));
+        });
+        test('-m', () {
+          final modifier = OrgTimestampModifier('-', '1', 'm', null);
+          expect(modifier.toMarkup(), '-1m');
+          expect(modifier.toPlainText(), '-1m');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 2, 1, 12, 34));
+        });
+        test('-y', () {
+          final modifier = OrgTimestampModifier('-', '1', 'y', null);
+          expect(modifier.toMarkup(), '-1y');
+          expect(modifier.toPlainText(), '-1y');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1971, 1, 1, 12, 34));
+        });
       });
-      test('-w', () {
-        final modifier = OrgTimestampModifier('-', '1', 'w', null);
-        expect(modifier.toMarkup(), '-1w');
-        expect(modifier.toPlainText(), '-1w');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 8, 12, 34));
+      group('- DEADLINE', () {
+        final kw = OrgPlanningKeyword('DEADLINE:');
+        test('-h', () {
+          final modifier = OrgTimestampModifier('-', '1', 'h', null);
+          expect(modifier.toMarkup(), '-1h');
+          expect(modifier.toPlainText(), '-1h');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 1, 11, 34));
+        });
+        test('-d', () {
+          final modifier = OrgTimestampModifier('-', '1', 'd', null);
+          expect(modifier.toMarkup(), '-1d');
+          expect(modifier.toPlainText(), '-1d');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1969, 12, 31, 12, 34));
+        });
+        test('-w', () {
+          final modifier = OrgTimestampModifier('-', '1', 'w', null);
+          expect(modifier.toMarkup(), '-1w');
+          expect(modifier.toPlainText(), '-1w');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1969, 12, 25, 12, 34));
+        });
+        test('-m', () {
+          final modifier = OrgTimestampModifier('-', '1', 'm', null);
+          expect(modifier.toMarkup(), '-1m');
+          expect(modifier.toPlainText(), '-1m');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1969, 12, 1, 12, 34));
+        });
+        test('-y', () {
+          final modifier = OrgTimestampModifier('-', '1', 'y', null);
+          expect(modifier.toMarkup(), '-1y');
+          expect(modifier.toPlainText(), '-1y');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1969, 1, 1, 12, 34));
+        });
       });
-      test('-m', () {
-        final modifier = OrgTimestampModifier('-', '1', 'm', null);
-        expect(modifier.toMarkup(), '-1m');
-        expect(modifier.toPlainText(), '-1m');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 2, 1, 12, 34));
+      group('-- default', () {
+        test('--h', () {
+          final modifier = OrgTimestampModifier('--', '1', 'h', null);
+          expect(modifier.toMarkup(), '--1h');
+          expect(modifier.toPlainText(), '--1h');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('--d', () {
+          final modifier = OrgTimestampModifier('--', '1', 'd', null);
+          expect(modifier.toMarkup(), '--1d');
+          expect(modifier.toPlainText(), '--1d');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('--w', () {
+          final modifier = OrgTimestampModifier('--', '1', 'w', null);
+          expect(modifier.toMarkup(), '--1w');
+          expect(modifier.toPlainText(), '--1w');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('--m', () {
+          final modifier = OrgTimestampModifier('--', '1', 'm', null);
+          expect(modifier.toMarkup(), '--1m');
+          expect(modifier.toPlainText(), '--1m');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
+        test('--y', () {
+          final modifier = OrgTimestampModifier('--', '1', 'y', null);
+          expect(modifier.toMarkup(), '--1y');
+          expect(modifier.toPlainText(), '--1y');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now), dt);
+        });
       });
-      test('-y', () {
-        final modifier = OrgTimestampModifier('-', '1', 'y', null);
-        expect(modifier.toMarkup(), '-1y');
-        expect(modifier.toPlainText(), '-1y');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1971, 1, 1, 12, 34));
-      });
-      test('--h', () {
-        final modifier = OrgTimestampModifier('--', '1', 'h', null);
-        expect(modifier.toMarkup(), '--1h');
-        expect(modifier.toPlainText(), '--1h');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 1, 13, 34));
-      });
-      test('--d', () {
-        final modifier = OrgTimestampModifier('--', '1', 'd', null);
-        expect(modifier.toMarkup(), '--1d');
-        expect(modifier.toPlainText(), '--1d');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 2, 12, 34));
-      });
-      test('--w', () {
-        final modifier = OrgTimestampModifier('--', '1', 'w', null);
-        expect(modifier.toMarkup(), '--1w');
-        expect(modifier.toPlainText(), '--1w');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 1, 8, 12, 34));
-      });
-      test('--m', () {
-        final modifier = OrgTimestampModifier('--', '1', 'm', null);
-        expect(modifier.toMarkup(), '--1m');
-        expect(modifier.toPlainText(), '--1m');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1970, 2, 1, 12, 34));
-      });
-      test('--y', () {
-        final modifier = OrgTimestampModifier('--', '1', 'y', null);
-        expect(modifier.toMarkup(), '--1y');
-        expect(modifier.toPlainText(), '--1y');
-        final now = DateTime(2026, 9, 25, 9, 0);
-        expect(modifier.apply(dt, now: now), DateTime(1971, 1, 1, 12, 34));
+      group('-- SCHEDULED', () {
+        final kw = OrgPlanningKeyword('SCHEDULED:');
+        test('--h', () {
+          final modifier = OrgTimestampModifier('--', '1', 'h', null);
+          expect(modifier.toMarkup(), '--1h');
+          expect(modifier.toPlainText(), '--1h');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 1, 13, 34));
+        });
+        test('--d', () {
+          final modifier = OrgTimestampModifier('--', '1', 'd', null);
+          expect(modifier.toMarkup(), '--1d');
+          expect(modifier.toPlainText(), '--1d');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 2, 12, 34));
+        });
+        test('--w', () {
+          final modifier = OrgTimestampModifier('--', '1', 'w', null);
+          expect(modifier.toMarkup(), '--1w');
+          expect(modifier.toPlainText(), '--1w');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 1, 8, 12, 34));
+        });
+        test('--m', () {
+          final modifier = OrgTimestampModifier('--', '1', 'm', null);
+          expect(modifier.toMarkup(), '--1m');
+          expect(modifier.toPlainText(), '--1m');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1970, 2, 1, 12, 34));
+        });
+        test('--y', () {
+          final modifier = OrgTimestampModifier('--', '1', 'y', null);
+          expect(modifier.toMarkup(), '--1y');
+          expect(modifier.toPlainText(), '--1y');
+          final now = DateTime(2026, 9, 25, 9, 0);
+          expect(modifier.apply(dt, now: now, keyword: kw),
+              DateTime(1971, 1, 1, 12, 34));
+        });
       });
     });
   });

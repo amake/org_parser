@@ -22,7 +22,8 @@ class OrgTimestampModifier extends OrgLeafNode {
   bool get isRepeater => prefix == '+' || prefix == '.+' || prefix == '++';
   bool get isDelay => prefix == '-' || prefix == '--';
 
-  DateTime apply(DateTime dateTime, {DateTime? now}) {
+  DateTime apply(DateTime dateTime,
+      {OrgPlanningKeyword? keyword, DateTime? now}) {
     now ??= DateTime.now();
     final value = int.parse(this.value);
     var newDateTime = dateTime;
@@ -45,22 +46,27 @@ class OrgTimestampModifier extends OrgLeafNode {
           );
         }
       case '-':
+        // Subtract the specified offset from the original datetime if this is a
+        // DEADLINE. Add if this is a SCHEDULED. If neither, it is a noop.
+        //
+        // https://orgmode.org/manual/Deadlines-and-Scheduling.html
+        final sign = keyword?.content == 'DEADLINE:'
+            ? -1
+            : keyword?.content == 'SCHEDULED:'
+                ? 1
+                : 0;
+        newDateTime = newDateTime.addModifier(sign * value, unit);
       case '--':
-        // The meaning of these depends on context:
+        // When a SCHEDULED and has a repeater, add the specified offset to the
+        // original datetime only for the first occurrence.
         //
-        // - `-`: Subtract the specified offset from the original datetime if
-        //   this is a DEADLINE. Add if this is a SCHEDULED.
-        //   https://orgmode.org/manual/Deadlines-and-Scheduling.html
+        // https://orgmode.org/manual/Deadlines-and-Scheduling.html
         //
-        // - `--`: When a SCHEDULED and has a repeater, add the specified offset
-        //   to the original datetime only for the first occurrence.
-        //   https://orgmode.org/manual/Deadlines-and-Scheduling.html
-        //
-        // We don't have that context here so we assume the common case of
-        // *delaying* the dateTime.
-        //
-        // TODO(aaron): Handle the DEADLINE case
-        newDateTime = newDateTime.addModifier(value, unit);
+        // We leave it up to the caller to determine whether the "has a
+        // repeater" condition applies.
+        if (keyword?.content == 'SCHEDULED:') {
+          newDateTime = newDateTime.addModifier(value, unit);
+        }
       default:
         throw UnimplementedError('Unknown repeater prefix: $prefix');
     }
