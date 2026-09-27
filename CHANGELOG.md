@@ -1,3 +1,6 @@
+## [12.0.1]
+- Minor edge case fixes
+
 ## [12.0.0]
 - Breaking changes to `OrgTimestampModifier.apply`:
   - `now` is a keyword argument
