@@ -25,6 +25,12 @@ void main() {
   hij''');
     expect(result.value, 'abc\n  def\n\n  hij', reason: 'blank lines are ok');
   });
+  test('indent parser allows tab indentation', () {
+    final parser = whitespace().star() & indentedRegion();
+    final result = parser.end().pick(1).parse('''\tparent
+\t  child''');
+    expect(result.value, 'parent\n\t  child');
+  });
   test('recursive list parser', () {
     final listStart =
         (lineStart() & whitespace().starString() & string('- ')).flatten();

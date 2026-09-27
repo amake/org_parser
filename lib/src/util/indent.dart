@@ -62,8 +62,12 @@ class IndentedRegionParser<R> extends DelegateParser<R, R> {
 
   bool _isIndentedTo(String buffer, int position, int indent) {
     for (var i = position; i < position + indent; i++) {
-      if (buffer.codeUnitAt(i) != 0x20) {
-        return false;
+      switch (buffer.codeUnitAt(i)) {
+        case 0x20: // space
+        case 0x09: // tab
+          break;
+        default:
+          return false;
       }
     }
     return true;
