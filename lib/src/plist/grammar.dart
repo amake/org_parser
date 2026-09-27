@@ -12,7 +12,7 @@ class PlistGrammar extends GrammarDefinition {
 
   Parser string() => char('"') & ref0(stringContent) & char('"');
 
-  Parser stringContent() => ref0(stringChar).plusLazy(char('"'));
+  Parser stringContent() => ref0(stringChar).starLazy(char('"'));
 
   Parser stringChar() => ref0(escapedChar).castList<String>().pick(1) | any();
 

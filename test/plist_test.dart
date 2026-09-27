@@ -13,6 +13,10 @@ void main() {
       final result = parser.parse('"foo bar" baz').value;
       expect(result, ['foo bar', 'baz']);
     });
+    test('empty string', () {
+      final result = parser.parse('"" baz').value;
+      expect(result, ['', 'baz']);
+    });
     test('escaped strings', () {
       final result = parser.parse(r'"foo \"bar\"" baz').value;
       expect(result, ['foo "bar"', 'baz']);
