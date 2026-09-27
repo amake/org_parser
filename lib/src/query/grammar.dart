@@ -7,10 +7,13 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
   @override
   Parser start() => ref0(alternates).end();
 
+  /// Parses right-associative disjunctions, which have lower precedence than
+  /// explicit and implicit conjunctions.
   Parser alternates() => ref0(alternate) | ref0(selection);
 
   Parser alternate() => ref0(selection) & char('|') & ref0(alternates);
 
+  /// Parses right-associative conjunctions before [`alternates`].
   Parser selection() =>
       ref0(explicitAnd) | ref0(implicitAnd) | ref0(simpleSelection);
 

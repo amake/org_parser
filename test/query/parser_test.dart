@@ -191,6 +191,18 @@ void main() {
         ),
       );
     });
+    test('conjunction binds more tightly than alternation', () {
+      expect(
+        orgQuery.parse('foo|bar&baz').value,
+        OrgQueryOrMatcher([
+          OrgQueryTagMatcher('foo'),
+          OrgQueryAndMatcher([
+            OrgQueryTagMatcher('bar'),
+            OrgQueryTagMatcher('baz'),
+          ]),
+        ]),
+      );
+    });
   });
   group('property', () {
     test('empty string value', () {
