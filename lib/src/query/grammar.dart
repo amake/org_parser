@@ -77,7 +77,7 @@ class OrgQueryGrammarDefinition extends GrammarDefinition {
       char('"') &
       char('"')
           .neg()
-          .plusLazy(char('"'))
+          .starLazy(char('"'))
           .flatten(message: 'String content expected') &
       char('"');
 }

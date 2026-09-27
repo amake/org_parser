@@ -193,6 +193,16 @@ void main() {
     });
   });
   group('property', () {
+    test('empty string value', () {
+      expect(
+        orgQuery.parse('TODO=""').value,
+        OrgQueryPropertyMatcher(
+          property: 'TODO',
+          operator: '=',
+          value: '',
+        ),
+      );
+    });
     test('single included tag', () {
       expect(
         orgQuery.parse('TODO="TODO"').value,
